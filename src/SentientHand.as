@@ -8,7 +8,7 @@ package
 	{
 		public function SentientHand()
 		{
-			super(400,300,PlayState,2,60,30,true);
+			super(640,480,PlayState,1,60,30,true);
 			forceDebugger = true;
 		}
 	}
