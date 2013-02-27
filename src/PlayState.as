@@ -21,6 +21,7 @@ package {
 		public var handGrab:Boolean;
 		public var handMetalFlag:Boolean;
 		public var handWoodFlag:Boolean;
+		public var onGround:Boolean;
 		
 		[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
@@ -29,6 +30,22 @@ package {
 			FlxG.bgColor = 0xffaaaaaa;
 			
 			var data:Array = new Array(
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -43,7 +60,7 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			level = new FlxTilemap();
 			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			add(level);
@@ -70,6 +87,7 @@ package {
 			hand.drag.x = hand.maxVelocity.x*4;
 			hand.drag.y = hand.maxVelocity.y*4;
 			setGravity(hand, FlxObject.DOWN, true);
+			onGround = true;
 			add(hand);
 			
 			arrow = new FlxSprite(body.x, body.y);
@@ -128,41 +146,12 @@ package {
 					}
 				} else {
 					if (FlxG.keys.LEFT) {
-						if (hand.facing == FlxObject.DOWN) {
-							arrow.angle -= ROTATE_RATE;
-						} else if (hand.facing == FlxObject.UP) {
-							arrow.angle += ROTATE_RATE;
-						} else if (handIsFacing(FlxObject.LEFT)) {
-							bodyMode = false;
-							arrow.visible = false;
-						}
+						arrow.angle -= ROTATE_RATE;
 					} if (FlxG.keys.RIGHT) {
-						if (hand.facing == FlxObject.DOWN) {
-							arrow.angle += ROTATE_RATE;
-						} else if (hand.facing == FlxObject.UP) {
-							arrow.angle -= ROTATE_RATE;
-						} else if (handIsFacing(FlxObject.RIGHT)) {
-							bodyMode = false;
-							arrow.visible = false;
-						}
-					} if (FlxG.keys.UP) {
-						if (hand.facing == FlxObject.LEFT) {
-							arrow.angle -= ROTATE_RATE;
-						} else if (hand.facing == FlxObject.RIGHT) {
-							arrow.angle += ROTATE_RATE;
-						} else if (handIsFacing(FlxObject.UP)) {
-							bodyMode = false;
-							arrow.visible = false;
-						}
-					} if (FlxG.keys.DOWN) {
-						if (hand.facing == FlxObject.LEFT) {
-							arrow.angle += ROTATE_RATE;
-						} else if (hand.facing == FlxObject.RIGHT) {
-							arrow.angle -= ROTATE_RATE;
-						} else if (handIsFacing(FlxObject.DOWN)) {
-							bodyMode = false;
-							arrow.visible = false;
-						}
+						arrow.angle += ROTATE_RATE;
+					} if (FlxG.keys.justPressed("DOWN")) {
+						bodyMode = false;
+						arrow.visible = false;
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed("SPACE")) {
@@ -173,7 +162,7 @@ package {
 					}
 				}
 			} else {
-				if (FlxG.keys.SPACE && hand.overlaps(body)) {
+				if (FlxG.keys.justPressed("DOWN") && hand.overlaps(body)) {
 					bodyMode = true;
 					hand.velocity.x = 0;
 					hand.velocity.y = 0;
@@ -183,43 +172,46 @@ package {
 					hand.y = body.y;
 					showArrow();
 				} else {
-					if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
-						hand.acceleration.x = 0;
-					} else if (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT) {
-						hand.acceleration.y = 0;
-					}
-					if (FlxG.keys.LEFT) {
-						if (handIsFacing(FlxObject.DOWN) || handIsFacing(FlxObject.UP)) {
-							hand.acceleration.x = -hand.maxVelocity.x*4;
-						} else if (handIsFacing(FlxObject.RIGHT) && hand.isTouching(FlxObject.RIGHT)) {
-							hand.velocity.x = -hand.maxVelocity.x/2;
-						} /*else if (handIsFacing(FlxObject.LEFT)) {
-							
-						}*/
-					} if (FlxG.keys.RIGHT) {
-						if (handIsFacing(FlxObject.DOWN) || handIsFacing(FlxObject.UP)) {
-							hand.acceleration.x = hand.maxVelocity.x*4;
-						} else if (handIsFacing(FlxObject.LEFT) && hand.isTouching(FlxObject.LEFT)) {
-							hand.velocity.x = hand.maxVelocity.x/2;
-						}/* else if (handIsFacing(FlxObject.RIGHT)) {
-							
-						}*/
-					} if (FlxG.keys.UP) {
-						if (handIsFacing(FlxObject.LEFT) || handIsFacing(FlxObject.RIGHT)) {
-							hand.acceleration.y = -hand.maxVelocity.y*4;
-						} else if (handIsFacing(FlxObject.DOWN) && hand.isTouching(FlxObject.DOWN)) {
-							hand.velocity.y = -hand.maxVelocity.y/2;
-						} /*else if (handIsFacing(FlxObject.UP)) {
-							
-						}*/
-					} if (FlxG.keys.DOWN) {
-						if (handIsFacing(FlxObject.LEFT) || handIsFacing(FlxObject.RIGHT)) {
-							hand.acceleration.y = hand.maxVelocity.y*4;
-						} else if (handIsFacing(FlxObject.UP) && hand.isTouching(FlxObject.UP)) {
-							hand.velocity.y = hand.maxVelocity.y/2;
-						}/* else if (handIsFacing(FlxObject.DOWN)) {
-							
-						}*/
+					if (onGround) {
+						if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
+							hand.acceleration.x = 0;
+						} else if (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT) {
+							hand.acceleration.y = 0;
+						}
+						//setGravity(hand, hand.facing, true);
+						if (FlxG.keys.LEFT) {
+							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT)) {
+								hand.acceleration.x = -hand.maxVelocity.x*4;
+							} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
+								hand.acceleration.y = -hand.maxVelocity.y*4;
+							} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
+								hand.acceleration.x = hand.maxVelocity.x*4;
+							} else if (handIsFacing(FlxObject.RIGHT)) {
+								hand.acceleration.y = hand.maxVelocity.y*4;
+							}
+						} if (FlxG.keys.RIGHT && hand.isTouching(hand.facing)) {
+							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT)) {
+								hand.acceleration.x = hand.maxVelocity.x*4;
+							} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
+								hand.acceleration.y = -hand.maxVelocity.y*4;
+							} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
+								hand.acceleration.x = -hand.maxVelocity.x*4;
+							} else if (handIsFacing(FlxObject.LEFT)) {
+								hand.acceleration.y = hand.maxVelocity.y*4;
+							}
+						} if (FlxG.keys.UP) {
+							if (hand.isTouching(FlxObject.DOWN)) {
+								hand.velocity.y = -hand.maxVelocity.y/2;
+							} else if (hand.isTouching(FlxObject.UP)) {
+								hand.velocity.y = hand.maxVelocity.y/2;
+							}
+							//process horizontal/vertical walls separately, to handle corners
+							if (hand.isTouching(FlxObject.LEFT)) {
+								hand.velocity.x = hand.maxVelocity.x/2;
+							} else if (hand.isTouching(FlxObject.RIGHT)) {
+								hand.velocity.x = -hand.maxVelocity.x/2;
+							}
+						}
 					}
 				}
 			}
@@ -230,8 +222,19 @@ package {
 			handWoodFlag = false;
 			FlxG.collide(level, hand);
 			FlxG.collide(level, body);
-			if (!bodyMode && handWoodFlag && !handMetalFlag) {
+			if (onGround && (!hand.isTouching(hand.facing) || (!bodyMode && handWoodFlag && !handMetalFlag))) {
+				onGround = false;
+				hand.drag.x = 0;
+				hand.drag.y = 0;
 				setGravity(hand, FlxObject.DOWN, true);
+				hand.acceleration.y = 800;
+				hand.maxVelocity.y = 400;
+			} else if (!onGround && hand.isTouching(hand.facing) && (bodyMode || !handWoodFlag || handMetalFlag)) {
+				onGround = true;
+				hand.drag.x = hand.maxVelocity.x*4;
+				hand.drag.y = hand.maxVelocity.y*4;
+				hand.maxVelocity.y = 200;
+				setGravity(hand, hand.facing, true);
 			}
 		}
 		
