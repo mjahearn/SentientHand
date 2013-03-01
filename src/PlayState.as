@@ -5,8 +5,18 @@ package {
 	
 	public class PlayState extends FlxState {
 		
-		public const ROTATE_RATE:Number = 2;
-		public const GRAPPLE_SPEED:Number = 300;
+		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
+		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
+		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
+		public const MAX_GRAV_VEL:Number = 400; //terminal velocity (in pixels per second) when the hand is falling
+		public const GRAV_RATE:Number = 1600; //acceleration (in pixels per second per second) due to gravity
+		public const MOVE_ACCEL:Number = 1600; //acceleration (in pixels per second per second) of the hand when moving along a wall
+		public const MOVE_DECEL:Number = MOVE_ACCEL; //deceleration (in pixels per second per second) of the hand when moving along a wall 
+		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
+		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
+		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
+		public const METAL_MIN:uint = 1; //minimum index number of metal in the tilemap
+		public const METAL_MAX:uint = 1; //maximum index number of metal in the tilemap
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -19,17 +29,18 @@ package {
 		public var bodyMode:Boolean;
 		public var handOut:Boolean;
 		public var handGrab:Boolean;
-		public var handMetalFlag:Boolean;
-		public var handWoodFlag:Boolean;
+		public var handMetalFlag:uint;
+		public var handWoodFlag:uint;
 		public var onGround:Boolean;
 		
 		[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		
 		override public function create():void {
+			dbg = 0;
 			FlxG.bgColor = 0xffaaaaaa;
 			
-			var data:Array = new Array(
+			/*var data:Array = new Array(
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -44,8 +55,8 @@ package {
 				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			/*var data:Array = new Array(
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
+			var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -60,7 +71,7 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 			level = new FlxTilemap();
 			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			add(level);
@@ -76,16 +87,16 @@ package {
 			bodyMode = false;
 			handOut = false;
 			handGrab = false;
-			handMetalFlag = false;
-			handWoodFlag = false;
+			handMetalFlag = uint.MAX_VALUE;
+			handWoodFlag = uint.MAX_VALUE;
 			rad = 0;
 			
 			hand = new FlxSprite(64, 416);
 			hand.makeGraphic(32,32,0xffaa1111);
-			hand.maxVelocity.x = 200;
-			hand.maxVelocity.y = 200;
-			hand.drag.x = hand.maxVelocity.x*4;
-			hand.drag.y = hand.maxVelocity.y*4;
+			hand.maxVelocity.x = MAX_MOVE_VEL;
+			hand.maxVelocity.y = MAX_MOVE_VEL;
+			hand.drag.x = MOVE_DECEL;
+			hand.drag.y = MOVE_DECEL;
 			setGravity(hand, FlxObject.DOWN, true);
 			onGround = true;
 			add(hand);
@@ -108,10 +119,7 @@ package {
 					rad = Math.atan2(diffY, diffX);
 					arrow.angle = 180*rad/Math.PI;
 					if (FlxG.keys.SPACE) {
-						if (hand.touching > 0 && hand.touching != body.touching) {
-							body.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
-							body.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
-						} else {
+						if (hand.touching <= 0) {
 							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
@@ -134,12 +142,12 @@ package {
 							body.velocity.y = 0;
 							body.acceleration.x = 0;
 							body.acceleration.y = 0;
-							if (body.touching == 0) {
-								body.x = hand.x;
-								body.y = hand.y;
-							} else {
+							if (hand.touching == 0) {
 								hand.x = body.x;
 								hand.y = body.y;
+							} else {
+								body.x = hand.x;
+								body.y = hand.y;
 							}
 							showArrow();
 						}
@@ -178,38 +186,37 @@ package {
 						} else if (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT) {
 							hand.acceleration.y = 0;
 						}
-						//setGravity(hand, hand.facing, true);
 						if (FlxG.keys.LEFT) {
 							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT)) {
-								hand.acceleration.x = -hand.maxVelocity.x*4;
+								hand.acceleration.x = -MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
-								hand.acceleration.y = -hand.maxVelocity.y*4;
+								hand.acceleration.y = -MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
-								hand.acceleration.x = hand.maxVelocity.x*4;
+								hand.acceleration.x = MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.RIGHT)) {
-								hand.acceleration.y = hand.maxVelocity.y*4;
+								hand.acceleration.y = MOVE_ACCEL;
 							}
 						} if (FlxG.keys.RIGHT && hand.isTouching(hand.facing)) {
 							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT)) {
-								hand.acceleration.x = hand.maxVelocity.x*4;
+								hand.acceleration.x = MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
-								hand.acceleration.y = -hand.maxVelocity.y*4;
+								hand.acceleration.y = -MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
-								hand.acceleration.x = -hand.maxVelocity.x*4;
+								hand.acceleration.x = -MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.LEFT)) {
-								hand.acceleration.y = hand.maxVelocity.y*4;
+								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.UP) {
+						} if (FlxG.keys.justPressed("UP")) {
 							if (hand.isTouching(FlxObject.DOWN)) {
-								hand.velocity.y = -hand.maxVelocity.y/2;
+								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
-								hand.velocity.y = hand.maxVelocity.y/2;
+								hand.velocity.y = CEIL_JUMP_VEL;
 							}
 							//process horizontal/vertical walls separately, to handle corners
 							if (hand.isTouching(FlxObject.LEFT)) {
-								hand.velocity.x = hand.maxVelocity.x/2;
+								hand.velocity.x = WALL_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.RIGHT)) {
-								hand.velocity.x = -hand.maxVelocity.x/2;
+								hand.velocity.x = -WALL_JUMP_VEL;
 							}
 						}
 					}
@@ -218,29 +225,47 @@ package {
 			
 			super.update();
 			
-			handMetalFlag = false;
-			handWoodFlag = false;
+			handMetalFlag = uint.MAX_VALUE;
+			handWoodFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand);
 			FlxG.collide(level, body);
-			if (onGround && (!hand.isTouching(hand.facing) || (!bodyMode && handWoodFlag && !handMetalFlag))) {
-				onGround = false;
-				hand.drag.x = 0;
-				hand.drag.y = 0;
-				setGravity(hand, FlxObject.DOWN, true);
-				hand.acceleration.y = 800;
-				hand.maxVelocity.y = 400;
-			} else if (!onGround && hand.isTouching(hand.facing) && (bodyMode || !handWoodFlag || handMetalFlag)) {
-				onGround = true;
-				hand.drag.x = hand.maxVelocity.x*4;
-				hand.drag.y = hand.maxVelocity.y*4;
-				hand.maxVelocity.y = 200;
-				setGravity(hand, hand.facing, true);
+			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
+				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
+				of the hand against the surface, we must do this check for the other corner to compensate*/
+				var indX:uint = handWoodFlag % level.widthInTiles;
+				var indY:uint = handWoodFlag / level.widthInTiles;
+				if (hand.isTouching(FlxObject.UP) && indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
+					handMetalFlag = indY*level.widthInTiles + indX+1;
+				} else if ((hand.isTouching(FlxObject.LEFT) || hand.isTouching(FlxObject.RIGHT)) && indY < level.heightInTiles - 1 && isMetal(level.getTile(indX,indY+1))) {
+					handMetalFlag = (indY+1)*level.widthInTiles + indX;
+				}
 			}
+			if (!bodyMode) {
+				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE))) {
+					onGround = false;
+					setGravity(hand, FlxObject.DOWN, true);
+					hand.drag.x = 0;
+					hand.drag.y = 0;
+					hand.maxVelocity.x = MAX_GRAV_VEL;
+					hand.maxVelocity.y = MAX_GRAV_VEL;
+				} else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE)) {
+					onGround = true;
+					setGravity(hand, hand.facing, true);
+					hand.drag.x = MOVE_DECEL;
+					hand.drag.y = MOVE_DECEL;
+					hand.maxVelocity.x = MAX_MOVE_VEL;
+					hand.maxVelocity.y = MAX_MOVE_VEL;
+				}
+			}
+			//FlxG.log("end of frame");
+			dbg = 0;
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
-				handMetalFlag = true;
+				handMetalFlag = tile.mapIndex;
+				dbg++;
+				//FlxG.log("metal"+dbg);
 			}
 			if ((spr.touching & spr.facing) >= spr.facing) {
 				if (spr.justTouched(FlxObject.DOWN)) {
@@ -267,7 +292,9 @@ package {
 		
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
-				handWoodFlag = true;
+				handWoodFlag = tile.mapIndex;
+				dbg++;
+				//FlxG.log("wood"+dbg);
 			}
 		}
 		
@@ -280,13 +307,13 @@ package {
 				spr.facing = spr.facing | dir;
 			}
 			if (dir == FlxObject.DOWN) {
-				spr.acceleration.y = 400;
+				spr.acceleration.y = GRAV_RATE;
 			} else if (dir == FlxObject.UP) {
-				spr.acceleration.y = -400;
+				spr.acceleration.y = -GRAV_RATE;
 			} else if (dir == FlxObject.LEFT) {
-				spr.acceleration.x = -400;
+				spr.acceleration.x = -GRAV_RATE;
 			} else if (dir == FlxObject.RIGHT) {
-				spr.acceleration.x = 400;
+				spr.acceleration.x = GRAV_RATE;
 			}
 		}
 		
@@ -307,6 +334,10 @@ package {
 			} else if (handIsFacing(FlxObject.RIGHT)) {
 				arrow.angle = 180;
 			}
+		}
+		
+		public function isMetal(tile:uint):Boolean {
+			return (tile >= METAL_MIN && tile <= METAL_MAX);
 		}
 	}
 }
