@@ -35,12 +35,13 @@ package {
 		
 		[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
+		[Embed("assets/hand.png")] public var handSheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
 			FlxG.bgColor = 0xffaaaaaa;
 			
-			/*var data:Array = new Array(
+			var data:Array = new Array(
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -55,8 +56,8 @@ package {
 				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
-			var data:Array = new Array(
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -71,7 +72,7 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			level = new FlxTilemap();
 			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			add(level);
@@ -92,7 +93,13 @@ package {
 			rad = 0;
 			
 			hand = new FlxSprite(64, 416);
-			hand.makeGraphic(32,32,0xffaa1111);
+			hand.loadGraphic(handSheet,true,false,32,32,true);
+			hand.addAnimation("crawl right",[0,1,2,3,4,5,6],22,true);
+			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
+			hand.addAnimation("crawl left",[20,19,18,17,16,15,14],22,true);
+			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
+			hand.play("idle right");
+			//hand.makeGraphic(32,32,0xffaa1111);
 			hand.maxVelocity.x = MAX_MOVE_VEL;
 			hand.maxVelocity.y = MAX_MOVE_VEL;
 			hand.drag.x = MOVE_DECEL;
@@ -108,6 +115,49 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// rudimentary animation
+			if (!bodyMode){
+				// first set facing of hand sprite
+				if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
+				else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
+				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
+				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
+				// then do left/rigt animations (sprite's not ambidexterous...)
+				
+				if (FlxG.keys.RIGHT) {
+					hand.play("crawl right");
+				} else if (FlxG.keys.justReleased("RIGHT")) {
+					hand.play("idle right");
+				} else if (FlxG.keys.LEFT) {
+					hand.play("crawl left");
+				} else if (FlxG.keys.justReleased("LEFT")){
+					hand.play("idle left");
+				}
+				
+				/*
+				// right side
+				if (hand.facing == FlxObject.DOWN && hand.velocity.x > 0 ||
+					hand.facing == FlxObject.LEFT && hand.velocity.y > 0 ||
+					hand.facing == FlxObject.UP && hand.velocity.x < 0 ||
+					hand.facing == FlxObject.RIGHT && hand.velocity.y < 0) {
+					hand.play("crawl right");
+				}
+				// left side
+				else if (hand.facing == FlxObject.DOWN && hand.velocity.x < 0 ||
+					hand.facing == FlxObject.LEFT && hand.velocity.y < 0 ||
+					hand.facing == FlxObject.UP && hand.velocity.x > 0 ||
+					hand.facing == FlxObject.RIGHT && hand.velocity.y > 0) {
+					hand.play("crawl left");
+				} else {hand.play("idle right");}
+				*/
+			} else {
+				hand.angle = arrow.angle - 90;
+				
+				//hand.play("body idle");
+			}
+			
+			
 			if (bodyMode) {
 				body.velocity.x = 0;
 				body.velocity.y = 0;
