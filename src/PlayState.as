@@ -29,7 +29,8 @@ package {
 		public var arrow:FlxSprite;
 		
 		public var arms:FlxGroup = new FlxGroup();
-		public var numArms:int = 33;
+		public var numArms:int = 22;
+		public var handDir:uint;
 		
 		public var bodyMode:Boolean;
 		public var handOut:Boolean;
@@ -114,6 +115,7 @@ package {
 			hand.addAnimation("crawl left",[20,19,18,17,16,15,14],22,true);
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
 			hand.addAnimation("idle body", [21],10,true);
+			handDir = FlxObject.RIGHT;
 			hand.play("idle right");
 			//hand.makeGraphic(32,32,0xffaa1111);
 			hand.maxVelocity.x = MAX_MOVE_VEL;
@@ -133,7 +135,7 @@ package {
 		override public function update():void {
 			
 			// rudimentary animation
-			if (!bodyMode){
+			if (!bodyMode && onGround){
 				for (var i:String in arms.members) {
 					arms.members[i].visible = false;
 				}
@@ -143,17 +145,27 @@ package {
 				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
 				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
 				// then do left/rigt animations (sprite's not ambidexterous...)
-				
 				if (FlxG.keys.RIGHT) {
+					handDir = FlxObject.RIGHT;
 					hand.play("crawl right");
-				} else if (FlxG.keys.justReleased("RIGHT")) {
-					hand.play("idle right");
 				} else if (FlxG.keys.LEFT) {
+					handDir = FlxObject.LEFT;
 					hand.play("crawl left");
-				} else if (FlxG.keys.justReleased("LEFT")){
-					hand.play("idle left");
+				} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+					if (handDir == FlxObject.LEFT) {hand.play("idle left");}
+					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");}
+				}	
+			} else if (!bodyMode && !onGround && hand.angle > 0 && hand.angle < 360) {
+				if (handDir == FlxObject.LEFT) {
+					hand.play("idle left"); //placeholder
+					//hand.play("left fall");
+					hand.angle += 10;
+				} else if (handDir == FlxObject.RIGHT) {
+					hand.play("idle right"); //placeholder
+					//hand.play("right fall");
+					hand.angle -= 10;
 				}
-			} else {
+			} else if (bodyMode){
 				hand.angle = arrow.angle - 90;
 				hand.play("idle body");
 				
@@ -165,9 +177,10 @@ package {
 				for (var jj:String in arms.members) {
 					arm = arms.members[jj];
 					arm.visible = true;
-					arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2-arm.frameWidth/2;
-					arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2-arm.frameHeight/2;
+					arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2.0-arm.frameWidth/2.0;
+					arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2.0-arm.frameHeight/2.0;
 					stupid = stupid + 1;
+					arm.angle = hand.angle;
 				}
 			}
 			
