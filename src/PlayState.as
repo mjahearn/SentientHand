@@ -39,11 +39,17 @@ package {
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
 		
+		public var blockGroup:FlxGroup;
+		public var handBlockFlag:uint;
+		public var handBlockRel:FlxPoint;
+		
 		[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
+		
+		//[Embed("assets/maps/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -83,13 +89,13 @@ package {
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			level = new FlxTilemap();
 			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
+			//level.loadMap(testMap, tileset, 32, 32);
 			add(level);
 			
 			level.setTileProperties(1, FlxObject.ANY, metalCallback);
 			level.setTileProperties(2, FlxObject.ANY, woodCallback);
 			
 			body = new FlxSprite(128, 416,bodySheet);
-			//body.makeGraphic(32,32,0xff1111aa);
 			setGravity(body, FlxObject.DOWN, true);
 			add(body);
 			
@@ -98,6 +104,8 @@ package {
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			handBlockFlag = uint.MAX_VALUE;
+			handBlockRel = new FlxPoint();
 			rad = 0;
 			
 			var arm:FlxSprite;
@@ -117,7 +125,6 @@ package {
 			hand.addAnimation("idle body", [21],10,true);
 			handDir = FlxObject.RIGHT;
 			hand.play("idle right");
-			//hand.makeGraphic(32,32,0xffaa1111);
 			hand.maxVelocity.x = MAX_MOVE_VEL;
 			hand.maxVelocity.y = MAX_MOVE_VEL;
 			hand.drag.x = MOVE_DECEL;
@@ -125,6 +132,12 @@ package {
 			setGravity(hand, FlxObject.DOWN, true);
 			onGround = true;
 			add(hand);
+			
+			blockGroup = new FlxGroup();
+			var testBlock:FlxSprite = new FlxSprite(450, 416).makeGraphic(32, 32, 0xff007fff);
+			testBlock.immovable = true;
+			blockGroup.add(testBlock);
+			add(blockGroup);
 			
 			arrow = new FlxSprite(body.x, body.y);
 			arrow.loadGraphic(arrowSheet);
@@ -304,8 +317,13 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			var prevHandBlockFlag:uint = handBlockFlag;
+			handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand);
+			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(level, body);
+			FlxG.collide(blockGroup, body, blockCallback);
+			FlxG.collide(level, blockGroup);
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate*/
@@ -317,7 +335,20 @@ package {
 					handMetalFlag = (indY+1)*level.widthInTiles + indX;
 				}
 			}
-			if (!bodyMode) {
+			if (bodyMode) {
+				/*if (onGround && handBlockFlag < uint.MAX_VALUE) {
+					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
+					if (handBlockFlag != prevHandBlockFlag) {
+						curBlock.immovable = false;
+						curBlock.drag.x = Number.MAX_VALUE;
+						curBlock.drag.y = Number.MAX_VALUE;
+						handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
+					}
+					FlxG.log(handBlockRel.x);
+					curBlock.x = hand.x + handBlockRel.x;
+					curBlock.y = hand.y + handBlockRel.y;
+				}*/
+			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE))) {
 					onGround = false;
 					setGravity(hand, FlxObject.DOWN, true);
@@ -334,16 +365,40 @@ package {
 					hand.maxVelocity.y = MAX_MOVE_VEL;
 				}
 			}
-			//FlxG.log("end of frame");
-			dbg = 0;
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
 				handMetalFlag = tile.mapIndex;
-				dbg++;
-				//FlxG.log("metal"+dbg);
 			}
+			fixGravity(spr);
+		}
+		
+		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
+			if (spr == hand) {
+				handWoodFlag = tile.mapIndex;
+			}
+		}
+		
+		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
+			if (spr2 == hand) {
+				//handBlockFlag = blockGroup.members.indexOf(spr1);
+				handMetalFlag = 1;
+				fixGravity(spr2);
+			} else if (spr2 == body) {
+				fixGravity(spr2);
+			} else { //spr2 is probably a block
+				if (spr1 == hand) {
+					//handBlockFlag = blockGroup.members.indexOf(spr2);
+					handMetalFlag = 1;
+					fixGravity(spr1);
+				} else if (spr1 == body) {
+					fixGravity(spr1);
+				}
+			}
+		}
+		
+		public function fixGravity(spr:FlxSprite):void {
 			if ((spr.touching & spr.facing) >= spr.facing) {
 				if (spr.justTouched(FlxObject.DOWN)) {
 					setGravity(spr, FlxObject.DOWN, false);
@@ -364,14 +419,6 @@ package {
 				} else if (spr.isTouching(FlxObject.RIGHT)) {
 					setGravity(spr, FlxObject.RIGHT, true);
 				}
-			}
-		}
-		
-		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
-			if (spr == hand) {
-				handWoodFlag = tile.mapIndex;
-				dbg++;
-				//FlxG.log("wood"+dbg);
 			}
 		}
 		
