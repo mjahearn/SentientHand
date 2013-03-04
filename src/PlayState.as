@@ -1,5 +1,7 @@
 package {
 	
+	import flashx.textLayout.formats.Float;
+	
 	import org.flixel.*;
 	import org.flixel.system.FlxTile;
 	
@@ -26,6 +28,10 @@ package {
 		public var body:FlxSprite;
 		public var arrow:FlxSprite;
 		
+		public var arms:FlxGroup = new FlxGroup();
+		public var numArms:int = 22;
+		public var handDir:uint;
+		
 		public var bodyMode:Boolean;
 		public var handOut:Boolean;
 		public var handGrab:Boolean;
@@ -35,6 +41,9 @@ package {
 		
 		[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
+		[Embed("assets/hand.png")] public var handSheet:Class;
+		[Embed("assets/arm.png")] public var armSheet:Class;
+		[Embed("assets/body.png")] public var bodySheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -79,8 +88,8 @@ package {
 			level.setTileProperties(1, FlxObject.ANY, metalCallback);
 			level.setTileProperties(2, FlxObject.ANY, woodCallback);
 			
-			body = new FlxSprite(128, 416);
-			body.makeGraphic(32,32,0xff1111aa);
+			body = new FlxSprite(128, 416,bodySheet);
+			//body.makeGraphic(32,32,0xff1111aa);
 			setGravity(body, FlxObject.DOWN, true);
 			add(body);
 			
@@ -91,8 +100,24 @@ package {
 			handWoodFlag = uint.MAX_VALUE;
 			rad = 0;
 			
+			var arm:FlxSprite;
+			for (var i:int = 0; i < numArms; i++) {
+				arm = new FlxSprite(body.x,body.y,armSheet);
+				arm.visible = false;
+				add(arm);
+				arms.add(arm);
+			}
+			
 			hand = new FlxSprite(64, 416);
-			hand.makeGraphic(32,32,0xffaa1111);
+			hand.loadGraphic(handSheet,true,false,32,32,true);
+			hand.addAnimation("crawl right",[0,1,2,3,4,5,6],22,true);
+			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
+			hand.addAnimation("crawl left",[20,19,18,17,16,15,14],22,true);
+			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
+			hand.addAnimation("idle body", [21],10,true);
+			handDir = FlxObject.RIGHT;
+			hand.play("idle right");
+			//hand.makeGraphic(32,32,0xffaa1111);
 			hand.maxVelocity.x = MAX_MOVE_VEL;
 			hand.maxVelocity.y = MAX_MOVE_VEL;
 			hand.drag.x = MOVE_DECEL;
@@ -108,6 +133,58 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// rudimentary animation
+			if (!bodyMode && onGround){
+				for (var i:String in arms.members) {
+					arms.members[i].visible = false;
+				}
+				// first set facing of hand sprite
+				if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
+				else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
+				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
+				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
+				// then do left/rigt animations (sprite's not ambidexterous...)
+				if (FlxG.keys.RIGHT) {
+					handDir = FlxObject.RIGHT;
+					hand.play("crawl right");
+				} else if (FlxG.keys.LEFT) {
+					handDir = FlxObject.LEFT;
+					hand.play("crawl left");
+				} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+					if (handDir == FlxObject.LEFT) {hand.play("idle left");}
+					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");}
+				}	
+			} else if (!bodyMode && !onGround && hand.angle > 0 && hand.angle < 360) {
+				if (handDir == FlxObject.LEFT) {
+					hand.play("idle left"); //placeholder
+					//hand.play("left fall");
+					hand.angle += 10;
+				} else if (handDir == FlxObject.RIGHT) {
+					hand.play("idle right"); //placeholder
+					//hand.play("right fall");
+					hand.angle -= 10;
+				}
+			} else if (bodyMode){
+				hand.angle = arrow.angle - 90;
+				hand.play("idle body");
+				
+				var deltaX:Number = -body.x + hand.x;
+				var deltaY:Number = -body.y + hand.y;
+				
+				var arm:FlxSprite;
+				var stupid:int = 0;
+				for (var jj:String in arms.members) {
+					arm = arms.members[jj];
+					arm.visible = true;
+					arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2.0-arm.frameWidth/2.0;
+					arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2.0-arm.frameHeight/2.0;
+					stupid = stupid + 1;
+					arm.angle = hand.angle;
+				}
+			}
+			
+			
 			if (bodyMode) {
 				body.velocity.x = 0;
 				body.velocity.y = 0;
