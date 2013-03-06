@@ -32,6 +32,7 @@ package {
 		public var hand:FlxSprite;
 		public var body:FlxSprite;
 		public var arrow:FlxSprite;
+		public var bodyGear:FlxSprite;
 		
 		public var arms:FlxGroup = new FlxGroup();
 		public var numArms:int = 22;
@@ -64,6 +65,8 @@ package {
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
+		
+		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -214,6 +217,8 @@ package {
 			body = new FlxSprite(128, 416,bodySheet);
 			setGravity(body, FlxObject.DOWN, true);
 			add(body);
+			bodyGear = new FlxSprite(body.x,body.y,bodyGearSheet);
+			add(bodyGear);
 			
 			bodyMode = false;
 			handOut = false;
@@ -262,6 +267,11 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// janky way of moving body gear (this only works for one body, should really classify it)
+			bodyGear.x = body.x;
+			bodyGear.y = body.y;
+			bodyGear.angle = -arrow.angle;
 			
 			// spin midground gears
 			var gear:FlxSprite;
