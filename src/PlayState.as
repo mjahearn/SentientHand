@@ -21,7 +21,7 @@ package {
 		public const METAL_MAX:uint = 159; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
-		//public const SPAWN:unit = ???; // index of player spawn point in tilemap
+		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		
 		public var dbg:int;
@@ -61,7 +61,8 @@ package {
 		
 		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
 		
-		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
+		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
+		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
@@ -72,24 +73,7 @@ package {
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
-			/*
-			var data:Array = new Array(
-				2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			var data:Array = new Array(
+			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -207,10 +191,10 @@ package {
 			level.loadMap(new testMap,tileset,8,8);
 			add(level);
 			
-			for (var i:int = WOOD_MIN; i < WOOD_MAX; i++) {
+			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
-			for (i = METAL_MIN; i < METAL_MAX; i++) {
+			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
@@ -348,7 +332,7 @@ package {
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
 					} else {
-						if (hand.touching > 0 && hand.touching != body.touching) {
+						if (hand.touching > 0 && hand.facing == hand.touching) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						} else {
@@ -384,6 +368,7 @@ package {
 					} if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						arrow.visible = false;
+						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed("SPACE")) {
