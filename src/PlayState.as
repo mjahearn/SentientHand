@@ -17,14 +17,10 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		/*public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
+		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 159; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap*/
-		public const METAL_MIN:uint = 1; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 1; //maximum index number of metal in the tilemap
-		public const WOOD_MIN:uint = 2; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 2;
+		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		
@@ -32,6 +28,7 @@ package {
 		public var rad:Number;
 		
 		public var level:FlxTilemap;
+		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
 		public var body:FlxSprite;
 		public var arrow:FlxSprite;
@@ -51,35 +48,26 @@ package {
 		public var handBlockFlag:uint;
 		public var handBlockRel:FlxPoint;
 		
+		public var gears:FlxGroup = new FlxGroup();
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
-		//[Embed("assets/testTile.png")] public var tileset:Class;
+		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
+		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
 		
-		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
+		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
+		
+		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
+		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
+		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
 		override public function create():void {
 			dbg = 0;
-			FlxG.bgColor = 0xffaaaaaa;
+			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
-			var data:Array = new Array(
-				2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -96,9 +84,21 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
+			
+			// background
+			levelBack = new FlxTilemap();
+			levelBack.loadMap(new backgroundMap,backgroundset,8,8);
+			add(levelBack);
+			
+			// midground objects
+			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			gears.add(gear000);
+			for (var jj:String in gears.members) {add(gears.members[jj]);}
+			
+			// foreground
 			level = new FlxTilemap();
-			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
+			level.loadMap(new testMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -108,10 +108,8 @@ package {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
-			//body = new FlxSprite(128, 416,bodySheet);
-			//setGravity(body, FlxObject.DOWN, true);
-			body = new FlxSprite(32, 320, bodySheet);
-			setGravity(body, FlxObject.RIGHT, true);
+			body = new FlxSprite(128, 416,bodySheet);
+			setGravity(body, FlxObject.DOWN, true);
 			add(body);
 			
 			bodyMode = false;
@@ -161,6 +159,14 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// spin midground gears
+			var gear:FlxSprite;
+			for (var jjj:String in gears.members) {
+				gear = gears.members[jjj];
+				gear.angle += 0.5;
+				if (gear.angle > 360) {gear.angle = 0;}
+			}
 			
 			// rudimentary animation
 			if (!bodyMode && onGround){
@@ -265,6 +271,7 @@ package {
 					} if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						arrow.visible = false;
+						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed("SPACE")) {
