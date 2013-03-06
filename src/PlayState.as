@@ -48,6 +48,8 @@ package {
 		public var handBlockFlag:uint;
 		public var handBlockRel:FlxPoint;
 		
+		public var gears:FlxGroup = new FlxGroup();
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		
@@ -55,6 +57,8 @@ package {
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
+		
+		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
 		
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
@@ -97,10 +101,17 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			
+			// background
 			levelBack = new FlxTilemap();
 			levelBack.loadMap(new backgroundMap,backgroundset,8,8);
 			add(levelBack);
 			
+			// midground objects
+			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			gears.add(gear000);
+			for (var jj:String in gears.members) {add(gears.members[jj]);}
+			
+			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			level.loadMap(new testMap,tileset,8,8);
@@ -164,6 +175,14 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// spin midground gears
+			var gear:FlxSprite;
+			for (var jjj:String in gears.members) {
+				gear = gears.members[jjj];
+				gear.angle += 0.5;
+				if (gear.angle > 360) {gear.angle = 0;}
+			}
 			
 			// rudimentary animation
 			if (!bodyMode && onGround){
