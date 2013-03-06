@@ -28,6 +28,7 @@ package {
 		public var rad:Number;
 		
 		public var level:FlxTilemap;
+		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
 		public var body:FlxSprite;
 		public var arrow:FlxSprite;
@@ -48,16 +49,19 @@ package {
 		public var handBlockRel:FlxPoint;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
+		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
+		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
+		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
 		override public function create():void {
 			dbg = 0;
-			FlxG.bgColor = 0xffaaaaaa;
+			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			/*
 			var data:Array = new Array(
@@ -92,6 +96,11 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
+			
+			levelBack = new FlxTilemap();
+			levelBack.loadMap(new backgroundMap,backgroundset,8,8);
+			add(levelBack);
+			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			level.loadMap(new testMap,tileset,8,8);
