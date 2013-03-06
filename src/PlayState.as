@@ -17,11 +17,15 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
+		/*public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 159; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
-		//public const SPAWN:unit = ???; // index of player spawn point in tilemap
+		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap*/
+		public const METAL_MIN:uint = 1; //minimum index number of metal in the tilemap
+		public const METAL_MAX:uint = 1; //maximum index number of metal in the tilemap
+		public const WOOD_MIN:uint = 2; //minimum index number of wood in the tilemap
+		public const WOOD_MAX:uint = 2;
+		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		
 		public var dbg:int;
@@ -48,6 +52,7 @@ package {
 		public var handBlockRel:FlxPoint;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
+		//[Embed("assets/testTile.png")] public var tileset:Class;
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
@@ -59,7 +64,6 @@ package {
 			dbg = 0;
 			FlxG.bgColor = 0xffaaaaaa;
 			
-			/*
 			var data:Array = new Array(
 				2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -68,15 +72,15 @@ package {
 				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
+				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2,
 				1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-			var data:Array = new Array(
+			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -93,19 +97,21 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			level = new FlxTilemap();
-			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
+			//level.loadMap(new testMap,tileset,8,8);
 			add(level);
 			
-			for (var i:int = WOOD_MIN; i < WOOD_MAX; i++) {
+			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
-			for (i = METAL_MIN; i < METAL_MAX; i++) {
+			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
-			body = new FlxSprite(128, 416,bodySheet);
-			setGravity(body, FlxObject.DOWN, true);
+			//body = new FlxSprite(128, 416,bodySheet);
+			//setGravity(body, FlxObject.DOWN, true);
+			body = new FlxSprite(32, 320, bodySheet);
+			setGravity(body, FlxObject.RIGHT, true);
 			add(body);
 			
 			bodyMode = false;
@@ -223,7 +229,7 @@ package {
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
 					} else {
-						if (hand.touching > 0 && hand.touching != body.touching) {
+						if (hand.touching > 0 && hand.facing == hand.touching) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						} else {
