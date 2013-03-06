@@ -313,8 +313,31 @@ package {
 					stupid = stupid + 1;
 					arm.angle = hand.angle;
 				}
+				
+				if (handOut && hand.touching) {
+					// first set facing of hand sprite
+					if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
+					else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
+					else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
+					else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
+					
+					// for now, just changing direction immediately, but should really swivel into place as the hand moves
+					// maybe set a destination, then swivel to it?
+					if (hand.facing == FlxObject.DOWN) {body.angle = 0;}
+					else if (hand.facing == FlxObject.LEFT) {body.angle = 90;}
+					else if (hand.facing == FlxObject.UP) {body.angle = 180;}
+					else if (hand.facing == FlxObject.RIGHT) {body.angle = 270;}
+				}
+				
 			}
-			
+			/*
+			// reangling the body...
+			if (body.touching) {
+				if (body.facing == FlxObject.DOWN) {body.angle = 0;}
+				else if (body.facing == FlxObject.LEFT) {body.angle = 90;}
+				else if (body.facing == FlxObject.UP) {body.angle = 180;}
+				else if (body.facing == FlxObject.RIGHT) {body.angle = 270;}
+			}*/
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
