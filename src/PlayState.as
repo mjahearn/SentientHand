@@ -70,7 +70,7 @@ package {
 				1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 				1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+				1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 			/*var data:Array = new Array(
 				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
@@ -286,7 +286,7 @@ package {
 							} else if (handIsFacing(FlxObject.RIGHT)) {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.RIGHT && hand.isTouching(hand.facing)) {
+						} if (FlxG.keys.RIGHT) {
 							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT)) {
 								hand.acceleration.x = MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
@@ -349,14 +349,14 @@ package {
 					curBlock.y = hand.y + handBlockRel.y;
 				}*/
 			} else {
-				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE))) {
+				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
 					setGravity(hand, FlxObject.DOWN, true);
 					hand.drag.x = 0;
 					hand.drag.y = 0;
 					hand.maxVelocity.x = MAX_GRAV_VEL;
 					hand.maxVelocity.y = MAX_GRAV_VEL;
-				} else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE)) {
+				} else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE || hand.isTouching(FlxObject.DOWN))) {
 					onGround = true;
 					setGravity(hand, hand.facing, true);
 					hand.drag.x = MOVE_DECEL;
