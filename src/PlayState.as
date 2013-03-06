@@ -63,6 +63,8 @@ package {
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
+		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
+		
 		override public function create():void {
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -108,7 +110,92 @@ package {
 			
 			// midground objects
 			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			
+			/*
+			var gear001:FlxSprite = new FlxSprite(64,480-64,gearSheet);
+			var gear002:FlxSprite = new FlxSprite(96,480-64,gearSheet);
+			var gear003:FlxSprite = new FlxSprite(128,480-64,gearSheet);
+			var gear004:FlxSprite = new FlxSprite(0,480-128,gearSheet);
+			var gear005:FlxSprite = new FlxSprite(64,480-128,gearSheet);
+			var gear006:FlxSprite = new FlxSprite(96,480-128,gearSheet);
+			var gear007:FlxSprite = new FlxSprite(128,480-128,gearSheet);
+			var gear008:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear009:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear010:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear011:FlxSprite = new FlxSprite(64,480-64,gearSheet);
+			var gear012:FlxSprite = new FlxSprite(96,480-64,gearSheet);
+			var gear013:FlxSprite = new FlxSprite(128,480-64,gearSheet);
+			var gear014:FlxSprite = new FlxSprite(0,480-128,gearSheet);
+			var gear015:FlxSprite = new FlxSprite(64,480-128,gearSheet);
+			var gear016:FlxSprite = new FlxSprite(96,480-128,gearSheet);
+			var gear017:FlxSprite = new FlxSprite(128,480-128,gearSheet);
+			var gear018:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear019:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear020:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear021:FlxSprite = new FlxSprite(64,480-64,gearSheet);
+			var gear022:FlxSprite = new FlxSprite(96,480-64,gearSheet);
+			var gear023:FlxSprite = new FlxSprite(128,480-64,gearSheet);
+			var gear024:FlxSprite = new FlxSprite(0,480-128,gearSheet);
+			var gear025:FlxSprite = new FlxSprite(64,480-128,gearSheet);
+			var gear026:FlxSprite = new FlxSprite(96,480-128,gearSheet);
+			var gear027:FlxSprite = new FlxSprite(128,480-128,gearSheet);
+			var gear028:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear029:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear030:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear031:FlxSprite = new FlxSprite(64,480-64,gearSheet);
+			var gear032:FlxSprite = new FlxSprite(96,480-64,gearSheet);
+			var gear033:FlxSprite = new FlxSprite(128,480-64,gearSheet);
+			var gear034:FlxSprite = new FlxSprite(0,480-128,gearSheet);
+			var gear035:FlxSprite = new FlxSprite(64,480-128,gearSheet);
+			var gear036:FlxSprite = new FlxSprite(96,480-128,gearSheet);
+			var gear037:FlxSprite = new FlxSprite(128,480-128,gearSheet);
+			var gear038:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			var gear039:FlxSprite = new FlxSprite(0,480-64,gearSheet);
+			*/
+			
 			gears.add(gear000);
+			/*
+			gears.add(gear001);
+			gears.add(gear002);
+			gears.add(gear003);
+			gears.add(gear004);
+			gears.add(gear005);
+			gears.add(gear006);
+			gears.add(gear007);
+			gears.add(gear008);
+			gears.add(gear009);
+			gears.add(gear010);
+			gears.add(gear011);
+			gears.add(gear012);
+			gears.add(gear013);
+			gears.add(gear014);
+			gears.add(gear015);
+			gears.add(gear016);
+			gears.add(gear017);
+			gears.add(gear018);
+			gears.add(gear019);
+			gears.add(gear020);
+			gears.add(gear021);
+			gears.add(gear022);
+			gears.add(gear023);
+			gears.add(gear024);
+			gears.add(gear025);
+			gears.add(gear026);
+			gears.add(gear027);
+			gears.add(gear028);
+			gears.add(gear029);
+			gears.add(gear030);
+			gears.add(gear031);
+			gears.add(gear032);
+			gears.add(gear033);
+			gears.add(gear034);
+			gears.add(gear035);
+			gears.add(gear036);
+			gears.add(gear037);
+			gears.add(gear038);
+			gears.add(gear039);
+			*/
+			
 			for (var jj:String in gears.members) {add(gears.members[jj]);}
 			
 			// foreground
@@ -163,7 +250,7 @@ package {
 			add(hand);
 			
 			blockGroup = new FlxGroup();
-			var testBlock:FlxSprite = new FlxSprite(450, 416).makeGraphic(32, 32, 0xff007fff);
+			var testBlock:FlxSprite = new FlxSprite(450, 416,block32x32w6Sheet);//.makeGraphic(32, 32, 0xff007fff);
 			testBlock.immovable = true;
 			blockGroup.add(testBlock);
 			add(blockGroup);
@@ -185,7 +272,7 @@ package {
 			}
 			
 			// rudimentary animation
-			if (!bodyMode && onGround){
+			if (!bodyMode && hand.touching){
 				for (var i:String in arms.members) {
 					arms.members[i].visible = false;
 				}
@@ -205,7 +292,7 @@ package {
 					if (handDir == FlxObject.LEFT) {hand.play("idle left");}
 					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");}
 				}	
-			} else if (!bodyMode && !onGround && hand.angle > 0 && hand.angle < 360) {
+			} else if (!bodyMode && !hand.touching && hand.angle > 0 && hand.angle < 360) {
 				if (handDir == FlxObject.LEFT) {
 					hand.play("idle left"); //placeholder
 					//hand.play("left fall");
