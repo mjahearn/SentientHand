@@ -23,6 +23,7 @@ package {
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
+		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -360,7 +361,7 @@ package {
 					rad = Math.atan2(diffY, diffX);
 					arrow.angle = 180*rad/Math.PI;
 					if (FlxG.keys.SPACE) {
-						if (hand.touching <= 0) {
+						if (hand.touching <= 0 && Math.sqrt(Math.pow(hand.x-body.x, 2) + Math.pow(hand.y-body.y, 2)) < GRAPPLE_LENGTH) {
 							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
@@ -369,7 +370,7 @@ package {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						} else {
-							FlxG.log(hand.touching + " " + hand.facing + " " + handBlockFlag + " " + blockGroup.members[handBlockFlag].mass + " " + body.mass);
+							FlxG.log("okay");
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						}

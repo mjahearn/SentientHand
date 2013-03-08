@@ -2,7 +2,7 @@ package
 {
 	import org.flixel.*;
 	
-	[SWF(width="800", height="600", backgroundColor="#000000")]
+	[SWF(width="640", height="480", backgroundColor="#000000")]
 	
 	public class SentientHand extends FlxGame
 	{
