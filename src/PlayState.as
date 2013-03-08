@@ -190,8 +190,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -202,6 +202,7 @@ package {
 			}
 			
 			body = new FlxSprite(160, 416,bodySheet);
+			body.mass = 2;
 			bodyTargetAngle = body.angle;
 			setGravity(body, FlxObject.DOWN, true);
 			add(body);
@@ -243,8 +244,11 @@ package {
 			add(hand);
 			
 			blockGroup = new FlxGroup();
-			var testBlock:FlxSprite = new FlxSprite(450, 416,block32x32w6Sheet);//.makeGraphic(32, 32, 0xff007fff);
+			var testBlock:FlxSprite = new FlxSprite(450, 416,block32x32w6Sheet);
 			testBlock.immovable = true;
+			testBlock.drag.x = Number.MAX_VALUE;
+			testBlock.drag.y = Number.MAX_VALUE;
+			testBlock.mass = 1;
 			blockGroup.add(testBlock);
 			add(blockGroup);
 			
@@ -361,10 +365,11 @@ package {
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
 					} else {
-						if (hand.touching > 0 && hand.facing == hand.touching) {
+						if ((hand.touching > 0 && hand.facing == hand.touching) || (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						} else {
+							FlxG.log(hand.touching + " " + hand.facing + " " + handBlockFlag + " " + blockGroup.members[handBlockFlag].mass + " " + body.mass);
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						}
@@ -466,7 +471,7 @@ package {
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 			var prevHandBlockFlag:uint = handBlockFlag;
-			handBlockFlag = uint.MAX_VALUE;
+			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand);
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(level, body);
@@ -484,18 +489,26 @@ package {
 				}
 			}
 			if (bodyMode) {
-				/*if (onGround && handBlockFlag < uint.MAX_VALUE) {
+				if (onGround && handBlockFlag < uint.MAX_VALUE) {
 					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
-					if (handBlockFlag != prevHandBlockFlag) {
-						curBlock.immovable = false;
-						curBlock.drag.x = Number.MAX_VALUE;
-						curBlock.drag.y = Number.MAX_VALUE;
-						handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
+					if (curBlock.mass < body.mass) {
+						if (prevHandBlockFlag == uint.MAX_VALUE) {
+							curBlock.immovable = false;
+							curBlock.drag.x = Number.MAX_VALUE;
+							curBlock.drag.y = Number.MAX_VALUE;
+							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
+						}
+						if (handOut) {
+							curBlock.x = hand.x + handBlockRel.x;
+							curBlock.y = hand.y + handBlockRel.y;
+						} else {
+							curBlock.drag.x = 0;
+							curBlock.drag.y = 0;
+							curBlock.acceleration.y = GRAV_RATE;
+							handBlockFlag = uint.MAX_VALUE;
+						}
 					}
-					FlxG.log(handBlockRel.x);
-					curBlock.x = hand.x + handBlockRel.x;
-					curBlock.y = hand.y + handBlockRel.y;
-				}*/
+				}
 			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
@@ -530,20 +543,33 @@ package {
 		
 		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
-				//handBlockFlag = blockGroup.members.indexOf(spr1);
-				handMetalFlag = 1;
-				fixGravity(spr2);
-			} else if (spr2 == body) {
+				if (bodyMode) {
+					handBlockFlag = blockGroup.members.indexOf(spr1);
+				} else {
+					handMetalFlag = 1;
+					fixGravity(spr2);
+				}
+			} else if (spr2 == body && spr1.mass > spr2.mass) {
 				fixGravity(spr2);
 			} else { //spr2 is probably a block
 				if (spr1 == hand) {
-					//handBlockFlag = blockGroup.members.indexOf(spr2);
-					handMetalFlag = 1;
-					fixGravity(spr1);
-				} else if (spr1 == body) {
+					if (bodyMode) {
+						handBlockFlag = blockGroup.members.indexOf(spr2);
+					} else {
+						handMetalFlag = 1;
+						fixGravity(spr1);
+					}
+				} else if (spr1 == body && spr2.mass > spr1.mass) {
 					fixGravity(spr1);
 				}
 			}
+		}
+		
+		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
+			spr2.immovable = true;
+			spr2.drag.x = Number.MAX_VALUE;
+			spr2.drag.y = Number.MAX_VALUE;
+			spr2.acceleration.y = 0;
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
