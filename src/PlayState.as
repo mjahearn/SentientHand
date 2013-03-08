@@ -34,6 +34,8 @@ package {
 		public var arrow:FlxSprite;
 		public var bodyGear:FlxSprite;
 		
+		public var bodyTargetAngle:Number;
+		
 		public var arms:FlxGroup = new FlxGroup();
 		public var numArms:int = 22;
 		public var handDir:uint;
@@ -188,7 +190,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -198,7 +201,8 @@ package {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
-			body = new FlxSprite(128, 416,bodySheet);
+			body = new FlxSprite(160, 416,bodySheet);
+			bodyTargetAngle = body.angle;
 			setGravity(body, FlxObject.DOWN, true);
 			add(body);
 			bodyGear = new FlxSprite(body.x,body.y,bodyGearSheet);
@@ -323,21 +327,23 @@ package {
 					
 					// for now, just changing direction immediately, but should really swivel into place as the hand moves
 					// maybe set a destination, then swivel to it?
-					if (hand.facing == FlxObject.DOWN) {body.angle = 0;}
-					else if (hand.facing == FlxObject.LEFT) {body.angle = 90;}
-					else if (hand.facing == FlxObject.UP) {body.angle = 180;}
-					else if (hand.facing == FlxObject.RIGHT) {body.angle = 270;}
+					if (hand.facing == FlxObject.DOWN) {bodyTargetAngle = 0;}
+					else if (hand.facing == FlxObject.LEFT) {bodyTargetAngle = 90;}
+					else if (hand.facing == FlxObject.UP) {bodyTargetAngle = 180;}
+					else if (hand.facing == FlxObject.RIGHT) {bodyTargetAngle = 270;}
 				}
 				
+				if (!FlxG.keys.SPACE) {
+					if (bodyTargetAngle > body.angle) {
+						body.angle += 2;
+					} else if (bodyTargetAngle < body.angle) {
+						body.angle -= 2;
+					}
+				}
+				if (!handOut) {body.angle = bodyTargetAngle;}
+				
 			}
-			/*
-			// reangling the body...
-			if (body.touching) {
-				if (body.facing == FlxObject.DOWN) {body.angle = 0;}
-				else if (body.facing == FlxObject.LEFT) {body.angle = 90;}
-				else if (body.facing == FlxObject.UP) {body.angle = 180;}
-				else if (body.facing == FlxObject.RIGHT) {body.angle = 270;}
-			}*/
+			////
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
