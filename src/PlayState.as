@@ -40,6 +40,7 @@ package {
 		public var numArms:int = 22;
 		public var handDir:uint;
 		
+		public var handFalling:Boolean;
 		public var bodyMode:Boolean;
 		public var handOut:Boolean;
 		public var handGrab:Boolean;
@@ -256,6 +257,8 @@ package {
 		
 		override public function update():void {
 			
+			if (hand.touching) {handFalling = false;}
+			
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			bodyGear.x = body.x;
 			bodyGear.y = body.y;
@@ -445,6 +448,7 @@ package {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
 						} if (FlxG.keys.justPressed("UP")) {
+							//handFalling = true;
 							if (hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
@@ -497,9 +501,33 @@ package {
 					curBlock.y = hand.y + handBlockRel.y;
 				}*/
 			} else {
-				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
+				if (onGround && ( !hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
-					setGravity(hand, FlxObject.DOWN, true);
+					
+					// needs fixing
+					if (FlxG.keys.justPressed("UP")) {
+						setGravity(hand, FlxObject.DOWN, true);
+					} else if (FlxG.keys.LEFT) {
+						if (hand.facing == FlxObject.UP) {
+							setGravity(hand,FlxObject.LEFT,true);
+						} else if (hand.facing == FlxObject.DOWN) {
+							setGravity(hand,FlxObject.RIGHT,true);
+						} else if (hand.facing == FlxObject.RIGHT) {
+							setGravity(hand,FlxObject.UP,true);
+						} else if (hand.facing == FlxObject.LEFT) {
+							setGravity(hand,FlxObject.DOWN,true);
+						}
+					} else if (FlxG.keys.RIGHT) {
+						if (hand.facing == FlxObject.UP) {
+							setGravity(hand,FlxObject.RIGHT,true);
+						} else if (hand.facing == FlxObject.DOWN) {
+							setGravity(hand,FlxObject.LEFT,true);
+						} else if (hand.facing == FlxObject.RIGHT) {
+							setGravity(hand,FlxObject.DOWN,true);
+						} else if (hand.facing == FlxObject.LEFT) {
+							setGravity(hand,FlxObject.UP,true);
+						}
+					}
 					hand.drag.x = 0;
 					hand.drag.y = 0;
 					hand.maxVelocity.x = MAX_GRAV_VEL;
