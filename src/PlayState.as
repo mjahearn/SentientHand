@@ -192,8 +192,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -454,7 +454,7 @@ package {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
 						} if (FlxG.keys.justPressed("UP")) {
-							//handFalling = true;
+							handFalling = true;
 							if (hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
@@ -518,30 +518,29 @@ package {
 				if (onGround && ( !hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
 					
-					// needs fixing
-					if (FlxG.keys.justPressed("UP")) {
+					// handle convex corners or jumping
+					if (handFalling || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE)) {
 						setGravity(hand, FlxObject.DOWN, true);
-					} else if (FlxG.keys.LEFT) {
-						if (hand.facing == FlxObject.UP) {
-							setGravity(hand,FlxObject.LEFT,true);
-						} else if (hand.facing == FlxObject.DOWN) {
-							setGravity(hand,FlxObject.RIGHT,true);
-						} else if (hand.facing == FlxObject.RIGHT) {
-							setGravity(hand,FlxObject.UP,true);
-						} else if (hand.facing == FlxObject.LEFT) {
-							setGravity(hand,FlxObject.DOWN,true);
-						}
-					} else if (FlxG.keys.RIGHT) {
-						if (hand.facing == FlxObject.UP) {
-							setGravity(hand,FlxObject.RIGHT,true);
-						} else if (hand.facing == FlxObject.DOWN) {
-							setGravity(hand,FlxObject.LEFT,true);
-						} else if (hand.facing == FlxObject.RIGHT) {
-							setGravity(hand,FlxObject.DOWN,true);
-						} else if (hand.facing == FlxObject.LEFT) {
-							setGravity(hand,FlxObject.UP,true);
-						}
+					} else if (hand.facing == FlxObject.UP && hand.velocity.x > 0) {
+						setGravity(hand,FlxObject.LEFT,true);
+					} else if (hand.facing == FlxObject.DOWN && hand.velocity.x < 0) {
+						setGravity(hand,FlxObject.RIGHT,true);
+					} else if (hand.facing == FlxObject.RIGHT && hand.velocity.y > 0) {
+						setGravity(hand,FlxObject.UP,true);
+					} else if (hand.facing == FlxObject.LEFT && hand.velocity.y < 0) {
+						setGravity(hand,FlxObject.DOWN,true);
+					} else if (hand.facing == FlxObject.UP && hand.velocity.x < 0) {
+						setGravity(hand,FlxObject.RIGHT,true);
+					} else if (hand.facing == FlxObject.DOWN && hand.velocity.x > 0) {
+						setGravity(hand,FlxObject.LEFT,true);
+					} else if (hand.facing == FlxObject.RIGHT && hand.velocity.y < 0) {
+						setGravity(hand,FlxObject.DOWN,true);
+					} else if (hand.facing == FlxObject.LEFT && hand.velocity.y > 0) {
+						setGravity(hand,FlxObject.UP,true);
+					} else if (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE) {
+						setGravity(hand,FlxObject.DOWN,true);
 					}
+					
 					hand.drag.x = 0;
 					hand.drag.y = 0;
 					hand.maxVelocity.x = MAX_GRAV_VEL;
