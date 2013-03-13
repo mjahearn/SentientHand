@@ -193,8 +193,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -533,6 +533,7 @@ package {
 						if (handOut) {
 							curBlock.x = hand.x + handBlockRel.x;
 							curBlock.y = hand.y + handBlockRel.y;
+							FlxG.collide(level, blockGroup);
 						} else {
 							curBlock.drag.x = 0;
 							curBlock.drag.y = 0;
