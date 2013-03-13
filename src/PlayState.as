@@ -32,9 +32,12 @@ package {
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
-		public var body:FlxSprite;
+		//public var body:FlxSprite;
+		public var bodyGroup:FlxGroup;
+		public var curBody:uint;
 		public var arrow:FlxSprite;
-		public var bodyGear:FlxSprite;
+		//public var bodyGear:FlxSprite;
+		public var bodyGearGroup:FlxGroup;
 		
 		public var bodyTargetAngle:Number;
 		
@@ -104,93 +107,9 @@ package {
 			
 			// midground objects
 			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			
-			/*
-			var gear001:FlxSprite = new FlxSprite(64,480-64,gearSheet);
-			var gear002:FlxSprite = new FlxSprite(96,480-64,gearSheet);
-			var gear003:FlxSprite = new FlxSprite(128,480-64,gearSheet);
-			var gear004:FlxSprite = new FlxSprite(0,480-128,gearSheet);
-			var gear005:FlxSprite = new FlxSprite(64,480-128,gearSheet);
-			var gear006:FlxSprite = new FlxSprite(96,480-128,gearSheet);
-			var gear007:FlxSprite = new FlxSprite(128,480-128,gearSheet);
-			var gear008:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear009:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear010:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear011:FlxSprite = new FlxSprite(64,480-64,gearSheet);
-			var gear012:FlxSprite = new FlxSprite(96,480-64,gearSheet);
-			var gear013:FlxSprite = new FlxSprite(128,480-64,gearSheet);
-			var gear014:FlxSprite = new FlxSprite(0,480-128,gearSheet);
-			var gear015:FlxSprite = new FlxSprite(64,480-128,gearSheet);
-			var gear016:FlxSprite = new FlxSprite(96,480-128,gearSheet);
-			var gear017:FlxSprite = new FlxSprite(128,480-128,gearSheet);
-			var gear018:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear019:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear020:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear021:FlxSprite = new FlxSprite(64,480-64,gearSheet);
-			var gear022:FlxSprite = new FlxSprite(96,480-64,gearSheet);
-			var gear023:FlxSprite = new FlxSprite(128,480-64,gearSheet);
-			var gear024:FlxSprite = new FlxSprite(0,480-128,gearSheet);
-			var gear025:FlxSprite = new FlxSprite(64,480-128,gearSheet);
-			var gear026:FlxSprite = new FlxSprite(96,480-128,gearSheet);
-			var gear027:FlxSprite = new FlxSprite(128,480-128,gearSheet);
-			var gear028:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear029:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear030:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear031:FlxSprite = new FlxSprite(64,480-64,gearSheet);
-			var gear032:FlxSprite = new FlxSprite(96,480-64,gearSheet);
-			var gear033:FlxSprite = new FlxSprite(128,480-64,gearSheet);
-			var gear034:FlxSprite = new FlxSprite(0,480-128,gearSheet);
-			var gear035:FlxSprite = new FlxSprite(64,480-128,gearSheet);
-			var gear036:FlxSprite = new FlxSprite(96,480-128,gearSheet);
-			var gear037:FlxSprite = new FlxSprite(128,480-128,gearSheet);
-			var gear038:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			var gear039:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			*/
-			
 			gears.add(gear000);
-			/*
-			gears.add(gear001);
-			gears.add(gear002);
-			gears.add(gear003);
-			gears.add(gear004);
-			gears.add(gear005);
-			gears.add(gear006);
-			gears.add(gear007);
-			gears.add(gear008);
-			gears.add(gear009);
-			gears.add(gear010);
-			gears.add(gear011);
-			gears.add(gear012);
-			gears.add(gear013);
-			gears.add(gear014);
-			gears.add(gear015);
-			gears.add(gear016);
-			gears.add(gear017);
-			gears.add(gear018);
-			gears.add(gear019);
-			gears.add(gear020);
-			gears.add(gear021);
-			gears.add(gear022);
-			gears.add(gear023);
-			gears.add(gear024);
-			gears.add(gear025);
-			gears.add(gear026);
-			gears.add(gear027);
-			gears.add(gear028);
-			gears.add(gear029);
-			gears.add(gear030);
-			gears.add(gear031);
-			gears.add(gear032);
-			gears.add(gear033);
-			gears.add(gear034);
-			gears.add(gear035);
-			gears.add(gear036);
-			gears.add(gear037);
-			gears.add(gear038);
-			gears.add(gear039);
-			*/
 			
-			for (var jj:String in gears.members) {add(gears.members[jj]);}
+			add(gears);
 			
 			// foreground
 			level = new FlxTilemap();
@@ -206,15 +125,29 @@ package {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
-			body = new FlxSprite(160, 416,bodySheet);
+			bodyGroup = new FlxGroup();
+			bodyGearGroup = new FlxGroup();
+			
+			var body:FlxSprite = new FlxSprite(160, 416,bodySheet);
 			body.mass = 2;
 			bodyTargetAngle = body.angle;
 			setGravity(body, FlxObject.DOWN, true);
-			add(body);
+			bodyGroup.add(body);
+			var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+			bodyGearGroup.add(bodyGear);
+			
+			body = new FlxSprite(120, 416,bodySheet);
+			body.mass = 4;
+			setGravity(body, FlxObject.DOWN, true);
+			bodyGroup.add(body);
 			bodyGear = new FlxSprite(body.x,body.y,bodyGearSheet);
-			add(bodyGear);
+			bodyGearGroup.add(bodyGear);
+			
+			add(bodyGroup);
+			add(bodyGearGroup);
 			
 			bodyMode = false;
+			curBody = uint.MAX_VALUE;
 			handOut = false;
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
@@ -225,11 +158,11 @@ package {
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
-				arm = new FlxSprite(body.x,body.y,armSheet);
+				arm = new FlxSprite(0,0,armSheet); //originally body.x/y
 				arm.visible = false;
-				add(arm);
 				arms.add(arm);
 			}
+			add(arms);
 			
 			hand = new FlxSprite(64, 416);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -253,24 +186,33 @@ package {
 			testBlock.immovable = true;
 			testBlock.drag.x = Number.MAX_VALUE;
 			testBlock.drag.y = Number.MAX_VALUE;
-			testBlock.mass = 1;
+			testBlock.mass = 3;
 			blockGroup.add(testBlock);
 			add(blockGroup);
 			
-			arrow = new FlxSprite(body.x, body.y);
+			arrow = new FlxSprite();
 			arrow.loadGraphic(arrowSheet);
 			arrow.visible = false;
 			add(arrow);
 		}
 		
 		override public function update():void {
+			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
+			var body:FlxSprite;
+			var bodyGear:FlxSprite;
+			if (bodyMode) {
+				body = bodyGroup.members[curBody];
+				bodyGear = bodyGearGroup.members[curBody];
+			}
 			
 			if (hand.touching) {handFalling = false;}
 			
 			// janky way of moving body gear (this only works for one body, should really classify it)
-			bodyGear.x = body.x;
-			bodyGear.y = body.y;
-			bodyGear.angle = -arrow.angle;
+			if (bodyMode) {
+				bodyGear.x = body.x;
+				bodyGear.y = body.y;
+				bodyGear.angle = -arrow.angle;
+			}
 			
 			// spin midground gears
 			var gear:FlxSprite;
@@ -402,13 +344,11 @@ package {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						} else {
-							FlxG.log("okay");
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						}
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
-							FlxG.log("coool");
 							handOut = false;
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
@@ -449,7 +389,11 @@ package {
 					}
 				}
 			} else {
-				if (FlxG.keys.justPressed("DOWN") && hand.overlaps(body)) {
+				var hob:uint = handOverlapsBody();
+				if (FlxG.keys.justPressed("DOWN") && hob < uint.MAX_VALUE) {
+					curBody = hob;
+					body = bodyGroup.members[curBody];
+					bodyGear = bodyGearGroup.members[curBody];
 					bodyMode = true;
 					hand.velocity.x = 0;
 					hand.velocity.y = 0;
@@ -511,8 +455,8 @@ package {
 			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand);
 			FlxG.collide(blockGroup, hand, blockCallback);
-			FlxG.collide(level, body);
-			FlxG.collide(blockGroup, body, blockCallback);
+			FlxG.collide(level, bodyGroup);
+			FlxG.collide(blockGroup, bodyGroup, blockCallback);
 			FlxG.collide(level, blockGroup);
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
@@ -593,8 +537,10 @@ package {
 			if (spr == hand) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
+				fixGravity(spr);
+			} else if (spr in bodyGroup) {
+				fixGravity(spr);
 			}
-			fixGravity(spr);
 		}
 		
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
@@ -612,7 +558,7 @@ package {
 					handMetalFlag = 1;
 					fixGravity(spr2);
 				}
-			} else if (spr2 == body && spr1.mass > spr2.mass) {
+			} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
 				fixGravity(spr2);
 			} else { //spr2 is probably a block
 				if (spr1 == hand) {
@@ -622,7 +568,7 @@ package {
 						handMetalFlag = 1;
 						fixGravity(spr1);
 					}
-				} else if (spr1 == body && spr2.mass > spr1.mass) {
+				} else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
 					fixGravity(spr1);
 				}
 			}
@@ -683,9 +629,10 @@ package {
 		}
 		
 		public function showArrow():void {
+			// PRECONDITION: curBody < uint.MAX_VALUE
 			arrow.visible = true;
-			arrow.x = body.x;
-			arrow.y = body.y;
+			arrow.x = bodyGroup.members[curBody].x;
+			arrow.y = bodyGroup.members[curBody].y;
 			if (handIsFacing(FlxObject.DOWN)) {
 				arrow.angle = -90;
 			} else if (handIsFacing(FlxObject.UP)) {
@@ -699,6 +646,15 @@ package {
 		
 		public function isMetal(tile:uint):Boolean {
 			return (tile >= METAL_MIN && tile <= METAL_MAX);
+		}
+		
+		public function handOverlapsBody():uint {
+			for (var b:int = 0; b < bodyGroup.length; b++) {
+				if (hand.overlaps(bodyGroup.members[b])) {
+					return(b);
+				}
+			}
+			return(uint.MAX_VALUE);
 		}
 	}
 }
