@@ -57,7 +57,7 @@ package {
 		public var gears:FlxGroup = new FlxGroup();
 		
 		public var lastTouchedWood:Boolean = false;
-		public var arrowStartAngle:uint;
+		public var arrowStartAngle:int;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -431,11 +431,12 @@ package {
 				} else {
 					if (FlxG.keys.LEFT) {
 						arrow.angle -= ROTATE_RATE;
-						if (arrow.angle < arrowStartAngle - 90) {arrowStartAngle - 90;}
+						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
 					} if (FlxG.keys.RIGHT) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
-					} if (FlxG.keys.justPressed("DOWN")) {
+					}
+					if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						arrow.visible = false;
 						setGravity(hand, hand.facing, true);
