@@ -693,15 +693,18 @@ package {
 			//arrow.visible = true;
 			//arrow.x = body.x;
 			//arrow.y = body.y;
-			if (handIsFacing(FlxObject.DOWN)) {
+			/*
+			if (body.facing == FlxObject.DOWN) {
 				arrow.angle = -90;
-			} else if (handIsFacing(FlxObject.UP)) {
+			} else if (body.facing == FlxObject.UP) {
 				arrow.angle = 90;
 			} else if (handIsFacing(FlxObject.LEFT)) {
 				arrow.angle = 0;
 			} else if (handIsFacing(FlxObject.RIGHT)) {
 				arrow.angle = 180;
 			}
+			*/
+			arrow.angle = bodyTargetAngle - 90;
 			arrowStartAngle = arrow.angle;
 		}
 		
