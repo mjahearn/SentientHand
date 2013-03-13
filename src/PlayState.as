@@ -57,6 +57,7 @@ package {
 		public var gears:FlxGroup = new FlxGroup();
 		
 		public var lastTouchedWood:Boolean = false;
+		public var arrowStartAngle:uint;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -430,10 +431,10 @@ package {
 				} else {
 					if (FlxG.keys.LEFT) {
 						arrow.angle -= ROTATE_RATE;
-						if (arrow.angle < -180) {-80;}
+						if (arrow.angle < arrowStartAngle - 90) {arrowStartAngle - 90;}
 					} if (FlxG.keys.RIGHT) {
 						arrow.angle += ROTATE_RATE;
-						if (arrow.angle > 0) {arrow.angle = 0;}
+						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
 					} if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						arrow.visible = false;
@@ -693,6 +694,7 @@ package {
 			} else if (handIsFacing(FlxObject.RIGHT)) {
 				arrow.angle = 180;
 			}
+			arrowStartAngle = arrow.angle;
 		}
 		
 		public function isMetal(tile:uint):Boolean {
