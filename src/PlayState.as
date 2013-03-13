@@ -694,9 +694,9 @@ package {
 			//arrow.x = body.x;
 			//arrow.y = body.y;
 			/*
-			if (body.facing == FlxObject.DOWN) {
+			if (handIsFacing(FlxObject.DOWN)) {
 				arrow.angle = -90;
-			} else if (body.facing == FlxObject.UP) {
+			} else if (handIsFacing(FlxObject.UP)) {
 				arrow.angle = 90;
 			} else if (handIsFacing(FlxObject.LEFT)) {
 				arrow.angle = 0;
