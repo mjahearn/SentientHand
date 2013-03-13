@@ -58,6 +58,7 @@ package {
 		
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
+		public var shootAngle:int;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -402,10 +403,12 @@ package {
 						if ((hand.touching > 0 && hand.facing == hand.touching) || (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+							showArrow();
 						} else {
 							FlxG.log("okay");
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
+							arrow.angle = shootAngle;
 						}
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
@@ -426,7 +429,7 @@ package {
 								body.x = hand.x;
 								body.y = hand.y;
 							}
-							showArrow();
+							//showArrow();
 						}
 					}
 				} else {
@@ -439,13 +442,14 @@ package {
 					}
 					if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
-						arrow.visible = false;
+						//arrow.visible = false;
 						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed("SPACE")) {
+						shootAngle = arrow.angle;
 						handOut = true;
-						arrow.visible = false;
+						//arrow.visible = false;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 					}
@@ -460,6 +464,7 @@ package {
 					hand.x = body.x;
 					hand.y = body.y;
 					showArrow();
+					FlxG.log(arrow.angle);
 				} else {
 					if (onGround) {
 						if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
@@ -685,9 +690,9 @@ package {
 		}
 		
 		public function showArrow():void {
-			arrow.visible = true;
-			arrow.x = body.x;
-			arrow.y = body.y;
+			//arrow.visible = true;
+			//arrow.x = body.x;
+			//arrow.y = body.y;
 			if (handIsFacing(FlxObject.DOWN)) {
 				arrow.angle = -90;
 			} else if (handIsFacing(FlxObject.UP)) {
