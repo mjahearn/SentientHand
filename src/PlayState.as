@@ -18,7 +18,8 @@ package {
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 159; //maximum index number of metal in the tilemap
+		public const METAL_MAX:uint = 127; //maximum index number of metal in the tilemap
+		// tilemap indices unspecified for 128 through 159
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
@@ -282,12 +283,37 @@ package {
 				for (var i:String in arms.members) {
 					arms.members[i].visible = false;
 				}
-				// first set facing of hand sprite
+				// first set angle of hand sprite
 				if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
 				else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
 				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
 				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
 				// then do left/rigt animations (sprite's not ambidexterous...)
+				
+				if (FlxG.keys.LEFT) {handDir = FlxObject.LEFT;}
+				if (FlxG.keys.RIGHT) {handDir = FlxObject.RIGHT;}
+				
+				if (handDir == FlxObject.LEFT) {
+					if ((hand.facing == FlxObject.UP && hand.velocity.x > 0) ||
+						(hand.facing == FlxObject.DOWN && hand.velocity.x < 0) ||
+						(hand.facing == FlxObject.LEFT && hand.velocity.y < 0) ||
+						(hand.facing == FlxObject.RIGHT && hand.velocity.y > 0)) {
+						hand.play("crawl left");
+					} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+						hand.play("idle left");
+					}
+				} else if (handDir == FlxObject.RIGHT) {
+					if ((hand.facing == FlxObject.UP && hand.velocity.x < 0) ||
+						(hand.facing == FlxObject.DOWN && hand.velocity.x > 0) ||
+						(hand.facing == FlxObject.LEFT && hand.velocity.y > 0) ||
+						(hand.facing == FlxObject.RIGHT && hand.velocity.y < 0)) {
+						hand.play("crawl right");
+					} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+						hand.play("idle right");
+					}
+				}
+				
+				/*
 				if (FlxG.keys.RIGHT) {
 					handDir = FlxObject.RIGHT;
 					hand.play("crawl right");
@@ -297,7 +323,8 @@ package {
 				} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
 					if (handDir == FlxObject.LEFT) {hand.play("idle left");}
 					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");}
-				}	
+				}
+				*/
 			} else if (!bodyMode && !hand.touching && hand.angle > 0 && hand.angle < 360) {
 				if (handDir == FlxObject.LEFT) {
 					hand.play("idle left"); //placeholder
