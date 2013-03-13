@@ -196,8 +196,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -407,8 +407,9 @@ package {
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						}
-						if (Math.abs(diffX) < Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
-							Math.abs(diffY) < Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
+						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
+							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
+							FlxG.log("coool");
 							handOut = false;
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
