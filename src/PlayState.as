@@ -640,6 +640,7 @@ package {
 			//arrow.visible = true;
 			//arrow.x = bodyGroup.members[curBody].x;
 			//arrow.y = bodyGroup.members[curBody].y;
+			/*
 			if (handIsFacing(FlxObject.DOWN)) {
 				arrow.angle = -90;
 			} else if (handIsFacing(FlxObject.UP)) {
@@ -649,6 +650,8 @@ package {
 			} else if (handIsFacing(FlxObject.RIGHT)) {
 				arrow.angle = 180;
 			}
+			*/
+			arrow.angle = bodyTargetAngle - 90;
 			arrowStartAngle = arrow.angle;
 		}
 		
