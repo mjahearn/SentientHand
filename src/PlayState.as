@@ -538,6 +538,7 @@ package {
 						if (handOut) {
 							curBlock.x = hand.x + handBlockRel.x;
 							curBlock.y = hand.y + handBlockRel.y;
+							FlxG.collide(level, blockGroup);
 						} else {
 							curBlock.drag.x = 0;
 							curBlock.drag.y = 0;
