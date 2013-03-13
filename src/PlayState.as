@@ -56,6 +56,8 @@ package {
 		
 		public var gears:FlxGroup = new FlxGroup();
 		
+		public var lastTouchedWood:Boolean = false;
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		
@@ -193,8 +195,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -428,8 +430,10 @@ package {
 				} else {
 					if (FlxG.keys.LEFT) {
 						arrow.angle -= ROTATE_RATE;
+						if (arrow.angle < -180) {-80;}
 					} if (FlxG.keys.RIGHT) {
 						arrow.angle += ROTATE_RATE;
+						if (arrow.angle > 0) {arrow.angle = 0;}
 					} if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						arrow.visible = false;
@@ -547,7 +551,7 @@ package {
 					onGround = false;
 					
 					// handle convex corners or jumping
-					if (handFalling || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE)) {
+					if (handFalling || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) || lastTouchedWood) {
 						setGravity(hand, FlxObject.DOWN, true);
 					} else if (hand.facing == FlxObject.UP && hand.velocity.x > 0) {
 						setGravity(hand,FlxObject.LEFT,true);
@@ -587,6 +591,7 @@ package {
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
 				handMetalFlag = tile.mapIndex;
+				lastTouchedWood = false;
 			}
 			fixGravity(spr);
 		}
@@ -594,6 +599,7 @@ package {
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
 				handWoodFlag = tile.mapIndex;
+				lastTouchedWood = true;
 			}
 		}
 		
