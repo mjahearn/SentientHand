@@ -116,8 +116,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -184,7 +184,7 @@ package {
 			add(hand);
 			
 			blockGroup = new FlxGroup();
-			var testBlock:FlxSprite = new FlxSprite(450, 416,block32x32w6Sheet);
+			var testBlock:FlxSprite = new FlxSprite(386, 416,block32x32w6Sheet);
 			testBlock.immovable = true;
 			testBlock.drag.x = Number.MAX_VALUE;
 			testBlock.drag.y = Number.MAX_VALUE;
@@ -224,21 +224,24 @@ package {
 				if (gear.angle > 360) {gear.angle = 0;}
 			}
 			
-			// rudimentary animation
+			/* Begin Animation */
+			
+			// The hand is crawling along a flat surface
 			if (!bodyMode && hand.touching){
-				for (var i:String in arms.members) {
-					arms.members[i].visible = false;
-				}
-				// first set angle of hand sprite
+				
+				// Set the Angle of the hand
 				if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
 				else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
 				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
 				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
-				// then do left/rigt animations (sprite's not ambidexterous...)
 				
+				// Set the direction the hand is facing
+				// (because the sprite's not ambidexterous)
 				if (FlxG.keys.LEFT) {handDir = FlxObject.LEFT;}
 				if (FlxG.keys.RIGHT) {handDir = FlxObject.RIGHT;}
 				
+				// Set appropriate animation
+				// (this relies on the facing because the sprite's not ambidexterous)
 				if (handDir == FlxObject.LEFT) {
 					if ((hand.facing == FlxObject.UP && hand.velocity.x > 0) ||
 						(hand.facing == FlxObject.DOWN && hand.velocity.x < 0) ||
@@ -259,29 +262,49 @@ package {
 					}
 				}
 				
-				/*
-				if (FlxG.keys.RIGHT) {
-					handDir = FlxObject.RIGHT;
-					hand.play("crawl right");
-				} else if (FlxG.keys.LEFT) {
-					handDir = FlxObject.LEFT;
-					hand.play("crawl left");
-				} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-					if (handDir == FlxObject.LEFT) {hand.play("idle left");}
-					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");}
+				// The hand is rapelling itself from a surface
+				if (FlxG.keys.UP) {
+					if (handDir == FlxObject.LEFT) {hand.play("idle left");} //<- placeholder {hand.play("jump left");}
+					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");} //<- placeholder {hand.play("jump right");}
 				}
-				*/
-			} else if (!bodyMode && !hand.touching && hand.angle > 0 && hand.angle < 360) {
+			}
+			
+			// The hand is rounding a convex corner
+			else if (!bodyMode && !hand.touching && !handFalling) {
 				if (handDir == FlxObject.LEFT) {
-					hand.play("idle left"); //placeholder
-					//hand.play("left fall");
-					hand.angle += 10;
+					/*if ((hand.facing == FlxObject.UP && hand.angle > 90) ||
+						(hand.facing == FlxObject.DOWN && hand.angle > -90) || <- this line's not working
+						(hand.facing == FlxObject.LEFT && hand.angle > 0) ||
+						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
+					*/
+						hand.angle -= 5;
+					//}
 				} else if (handDir == FlxObject.RIGHT) {
-					hand.play("idle right"); //placeholder
-					//hand.play("right fall");
-					hand.angle -= 10;
+					/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
+						(hand.facing == FlxObject.DOWN && hand.angle < 90) ||
+						(hand.facing == FlxObject.LEFT && hand.angle < 180) ||
+						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
+					*/
+						hand.angle += 5;
+					//}
 				}
-			} else if (bodyMode){
+			}
+			
+			// The hand is falling (with style!)
+			else if (!bodyMode && !hand.touching && handFalling) {
+				if (hand.angle > 0 && hand.angle < 360) {
+					if (handDir == FlxObject.LEFT) {
+						hand.play("idle left"); //<- placeholder hand.play("fall left");
+						hand.angle += 10;
+					} else if (handDir == FlxObject.RIGHT) {
+						hand.play("idle right"); //<- placeholder hand.play("fall right");
+						hand.angle -= 10;
+					}
+				}
+			}
+				
+			// The hand is attached to the body
+			else if (bodyMode){
 				hand.angle = arrow.angle - 90;
 				hand.play("idle body");
 				
@@ -296,7 +319,7 @@ package {
 					arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2.0-arm.frameWidth/2.0;
 					arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2.0-arm.frameHeight/2.0;
 					stupid = stupid + 1;
-					arm.angle = hand.angle;
+					arm.angle = shootAngle + 90;
 				}
 				
 				if (handOut && hand.touching) {
@@ -314,6 +337,17 @@ package {
 					else if (hand.facing == FlxObject.RIGHT) {bodyTargetAngle = 270;}
 				}
 				
+				if (FlxG.keys.justPressed("SPACE")) {
+					for (var i:String in arms.members) {
+						arms.members[i].visible = true;
+					}
+				}
+				if (!handOut) {
+					for (var ii:String in arms.members) {
+						arms.members[ii].visible = false;
+					}
+				}
+				
 				if (!FlxG.keys.SPACE) {
 					if (bodyTargetAngle > body.angle) {
 						body.angle += 2;
@@ -324,7 +358,7 @@ package {
 				if (!handOut) {body.angle = bodyTargetAngle;}
 				
 			}
-			////
+			/* End Animation */
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
@@ -408,7 +442,6 @@ package {
 					hand.x = body.x;
 					hand.y = body.y;
 					showArrow();
-					FlxG.log(arrow.angle);
 				} else {
 					if (onGround) {
 						if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
@@ -502,26 +535,15 @@ package {
 				if (onGround && ( !hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
 					
-					// handle convex corners or jumping
-					if (handFalling || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) || lastTouchedWood) {
-						setGravity(hand, FlxObject.DOWN, true);
-					} else if (hand.facing == FlxObject.UP && hand.velocity.x > 0) {
-						setGravity(hand,FlxObject.LEFT,true);
-					} else if (hand.facing == FlxObject.DOWN && hand.velocity.x < 0) {
-						setGravity(hand,FlxObject.RIGHT,true);
-					} else if (hand.facing == FlxObject.RIGHT && hand.velocity.y > 0) {
-						setGravity(hand,FlxObject.UP,true);
-					} else if (hand.facing == FlxObject.LEFT && hand.velocity.y < 0) {
+					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
-					} else if (hand.facing == FlxObject.UP && hand.velocity.x < 0) {
-						setGravity(hand,FlxObject.RIGHT,true);
-					} else if (hand.facing == FlxObject.DOWN && hand.velocity.x > 0) {
+					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
 						setGravity(hand,FlxObject.LEFT,true);
-					} else if (hand.facing == FlxObject.RIGHT && hand.velocity.y < 0) {
-						setGravity(hand,FlxObject.DOWN,true);
-					} else if (hand.facing == FlxObject.LEFT && hand.velocity.y > 0) {
+					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
+						setGravity(hand,FlxObject.RIGHT,true);
+					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
 						setGravity(hand,FlxObject.UP,true);
-					} else if (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE) {
+					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
 						setGravity(hand,FlxObject.DOWN,true);
 					}
 					
