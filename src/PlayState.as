@@ -229,6 +229,10 @@ package {
 			
 			// The hand is not attached to a body
 			if (!bodyMode) {
+				// The hand is about to mount a body
+				if (FlxG.keys.justPressed("DOWN")) {
+					bodyTargetAngle = hand.angle;
+				}
 				// The hand is crawling along a flat surface
 				if (hand.touching) {
 					// Set the Angle of the hand
@@ -308,23 +312,18 @@ package {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
 					hand.play("idle body");
-					
-					// The hand has just returned to the body
-					if (handReturnedToBody) {
-						handReturnedToBody = false;
-						for (var l:String in arms.members) {
-							arms.members[l].visible = false;
-						}
+					// The hand is about to dismount 
+					if (FlxG.keys.justPressed("DOWN")) {
+						//
 					}
-					// The hand is about to extend from the body
-					if (FlxG.keys.justPressed("SPACE")) {
-						for (var ll:String in arms.members) {
-							arms.members[ll].visible = true;
-						}
+					// Keep arms hidden
+					for (var i:String in arms.members) {
+						arms.members[i].visible = false;
 					}
 				}
 				// The hand is extended
 				else if (handOut) {
+					
 					// Properly space and rotate the arm segments
 					var deltaX:Number = -body.x + hand.x;
 					var deltaY:Number = -body.y + hand.y;
@@ -347,14 +346,18 @@ package {
 						else if (hand.isTouching(FlxObject.UP)) {hand.angle = 180;}
 						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
 						bodyTargetAngle = hand.angle;
-						
+						// The arm is retracting while holding
 						if (!FlxG.keys.SPACE) {
 							if (bodyTargetAngle > body.angle) {
-								body.angle += 2;
+								body.angle += 4;
 							} else if (bodyTargetAngle < body.angle) {
-								body.angle -= 2;
+								body.angle -= 4;
 							}
 						}
+					}
+					// The hand is retracting without having touched anything
+					if (!FlxG.keys.SPACE && !hand.touching) {
+						//
 					}
 				}
 			}
