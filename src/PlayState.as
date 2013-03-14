@@ -293,7 +293,7 @@ package {
 						(hand.facing == FlxObject.LEFT && hand.angle > 0) ||
 						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
 						*/
-						hand.angle -= 5;
+						hand.angle -= 2.2;
 						//}
 					} else if (handDir == FlxObject.RIGHT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
@@ -301,7 +301,7 @@ package {
 						(hand.facing == FlxObject.LEFT && hand.angle < 180) ||
 						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
 						*/
-						hand.angle += 5;
+						hand.angle += 2.2;
 						//}
 					}
 				}
@@ -557,16 +557,16 @@ package {
 					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
 					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						hand.velocity.x = -MAX_MOVE_VEL;
+						//hand.velocity.x = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.LEFT,true);
 					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						hand.velocity.x = MAX_MOVE_VEL;
+						//hand.velocity.x = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.RIGHT,true);
 					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						hand.velocity.y = -MAX_MOVE_VEL;
+						//hand.velocity.y = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.UP,true);
 					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						hand.velocity.y = MAX_MOVE_VEL;
+						//hand.velocity.y = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.DOWN,true);
 					}
 					
