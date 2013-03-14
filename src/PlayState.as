@@ -19,12 +19,26 @@ package {
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 127; //maximum index number of metal in the tilemap
-		// tilemap indices unspecified for 128 through 159
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		
+		/* Spawn point info
+		
+		Spawn point indices:
+		hand: 191
+		bodies (weights 1-6): 190-185
+		blocks 32x32 (weights 1-6): 184-179
+		blocks 64x64 (weights 1-6): 178-173
+		blocks 96x96 (weights 1-6): 172-167
+		
+		Spawn point markings:
+		hand: H
+		bodies: arabic numerals
+		blocks: relative block size, roman numerals
+		*/
 		
 		public var dbg:int;
 		public var rad:Number;
