@@ -62,6 +62,7 @@ package {
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
 		public var shootAngle:int;
+		public var handReturnedToBody:Boolean = false;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -224,141 +225,141 @@ package {
 				if (gear.angle > 360) {gear.angle = 0;}
 			}
 			
-			/* Begin Animation */
+			/* Begin Animations */
 			
-			// The hand is crawling along a flat surface
-			if (!bodyMode && hand.touching){
-				
-				// Set the Angle of the hand
-				if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
-				else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
-				else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
-				else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
-				
-				// Set the direction the hand is facing
-				// (because the sprite's not ambidexterous)
-				if (FlxG.keys.LEFT) {handDir = FlxObject.LEFT;}
-				if (FlxG.keys.RIGHT) {handDir = FlxObject.RIGHT;}
-				
-				// Set appropriate animation
-				// (this relies on the facing because the sprite's not ambidexterous)
-				if (handDir == FlxObject.LEFT) {
-					if ((hand.facing == FlxObject.UP && hand.velocity.x > 0) ||
-						(hand.facing == FlxObject.DOWN && hand.velocity.x < 0) ||
-						(hand.facing == FlxObject.LEFT && hand.velocity.y < 0) ||
-						(hand.facing == FlxObject.RIGHT && hand.velocity.y > 0)) {
-						hand.play("crawl left");
-					} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-						hand.play("idle left");
-					}
-				} else if (handDir == FlxObject.RIGHT) {
-					if ((hand.facing == FlxObject.UP && hand.velocity.x < 0) ||
-						(hand.facing == FlxObject.DOWN && hand.velocity.x > 0) ||
-						(hand.facing == FlxObject.LEFT && hand.velocity.y > 0) ||
-						(hand.facing == FlxObject.RIGHT && hand.velocity.y < 0)) {
-						hand.play("crawl right");
-					} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-						hand.play("idle right");
-					}
-				}
-				
-				// The hand is rapelling itself from a surface
-				if (FlxG.keys.UP) {
-					if (handDir == FlxObject.LEFT) {hand.play("idle left");} //<- placeholder {hand.play("jump left");}
-					else if (handDir == FlxObject.RIGHT) {hand.play("idle right");} //<- placeholder {hand.play("jump right");}
-				}
-			}
-			
-			// The hand is rounding a convex corner
-			else if (!bodyMode && !hand.touching && !handFalling) {
-				if (handDir == FlxObject.LEFT) {
-					/*if ((hand.facing == FlxObject.UP && hand.angle > 90) ||
-						(hand.facing == FlxObject.DOWN && hand.angle > -90) || <- this line's not working
-						(hand.facing == FlxObject.LEFT && hand.angle > 0) ||
-						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
-					*/
-						hand.angle -= 5;
-					//}
-				} else if (handDir == FlxObject.RIGHT) {
-					/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
-						(hand.facing == FlxObject.DOWN && hand.angle < 90) ||
-						(hand.facing == FlxObject.LEFT && hand.angle < 180) ||
-						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
-					*/
-						hand.angle += 5;
-					//}
-				}
-			}
-			
-			// The hand is falling (with style!)
-			else if (!bodyMode && !hand.touching && handFalling) {
-				if (hand.angle > 0 && hand.angle < 360) {
-					if (handDir == FlxObject.LEFT) {
-						hand.play("idle left"); //<- placeholder hand.play("fall left");
-						hand.angle += 10;
-					} else if (handDir == FlxObject.RIGHT) {
-						hand.play("idle right"); //<- placeholder hand.play("fall right");
-						hand.angle -= 10;
-					}
-				}
-			}
-				
-			// The hand is attached to the body
-			else if (bodyMode){
-				hand.angle = arrow.angle - 90;
-				hand.play("idle body");
-				
-				var deltaX:Number = -body.x + hand.x;
-				var deltaY:Number = -body.y + hand.y;
-				
-				var arm:FlxSprite;
-				var stupid:int = 0;
-				for (var jj:String in arms.members) {
-					arm = arms.members[jj];
-					arm.visible = true;
-					arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2.0-arm.frameWidth/2.0;
-					arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2.0-arm.frameHeight/2.0;
-					stupid = stupid + 1;
-					arm.angle = shootAngle + 90;
-				}
-				
-				if (handOut && hand.touching) {
-					// first set facing of hand sprite
+			// The hand is not attached to a body
+			if (!bodyMode) {
+				// The hand is crawling along a flat surface
+				if (hand.touching) {
+					// Set the Angle of the hand
 					if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
 					else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
 					else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
 					else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
-					
-					// for now, just changing direction immediately, but should really swivel into place as the hand moves
-					// maybe set a destination, then swivel to it?
-					if (hand.facing == FlxObject.DOWN) {bodyTargetAngle = 0;}
-					else if (hand.facing == FlxObject.LEFT) {bodyTargetAngle = 90;}
-					else if (hand.facing == FlxObject.UP) {bodyTargetAngle = 180;}
-					else if (hand.facing == FlxObject.RIGHT) {bodyTargetAngle = 270;}
-				}
-				
-				if (FlxG.keys.justPressed("SPACE")) {
-					for (var i:String in arms.members) {
-						arms.members[i].visible = true;
+					// The hand is changing direction
+					// (because the sprite's not ambidexterous)
+					if (FlxG.keys.LEFT) {handDir = FlxObject.LEFT;}
+					if (FlxG.keys.RIGHT) {handDir = FlxObject.RIGHT;}
+					// Make the hand crawl or idle
+					// (this relies on the facing and direction because the sprite's not ambidexterous)
+					if (handDir == FlxObject.LEFT) {
+						if ((hand.facing == FlxObject.UP && hand.velocity.x > 0) ||
+							(hand.facing == FlxObject.DOWN && hand.velocity.x < 0) ||
+							(hand.facing == FlxObject.LEFT && hand.velocity.y < 0) ||
+							(hand.facing == FlxObject.RIGHT && hand.velocity.y > 0)) {
+							hand.play("crawl left");
+						} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+							hand.play("idle left");
+						}
+					} else if (handDir == FlxObject.RIGHT) {
+						if ((hand.facing == FlxObject.UP && hand.velocity.x < 0) ||
+							(hand.facing == FlxObject.DOWN && hand.velocity.x > 0) ||
+							(hand.facing == FlxObject.LEFT && hand.velocity.y > 0) ||
+							(hand.facing == FlxObject.RIGHT && hand.velocity.y < 0)) {
+							hand.play("crawl right");
+						} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+							hand.play("idle right");
+						}
+					}
+					// The hand is about to jump from a flat surface
+					if (FlxG.keys.justPressed("UP")) {
+						if (handDir == FlxObject.LEFT) {hand.play("idle left");} //<- placeholder {hand.play("jump left");}
+						else if (handDir == FlxObject.RIGHT) {hand.play("idle right");} //<- placeholder {hand.play("jump right");}
 					}
 				}
-				if (!handOut) {
-					for (var ii:String in arms.members) {
-						arms.members[ii].visible = false;
+				// The hand is rounding a convex corner
+				else if (!handFalling) {
+					if (handDir == FlxObject.LEFT) {
+						/*if ((hand.facing == FlxObject.UP && hand.angle > 90) ||
+						(hand.facing == FlxObject.DOWN && hand.angle > -90) || <- this line's not working
+						(hand.facing == FlxObject.LEFT && hand.angle > 0) ||
+						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
+						*/
+						hand.angle -= 5;
+						//}
+					} else if (handDir == FlxObject.RIGHT) {
+						/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
+						(hand.facing == FlxObject.DOWN && hand.angle < 90) ||
+						(hand.facing == FlxObject.LEFT && hand.angle < 180) ||
+						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
+						*/
+						hand.angle += 5;
+						//}
 					}
 				}
-				
-				if (!FlxG.keys.SPACE) {
-					if (bodyTargetAngle > body.angle) {
-						body.angle += 2;
-					} else if (bodyTargetAngle < body.angle) {
-						body.angle -= 2;
+				// The hand is falling (with style!)
+				else {
+					if (hand.angle > 0 && hand.angle < 360) {
+						if (handDir == FlxObject.LEFT) {
+							hand.play("idle left"); //<- placeholder hand.play("fall left");
+							hand.angle += 10;
+						} else if (handDir == FlxObject.RIGHT) {
+							hand.play("idle right"); //<- placeholder hand.play("fall right");
+							hand.angle -= 10;
+						}
 					}
 				}
-				if (!handOut) {body.angle = bodyTargetAngle;}
-				
 			}
-			/* End Animation */
+			
+			// The hand is attached to a body
+			else if (bodyMode) {
+				// The hand is idling in the body
+				if (!handOut) {
+					hand.angle = arrow.angle - 90;
+					body.angle = bodyTargetAngle;
+					hand.play("idle body");
+					
+					// The hand has just returned to the body
+					if (handReturnedToBody) {
+						handReturnedToBody = false;
+						for (var l:String in arms.members) {
+							arms.members[l].visible = false;
+						}
+					}
+					// The hand is about to extend from the body
+					if (FlxG.keys.justPressed("SPACE")) {
+						for (var ll:String in arms.members) {
+							arms.members[ll].visible = true;
+						}
+					}
+				}
+				// The hand is extended
+				else if (handOut) {
+					// Properly space and rotate the arm segments
+					var deltaX:Number = -body.x + hand.x;
+					var deltaY:Number = -body.y + hand.y;
+					
+					var arm:FlxSprite;
+					var stupid:int = 0;
+					for (var jj:String in arms.members) {
+						arm = arms.members[jj];
+						arm.visible = true;
+						arm.x = body.x + deltaX*(stupid)/numArms + hand.frameWidth/2.0-arm.frameWidth/2.0;
+						arm.y = body.y + deltaY*(stupid)/numArms + hand.frameHeight/2.0-arm.frameHeight/2.0;
+						stupid = stupid + 1;
+						arm.angle = shootAngle + 90;
+					}
+					
+					// The hand has come in contact with a wall
+					if (hand.touching && !lastTouchedWood) {
+						if (hand.isTouching(FlxObject.DOWN)) {hand.angle = 0;}
+						else if (hand.isTouching(FlxObject.LEFT)) {hand.angle = 90;}
+						else if (hand.isTouching(FlxObject.UP)) {hand.angle = 180;}
+						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
+						bodyTargetAngle = hand.angle;
+						
+						if (!FlxG.keys.SPACE) {
+							if (bodyTargetAngle > body.angle) {
+								body.angle += 2;
+							} else if (bodyTargetAngle < body.angle) {
+								body.angle -= 2;
+							}
+						}
+					}
+				}
+			}
+		
+			/* End Animations */
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
@@ -384,6 +385,7 @@ package {
 							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 							arrow.angle = shootAngle;
+							handReturnedToBody = true;
 						}
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
@@ -532,18 +534,22 @@ package {
 					}
 				}
 			} else {
-				if (onGround && ( !hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
+				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
 					
 					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
 					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
+						hand.velocity.x = -MAX_MOVE_VEL;
 						setGravity(hand,FlxObject.LEFT,true);
 					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
+						hand.velocity.x = MAX_MOVE_VEL;
 						setGravity(hand,FlxObject.RIGHT,true);
 					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
+						hand.velocity.y = -MAX_MOVE_VEL;
 						setGravity(hand,FlxObject.UP,true);
 					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
+						hand.velocity.y = MAX_MOVE_VEL;
 						setGravity(hand,FlxObject.DOWN,true);
 					}
 					
@@ -586,6 +592,7 @@ package {
 				} else {
 					handMetalFlag = 1;
 					fixGravity(spr2);
+					lastTouchedWood = false;
 				}
 			} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
 				fixGravity(spr2);
@@ -596,6 +603,7 @@ package {
 					} else {
 						handMetalFlag = 1;
 						fixGravity(spr1);
+						lastTouchedWood = false;
 					}
 				} else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
 					fixGravity(spr1);
