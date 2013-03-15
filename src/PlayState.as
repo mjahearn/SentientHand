@@ -139,25 +139,23 @@ package {
 			//level.loadMap(new testMap,tileset,8,8);
 			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
+			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
+			FlxG.camera.bounds = FlxG.worldBounds;
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
+			
 			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
+			
+			// Bodies
+			bodyGroup = new FlxGroup();
+			bodyGearGroup = new FlxGroup();
 			for (i = BODY_MIN; i <= BODY_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
 			}
-			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-			}
-			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
-			var array:Array = level.getTileInstances(HAND_SPAWN);
-			var handPoint:FlxPoint = pointForTile(array[0]);
-			
-			bodyGroup = new FlxGroup();
-			bodyGearGroup = new FlxGroup();
 			
 			var body:FlxSprite = new FlxSprite(160, 416,bodySheet);
 			body.mass = 2;
@@ -177,15 +175,28 @@ package {
 			add(bodyGroup);
 			add(bodyGearGroup);
 			
-			bodyMode = false;
-			curBody = uint.MAX_VALUE;
-			handOut = false;
-			handGrab = false;
-			handMetalFlag = uint.MAX_VALUE;
-			handWoodFlag = uint.MAX_VALUE;
-			handBlockFlag = uint.MAX_VALUE;
-			handBlockRel = new FlxPoint();
-			rad = 0;
+			// Blocks
+			blockGroup = new FlxGroup();
+			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var blockArray:Array = level.getTileInstances(i);
+				if (blockArray) {
+					for (var jj:int = 0; jj < blockArray.length; jj++) {
+						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
+						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,block32x32w6Sheet);
+						setBlockState(testBlock,0);
+						testBlock.mass = BLOCK_MAX-i+1;
+						FlxG.log(testBlock.mass);
+						blockGroup.add(testBlock);
+					}
+				}
+			}
+			add(blockGroup);
+			
+			// Hand + Arms
+			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
+			var array:Array = level.getTileInstances(HAND_SPAWN);
+			var handPoint:FlxPoint = pointForTile(array[0]);
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -212,14 +223,16 @@ package {
 			onGround = true;
 			add(hand);
 			
-			blockGroup = new FlxGroup();
-			var testBlock:FlxSprite = new FlxSprite(386, 416,block32x32w6Sheet);
-			testBlock.immovable = true;
-			testBlock.drag.x = Number.MAX_VALUE;
-			testBlock.drag.y = Number.MAX_VALUE;
-			testBlock.mass = 3;
-			blockGroup.add(testBlock);
-			add(blockGroup);
+			
+			bodyMode = false;
+			curBody = uint.MAX_VALUE;
+			handOut = false;
+			handGrab = false;
+			handMetalFlag = uint.MAX_VALUE;
+			handWoodFlag = uint.MAX_VALUE;
+			handBlockFlag = uint.MAX_VALUE;
+			handBlockRel = new FlxPoint();
+			rad = 0;
 			
 			arrow = new FlxSprite();
 			arrow.loadGraphic(arrowSheet);
@@ -421,6 +434,7 @@ package {
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
 							handOut = false;
+							handBlockFlag = uint.MAX_VALUE;
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
 							hand.acceleration.x = 0;
@@ -530,10 +544,12 @@ package {
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(blockGroup, bodyGroup, blockCallback);
-			FlxG.collide(level, blockGroup);
+			FlxG.collide(level, blockGroup, levelBlockCallback);
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
-				of the hand against the surface, we must do this check for the other corner to compensate*/
+				of the hand against the surface, we must do this check for the other corner to compensate
+				WARNING: since the switch to 8x8 tiles, this only checks one other tile (on the opposite end), while the player is
+				colliding with >=4 */
 				var indX:uint = handWoodFlag % level.widthInTiles;
 				var indY:uint = handWoodFlag / level.widthInTiles;
 				if (hand.isTouching(FlxObject.UP) && indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
@@ -547,9 +563,7 @@ package {
 					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
 					if (curBlock.mass < body.mass) {
 						if (prevHandBlockFlag == uint.MAX_VALUE) {
-							curBlock.immovable = false;
-							curBlock.drag.x = Number.MAX_VALUE;
-							curBlock.drag.y = Number.MAX_VALUE;
+							setBlockState(curBlock, 1);
 							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
 						}
 						if (handOut) {
@@ -557,9 +571,7 @@ package {
 							curBlock.y = hand.y + handBlockRel.y;
 							FlxG.collide(level, blockGroup);
 						} else {
-							curBlock.drag.x = 0;
-							curBlock.drag.y = 0;
-							curBlock.acceleration.y = GRAV_RATE;
+							setBlockState(curBlock, 2);
 							handBlockFlag = uint.MAX_VALUE;
 						}
 					}
@@ -645,10 +657,7 @@ package {
 		}
 		
 		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
-			spr2.immovable = true;
-			spr2.drag.x = Number.MAX_VALUE;
-			spr2.drag.y = Number.MAX_VALUE;
-			spr2.acceleration.y = 0;
+			setBlockState(spr2, 0);
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
@@ -732,10 +741,31 @@ package {
 		}
 		
 		public function pointForTile(tile:uint):FlxPoint {
-			var X:int = 8*(tile%level.heightInTiles);
-			var Y:int = 8*(tile/level.widthInTiles);
+			var X:Number = level.width-32*(tile%level.heightInTiles);
+			var Y:Number = 8*(tile/level.widthInTiles) - 4;
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
+		}
+		/* 0 = rest
+		1 = grabbed
+		2 = in air*/
+		public function setBlockState(b:FlxSprite, n:uint):void {
+			if (n == 0) {
+				b.immovable = true;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else if (n == 1) {
+				b.immovable = false;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else {
+				b.immovable = false;
+				b.drag.x = 0;
+				b.drag.y = 0;
+				b.acceleration.y = GRAV_RATE;
+			}
 		}
 	}
 }
