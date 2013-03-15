@@ -407,6 +407,7 @@ package {
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
 							handOut = false;
+							handBlockFlag = uint.MAX_VALUE;
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
 							hand.acceleration.x = 0;
@@ -519,7 +520,9 @@ package {
 			FlxG.collide(level, blockGroup, levelBlockCallback);
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
-				of the hand against the surface, we must do this check for the other corner to compensate*/
+				of the hand against the surface, we must do this check for the other corner to compensate
+				WARNING: since the switch to 8x8 tiles, this only checks one other tile (on the opposite end), while the player is
+				colliding with >=4 */
 				var indX:uint = handWoodFlag % level.widthInTiles;
 				var indY:uint = handWoodFlag / level.widthInTiles;
 				if (hand.isTouching(FlxObject.UP) && indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
