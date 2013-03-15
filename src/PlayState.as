@@ -89,7 +89,14 @@ package {
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
-		[Embed("assets/body.png")] public var bodySheet:Class;
+		//[Embed("assets/body.png")] public var bodySheet:Class;
+		
+		[Embed("assets/body_w1.png")] public var bodyw1Sheet:Class;
+		[Embed("assets/body_w2.png")] public var bodyw2Sheet:Class;
+		[Embed("assets/body_w3.png")] public var bodyw3Sheet:Class;
+		[Embed("assets/body_w4.png")] public var bodyw4Sheet:Class;
+		[Embed("assets/body_w5.png")] public var bodyw5Sheet:Class;
+		[Embed("assets/body_w6.png")] public var bodyw6Sheet:Class;
 		
 		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
 		
@@ -97,6 +104,11 @@ package {
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		
+		[Embed("assets/block_32x32_w1.png")] public var block32x32w1Sheet:Class;
+		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
+		[Embed("assets/block_32x32_w3.png")] public var block32x32w3Sheet:Class;
+		[Embed("assets/block_32x32_w4.png")] public var block32x32w4Sheet:Class;
+		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
@@ -136,8 +148,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -159,11 +171,21 @@ package {
 				if (bodyArray) {
 					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
 						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj]);
-						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-						body.mass = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
-						if (body.mass == 0) {body.mass = 6;}
-						FlxG.log(body.mass);
+						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
+						if (bmass == 0) {bmass = 6;}
+						
+						var bodyImgClass:Class;
+						if (bmass == 1) {bodyImgClass = bodyw1Sheet;}
+						else if (bmass == 2) {bodyImgClass = bodyw2Sheet;}
+						else if (bmass == 3) {bodyImgClass = bodyw3Sheet;}
+						else if (bmass == 4) {bodyImgClass = bodyw4Sheet;}
+						else if (bmass == 5) {bodyImgClass = bodyw5Sheet;}
+						else if (bmass == 6) {bodyImgClass = bodyw6Sheet;}
+						
+						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodyImgClass); // need to adjust graphic
+						//FlxG.log(body.mass);
 						bodyTargetAngle = body.angle;
+						body.mass = bmass;
 						setGravity(body,FlxObject.DOWN,true);
 						bodyGroup.add(body);
 						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
@@ -181,11 +203,21 @@ package {
 				var blockArray:Array = level.getTileInstances(i);
 				if (blockArray) {
 					for (var jj:int = 0; jj < blockArray.length; jj++) {
+						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
+						if (mass == 0) {mass = 6};
 						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
-						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,block32x32w6Sheet); // need to adjust graphic
+						
+						var imgClass:Class;
+						if (mass == 1) {imgClass = block32x32w1Sheet;}
+						else if (mass == 2) {imgClass = block32x32w2Sheet;}
+						else if (mass == 3) {imgClass = block32x32w3Sheet;}
+						else if (mass == 4) {imgClass = block32x32w4Sheet;}
+						else if (mass == 5) {imgClass = block32x32w5Sheet;}
+						else if (mass == 6) {imgClass = block32x32w6Sheet;}
+						
+						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
 						setBlockState(testBlock,0);
-						testBlock.mass = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
-						if (testBlock.mass == 0) {testBlock.mass = 6};
+						testBlock.mass = mass;
 						//FlxG.log(testBlock.mass);
 						blockGroup.add(testBlock);
 					}
