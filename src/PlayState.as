@@ -155,8 +155,23 @@ package {
 			bodyGearGroup = new FlxGroup();
 			for (i = BODY_MIN; i <= BODY_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
+				var bodyArray:Array = level.getTileInstances(i);
+				if (bodyArray) {
+					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
+						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj]);
+						FlxG.log(bodyPoint.x);
+						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
+						body.mass = 2; // need to adjust mass
+						bodyTargetAngle = body.angle;
+						setGravity(body,FlxObject.DOWN,true);
+						bodyGroup.add(body);
+						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+						bodyGearGroup.add(bodyGear);
+					}
+				}
 			}
 			
+			/*
 			var body:FlxSprite = new FlxSprite(160, 416,bodySheet);
 			body.mass = 2;
 			bodyTargetAngle = body.angle;
@@ -171,6 +186,7 @@ package {
 			bodyGroup.add(body);
 			bodyGear = new FlxSprite(body.x,body.y,bodyGearSheet);
 			bodyGearGroup.add(bodyGear);
+			*/
 			
 			add(bodyGroup);
 			add(bodyGearGroup);
@@ -183,10 +199,10 @@ package {
 				if (blockArray) {
 					for (var jj:int = 0; jj < blockArray.length; jj++) {
 						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
-						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,block32x32w6Sheet);
+						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,block32x32w6Sheet); // need to adjust graphic
 						setBlockState(testBlock,0);
-						testBlock.mass = BLOCK_MAX-i+1;
-						FlxG.log(testBlock.mass);
+						testBlock.mass = 3; // need to adjust mass //BLOCK_MAX-i+1;
+						//FlxG.log(testBlock.mass);
 						blockGroup.add(testBlock);
 					}
 				}
@@ -741,8 +757,8 @@ package {
 		}
 		
 		public function pointForTile(tile:uint):FlxPoint {
-			var X:Number = level.width-32*(tile%level.heightInTiles);
-			var Y:Number = 8*(tile/level.widthInTiles) - 4;
+			var X:Number = 8*(int)(tile%level.widthInTiles);
+			var Y:Number = 8*(int)(tile/level.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
 		}
