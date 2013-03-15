@@ -136,8 +136,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -159,9 +159,10 @@ package {
 				if (bodyArray) {
 					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
 						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj]);
-						FlxG.log(bodyPoint.x);
 						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-						body.mass = 2; // need to adjust mass
+						body.mass = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
+						if (body.mass == 0) {body.mass = 6;}
+						FlxG.log(body.mass);
 						bodyTargetAngle = body.angle;
 						setGravity(body,FlxObject.DOWN,true);
 						bodyGroup.add(body);
@@ -169,25 +170,7 @@ package {
 						bodyGearGroup.add(bodyGear);
 					}
 				}
-			}
-			
-			/*
-			var body:FlxSprite = new FlxSprite(160, 416,bodySheet);
-			body.mass = 2;
-			bodyTargetAngle = body.angle;
-			setGravity(body, FlxObject.DOWN, true);
-			bodyGroup.add(body);
-			var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
-			bodyGearGroup.add(bodyGear);
-			
-			body = new FlxSprite(120, 416,bodySheet);
-			body.mass = 4;
-			setGravity(body, FlxObject.DOWN, true);
-			bodyGroup.add(body);
-			bodyGear = new FlxSprite(body.x,body.y,bodyGearSheet);
-			bodyGearGroup.add(bodyGear);
-			*/
-			
+			}			
 			add(bodyGroup);
 			add(bodyGearGroup);
 			
@@ -201,7 +184,8 @@ package {
 						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,block32x32w6Sheet); // need to adjust graphic
 						setBlockState(testBlock,0);
-						testBlock.mass = 3; // need to adjust mass //BLOCK_MAX-i+1;
+						testBlock.mass = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
+						if (testBlock.mass == 0) {testBlock.mass = 6};
 						//FlxG.log(testBlock.mass);
 						blockGroup.add(testBlock);
 					}
