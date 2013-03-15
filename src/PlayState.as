@@ -131,9 +131,11 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
+			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
+			FlxG.camera.bounds = FlxG.worldBounds;
 			
 			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -200,9 +202,7 @@ package {
 			
 			blockGroup = new FlxGroup();
 			var testBlock:FlxSprite = new FlxSprite(386, 416,block32x32w6Sheet);
-			testBlock.immovable = true;
-			testBlock.drag.x = Number.MAX_VALUE;
-			testBlock.drag.y = Number.MAX_VALUE;
+			setBlockState(testBlock, 0);
 			testBlock.mass = 3;
 			blockGroup.add(testBlock);
 			add(blockGroup);
@@ -516,7 +516,7 @@ package {
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(blockGroup, bodyGroup, blockCallback);
-			FlxG.collide(level, blockGroup);
+			FlxG.collide(level, blockGroup, levelBlockCallback);
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate*/
@@ -533,9 +533,7 @@ package {
 					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
 					if (curBlock.mass < body.mass) {
 						if (prevHandBlockFlag == uint.MAX_VALUE) {
-							curBlock.immovable = false;
-							curBlock.drag.x = Number.MAX_VALUE;
-							curBlock.drag.y = Number.MAX_VALUE;
+							setBlockState(curBlock, 1);
 							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
 						}
 						if (handOut) {
@@ -543,9 +541,7 @@ package {
 							curBlock.y = hand.y + handBlockRel.y;
 							FlxG.collide(level, blockGroup);
 						} else {
-							curBlock.drag.x = 0;
-							curBlock.drag.y = 0;
-							curBlock.acceleration.y = GRAV_RATE;
+							setBlockState(curBlock, 2);
 							handBlockFlag = uint.MAX_VALUE;
 						}
 					}
@@ -629,10 +625,7 @@ package {
 		}
 		
 		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
-			spr2.immovable = true;
-			spr2.drag.x = Number.MAX_VALUE;
-			spr2.drag.y = Number.MAX_VALUE;
-			spr2.acceleration.y = 0;
+			setBlockState(spr2, 0);
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
@@ -713,6 +706,28 @@ package {
 				}
 			}
 			return(uint.MAX_VALUE);
+		}
+		
+		/* 0 = rest
+		1 = grabbed
+		2 = in air*/
+		public function setBlockState(b:FlxSprite, n:uint):void {
+			if (n == 0) {
+				b.immovable = true;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else if (n == 1) {
+				b.immovable = false;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else {
+				b.immovable = false;
+				b.drag.x = 0;
+				b.drag.y = 0;
+				b.acceleration.y = GRAV_RATE;
+			}
 		}
 	}
 }
