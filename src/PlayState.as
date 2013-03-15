@@ -39,6 +39,11 @@ package {
 		bodies: arabic numerals
 		blocks: relative block size, roman numerals
 		*/
+		public const HAND_SPAWN:uint = 191;
+		public const BODY_MIN:uint = 185;
+		public const BODY_MAX:uint = 190;
+		public const BLOCK_MIN:uint = 167;
+		public const BLOCK_MAX:uint = 184
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -141,6 +146,15 @@ package {
 			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
+			for (i = BODY_MIN; i <= BODY_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+			}
+			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+			}
+			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
+			var array:Array = level.getTileInstances(HAND_SPAWN);
+			var handPoint:FlxPoint = pointForTile(array[0]);
 			
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
@@ -181,7 +195,7 @@ package {
 			}
 			add(arms);
 			
-			hand = new FlxSprite(64, 416);
+			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
 			hand.addAnimation("crawl right",[0,1,2,3,4,5,6],22,true);
 			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
@@ -602,6 +616,8 @@ package {
 			}
 		}
 		
+		
+		
 		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				if (bodyMode) {
@@ -713,6 +729,13 @@ package {
 				}
 			}
 			return(uint.MAX_VALUE);
+		}
+		
+		public function pointForTile(tile:uint):FlxPoint {
+			var X:int = 8*(tile%level.heightInTiles);
+			var Y:int = 8*(tile/level.widthInTiles);
+			var p:FlxPoint = new FlxPoint(X,Y);
+			return p;
 		}
 	}
 }
