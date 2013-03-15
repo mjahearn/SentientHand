@@ -450,7 +450,10 @@ package {
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
 							handOut = false;
-							handBlockFlag = uint.MAX_VALUE;
+							if (handBlockFlag < uint.MAX_VALUE) {
+								setBlockState(blockGroup.members[handBlockFlag], 2);
+								handBlockFlag = uint.MAX_VALUE;
+							}
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
 							hand.acceleration.x = 0;
@@ -587,6 +590,7 @@ package {
 							curBlock.y = hand.y + handBlockRel.y;
 							FlxG.collide(level, blockGroup);
 						} else {
+							//prolly won't be reached any more due to handBlockFlag resetting with handOut
 							setBlockState(curBlock, 2);
 							handBlockFlag = uint.MAX_VALUE;
 						}
