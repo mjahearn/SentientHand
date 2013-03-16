@@ -148,8 +148,8 @@ package {
 			// foreground
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -573,13 +573,14 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			var prevHandBlockFlag:uint = handBlockFlag;
 			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand);
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(blockGroup, bodyGroup, blockCallback);
 			FlxG.collide(level, blockGroup, levelBlockCallback);
+			//FlxG.log(blockGroup.members[0].immovable);
+			//FlxG.collide(blockGroup); //Need to figure out how to make this work
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate
@@ -597,7 +598,7 @@ package {
 				if (onGround && handBlockFlag < uint.MAX_VALUE) {
 					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
 					if (curBlock.mass < body.mass) {
-						if (prevHandBlockFlag == uint.MAX_VALUE) {
+						if (curBlock.immovable) {
 							setBlockState(curBlock, 1);
 							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
 						}
@@ -693,7 +694,9 @@ package {
 		}
 		
 		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
-			setBlockState(spr2, 0);
+			if (spr2.isTouching(FlxObject.DOWN)) {
+				setBlockState(spr2, 0);
+			}
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
