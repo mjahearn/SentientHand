@@ -24,6 +24,7 @@ package {
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		public const SOUND_ON:Boolean = true;
 		
 		/* Spawn point info
 		
@@ -304,20 +305,21 @@ package {
 			}
 			
 			/* Begin Audio */
-			
-			if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-				//sound.play();
-				if (lastTouchedWood) {
-					woodCrawlSound.play();
-					//sound = FlxG.play(woodFootstepsSFX);
+			if (SOUND_ON) {
+				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+					//sound.play();
+					if (lastTouchedWood) {
+						woodCrawlSound.play();
+						//sound = FlxG.play(woodFootstepsSFX);
+					} else {
+						metalCrawlSound.play();
+						//sound = FlxG.play(metalFootstepsSFX);
+					}
 				} else {
-					metalCrawlSound.play();
-					//sound = FlxG.play(metalFootstepsSFX);
+					woodCrawlSound.stop();
+					metalCrawlSound.stop();
+					//sound.stop();
 				}
-			} else {
-				woodCrawlSound.stop();
-				metalCrawlSound.stop();
-				//sound.stop();
 			}
 			
 			/* End Audio */
