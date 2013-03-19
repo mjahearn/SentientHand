@@ -113,6 +113,11 @@ package {
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
+		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
+		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
+		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
+		
 		override public function create():void {
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -297,6 +302,25 @@ package {
 				gear.angle += 0.5;
 				if (gear.angle > 360) {gear.angle = 0;}
 			}
+			
+			/* Begin Audio */
+			
+			if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+				//sound.play();
+				if (lastTouchedWood) {
+					woodCrawlSound.play();
+					//sound = FlxG.play(woodFootstepsSFX);
+				} else {
+					metalCrawlSound.play();
+					//sound = FlxG.play(metalFootstepsSFX);
+				}
+			} else {
+				woodCrawlSound.stop();
+				metalCrawlSound.stop();
+				//sound.stop();
+			}
+			
+			/* End Audio */
 			
 			/* Begin Animations */
 			
