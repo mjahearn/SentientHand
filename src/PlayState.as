@@ -309,9 +309,11 @@ package {
 				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
 					//sound.play();
 					if (lastTouchedWood) {
+						metalCrawlSound.stop();
 						woodCrawlSound.play();
 						//sound = FlxG.play(woodFootstepsSFX);
 					} else {
+						woodCrawlSound.stop();
 						metalCrawlSound.play();
 						//sound = FlxG.play(metalFootstepsSFX);
 					}
