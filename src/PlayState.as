@@ -85,7 +85,8 @@ package {
 		public var handBlockFlag:uint;
 		public var handBlockRel:FlxPoint;
 		
-		public var gears:FlxGroup = new FlxGroup();
+		public var gearInGroup:FlxGroup = new FlxGroup();
+		public var gearOutGroup:FlxGroup = new FlxGroup();
 		public var steams:FlxGroup = new FlxGroup();
 		
 		public var lastTouchedWood:Boolean = false;
@@ -109,7 +110,10 @@ package {
 		[Embed("assets/body_w5.png")] public var bodyw5Sheet:Class;
 		[Embed("assets/body_w6.png")] public var bodyw6Sheet:Class;
 		
-		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
+		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
+		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
+		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
+		
 		
 		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
@@ -166,40 +170,65 @@ package {
 				var gearArray:Array = midground.getTileInstances(i);
 				if (gearArray) {
 					for (var j:int = 0; j < gearArray.length; j++) {
-						// eventually some math to get in/out, speed, and size
-						// then pick appropriate sheet
+						
+						// Decide gear spin (In or Out)
+						// n.b. Every other gear in the sheet is In or Out
+						var gearGroup:FlxGroup;
+						if (i%2 == 0) {gearGroup = gearInGroup;}
+						else {gearGroup = gearOutGroup;}
+						
+						// Decide gear size
+						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
+						var gearSheet:Class;
+						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
+						FlxG.log(gearGaugeNumber);
+						if (gearGaugeNumber < 3) {gearSheet = gear64x64Sheet;}
+						else if (gearGaugeNumber < 5) {gearSheet = gear32x32Sheet;}
+						else {gearSheet = gear16x16Sheet;}
+						
+						// do something for gear speed...
+						
 						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
 						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
-						gears.add(gear);
+						gearGroup.add(gear);
 					}
 				}
 			}
-			add(gears)
+			add(gearInGroup);
+			add(gearOutGroup);
 			
 			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 				var steamArray:Array = midground.getTileInstances(i);
 				if (steamArray) {
 					for (j = 0; j < steamArray.length; j++) {
-						// eventually some math to get angle and speed
-						// then pick appropriate sheet
 						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
 						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
 						steam.loadGraphic(steamSheet,true,false,32,32,true);
 						steam.addAnimation("idle",[0]);
-						steam.addAnimation("puff",[1,2,3,0,0,0,0,0,0],11,true);
 						steam.play("idle");
+						
+						// Decide steam angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
+						if (steamGaugeNumber == 0) {steam.angle = 90;}
+						else if (steamGaugeNumber == 1) {steam.angle = 180;}
+						else if (steamGaugeNumber == 2) {steam.angle = 270;}
+						
+						// Decide steam pattern
+						// n.b. Steam is group in 3 patterns
+						steamGaugeNumber = (i-STEAM_MIN);
+						var steamPuffFrames:Array;
+						if (steamGaugeNumber < 4)      {steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
+						else if (steamGaugeNumber < 8) {steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
+						else                           {steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];}
+						steam.addAnimation("puff",steamPuffFrames,11,true);
+						
 						steams.add(steam);
 					}
 				}
 			}
 			add(steams);
-			
-			/*
-			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			gears.add(gear000);
-			add(gears);
-			*/
-			
+
 			/* Foreground */
 			
 			level = new FlxTilemap();
@@ -375,12 +404,18 @@ package {
 			}
 			
 			if (reinvigorated) {
-				// spin midground gears
+				
+				// Spin Gears // should eventually make them accel in/out of spinning
 				var gear:FlxSprite;
-				for (var jjj:String in gears.members) {
-					gear = gears.members[jjj];
+				for (var jjj:String in gearInGroup.members) {
+					gear = gearInGroup.members[jjj];
 					gear.angle += 0.5;
 					if (gear.angle > 360) {gear.angle = 0;}
+				}
+				for (jjj in gearOutGroup.members) {
+					gear = gearOutGroup.members[jjj];
+					gear.angle -= 0.5;
+					if (gear.angle < 0) {gear.angle = 360;}
 				}
 			}
 			
