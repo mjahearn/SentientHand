@@ -44,7 +44,15 @@ package {
 		public const BODY_MIN:uint = 185;
 		public const BODY_MAX:uint = 190;
 		public const BLOCK_MIN:uint = 167;
-		public const BLOCK_MAX:uint = 184
+		public const BLOCK_MAX:uint = 184;
+		
+		/* midground spawn points: */
+		public const GEAR_MIN:uint = 1;
+		public const GEAR_MAX:uint = 18;
+		public const STEAM_MIN:uint = 19;
+		public const STEAM_MAX:uint = 30;
+		
+		public var reinvigorated:Boolean = false;
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -78,6 +86,7 @@ package {
 		public var handBlockRel:FlxPoint;
 		
 		public var gears:FlxGroup = new FlxGroup();
+		public var steams:FlxGroup = new FlxGroup();
 		
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
@@ -86,6 +95,7 @@ package {
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
+		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
 		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
@@ -104,6 +114,7 @@ package {
 		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
+		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
 		
 		[Embed("assets/block_32x32_w1.png")] public var block32x32w1Sheet:Class;
 		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
@@ -118,6 +129,8 @@ package {
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
+		
+		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -140,18 +153,55 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			
-			// background
-			levelBack = new FlxTilemap();
-			levelBack.loadMap(new backgroundMap,backgroundset,8,8);
-			add(levelBack);
+			/* Background */
 			
-			// midground objects
+			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
+			
+			/* Midground */
+			
+			var midground:FlxTilemap = new FlxTilemap();
+			midground.loadMap(new midgroundMap,midgroundset,8,8);
+			
+			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
+				var gearArray:Array = midground.getTileInstances(i);
+				if (gearArray) {
+					for (var j:int = 0; j < gearArray.length; j++) {
+						// eventually some math to get in/out, speed, and size
+						// then pick appropriate sheet
+						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
+						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
+						gears.add(gear);
+					}
+				}
+			}
+			add(gears)
+			
+			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
+				var steamArray:Array = midground.getTileInstances(i);
+				if (steamArray) {
+					for (j = 0; j < steamArray.length; j++) {
+						// eventually some math to get angle and speed
+						// then pick appropriate sheet
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
+						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
+						steam.loadGraphic(steamSheet,true,false,32,32,true);
+						steam.addAnimation("idle",[0]);
+						steam.addAnimation("puff",[1,2,3,0,0,0,0,0,0],11,true);
+						steam.play("idle");
+						steams.add(steam);
+					}
+				}
+			}
+			add(steams);
+			
+			/*
 			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
 			gears.add(gear000);
-			
 			add(gears);
+			*/
 			
-			// foreground
+			/* Foreground */
+			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			level.loadMap(new testMap,tileset,8,8);
@@ -160,7 +210,7 @@ package {
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
 			
-			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
+			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
@@ -176,7 +226,7 @@ package {
 				var bodyArray:Array = level.getTileInstances(i);
 				if (bodyArray) {
 					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
-						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj]);
+						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj],level);
 						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
 						if (bmass == 0) {bmass = 6;}
 						
@@ -211,7 +261,7 @@ package {
 					for (var jj:int = 0; jj < blockArray.length; jj++) {
 						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
 						if (mass == 0) {mass = 6};
-						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
+						var blockPoint:FlxPoint = pointForTile(blockArray[jj],level);
 						
 						var imgClass:Class;
 						if (mass == 1) {imgClass = block32x32w1Sheet;}
@@ -234,7 +284,7 @@ package {
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
 			var array:Array = level.getTileInstances(HAND_SPAWN);
-			var handPoint:FlxPoint = pointForTile(array[0]);
+			var handPoint:FlxPoint = pointForTile(array[0],level);
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -261,7 +311,6 @@ package {
 			onGround = true;
 			add(hand);
 			
-			
 			bodyMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
@@ -276,6 +325,17 @@ package {
 			arrow.loadGraphic(arrowSheet);
 			arrow.visible = false;
 			add(arrow);
+			
+			/*
+			var steam:FlxSprite = new FlxSprite(32,32);
+			steam.loadGraphic(steamSheet,true,false,32,32,true);
+			steam.addAnimation("idle",[0]);
+			steam.addAnimation("puff",[1,2,3,0,0,0,0,0,0],11,true);
+			steam.play("puff");
+			steams.add(steam);
+			add(steams);
+			*/
+			
 		}
 		
 		override public function update():void {
@@ -296,31 +356,50 @@ package {
 				bodyGear.angle = -arrow.angle;
 			}
 			
-			// spin midground gears
-			var gear:FlxSprite;
-			for (var jjj:String in gears.members) {
-				gear = gears.members[jjj];
-				gear.angle += 0.5;
-				if (gear.angle > 360) {gear.angle = 0;}
+			// Bring Midground to Life!
+			if (FlxG.keys.justPressed("A")) {// for debugging
+				if (reinvigorated) {
+					reinvigorated = false;
+					for (var m:String in steams.members) {
+						var steam:FlxSprite = steams.members[m];
+						steam.play("idle");
+					}
+					
+				} else {
+					reinvigorated = true;
+					for (m in steams.members) {
+						steam = steams.members[m];
+						steam.play("puff");
+					}
+				}
+			}
+			
+			if (reinvigorated) {
+				// spin midground gears
+				var gear:FlxSprite;
+				for (var jjj:String in gears.members) {
+					gear = gears.members[jjj];
+					gear.angle += 0.5;
+					if (gear.angle > 360) {gear.angle = 0;}
+				}
 			}
 			
 			/* Begin Audio */
+			
 			if (SOUND_ON) {
+				
+				// The hand is crawling on wood or metal
 				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-					//sound.play();
 					if (lastTouchedWood) {
 						metalCrawlSound.stop();
 						woodCrawlSound.play();
-						//sound = FlxG.play(woodFootstepsSFX);
 					} else {
 						woodCrawlSound.stop();
 						metalCrawlSound.play();
-						//sound = FlxG.play(metalFootstepsSFX);
 					}
 				} else {
 					woodCrawlSound.stop();
 					metalCrawlSound.stop();
-					//sound.stop();
 				}
 			}
 			
@@ -381,6 +460,7 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
 						*/
 						hand.angle -= 2.2;
+						hand.play("idle left"); //<- placeholder {hand.play("jump left");
 						//}
 					} else if (handDir == FlxObject.RIGHT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
@@ -389,6 +469,7 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
 						*/
 						hand.angle += 2.2;
+						hand.play("idle right"); //<- placeholder {hand.play("jump right");
 						//}
 					}
 				}
@@ -807,9 +888,9 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
-		public function pointForTile(tile:uint):FlxPoint {
-			var X:Number = 8*(int)(tile%level.widthInTiles);
-			var Y:Number = 8*(int)(tile/level.widthInTiles);
+		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
+			var X:Number = 8*(int)(tile%map.widthInTiles);
+			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
 		}
