@@ -328,7 +328,7 @@ package {
 						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],level);
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
-						button.loadGraphic(buttonSheet,true,false,32,32,true);
+						button.loadGraphic(buttonSheet,true,false,32,5,true);
 						button.addAnimation("up",[0]);
 						button.addAnimation("down",[1]);
 						button.play("up");
@@ -336,9 +336,10 @@ package {
 						// Decide button angle
 						// n.b. Steam is grouped in 3 frequencies, 4 angles
 						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
-						if (buttonGaugeNumber == 0) {button.angle = 90;}
+						if (buttonGaugeNumber == 0) {button.angle = 90; button.x -= 14; button.y += 14;}
 						else if (buttonGaugeNumber == 1) {button.angle = 180;}
-						else if (buttonGaugeNumber == 2) {button.angle = 270;}
+						else if (buttonGaugeNumber == 2) {button.angle = 270; button.x -= 10; button.y += 14;}
+						else if (buttonGaugeNumber == 3) {button.y += 3;}
 						
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
