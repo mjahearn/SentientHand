@@ -134,6 +134,10 @@ package {
 		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
 		
+		[Embed("assets/block_64x64_w6.png")] public var block64x64w6Sheet:Class;
+		
+		[Embed("assets/block_96x96_w6.png")] public var block96x96w6Sheet:Class;
+		
 		[Embed("assets/button.png")] public var buttonSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
@@ -302,12 +306,24 @@ package {
 						var blockPoint:FlxPoint = pointForTile(blockArray[jj],level);
 						
 						var imgClass:Class;
-						if (mass == 1) {imgClass = block32x32w1Sheet;}
-						else if (mass == 2) {imgClass = block32x32w2Sheet;}
-						else if (mass == 3) {imgClass = block32x32w3Sheet;}
-						else if (mass == 4) {imgClass = block32x32w4Sheet;}
-						else if (mass == 5) {imgClass = block32x32w5Sheet;}
-						else if (mass == 6) {imgClass = block32x32w6Sheet;}
+						
+						// there are six sizes total
+						//var blockGaugeNumber:Number = (i-BLOCK_MIN)%6;
+						
+						if (i>178) {//(blockGaugeNumber > 12) {
+							if (mass == 1) {imgClass = block32x32w1Sheet;}
+							else if (mass == 2) {imgClass = block32x32w2Sheet;}
+							else if (mass == 3) {imgClass = block32x32w3Sheet;}
+							else if (mass == 4) {imgClass = block32x32w4Sheet;}
+							else if (mass == 5) {imgClass = block32x32w5Sheet;}
+							else if (mass == 6) {imgClass = block32x32w6Sheet;}
+						}
+							// not all are implemented yet
+						else if (i>172) {//(blockGaugeNumber > 6) {
+							imgClass = block64x64w6Sheet;
+						} else {
+							imgClass = block96x96w6Sheet;
+						}
 						
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
 						setBlockState(testBlock,0);
