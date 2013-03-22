@@ -46,6 +46,9 @@ package {
 		public const BLOCK_MIN:uint = 167;
 		public const BLOCK_MAX:uint = 184;
 		
+		public const BUTTON_MIN:uint = 163;
+		public const BUTTON_MAX:uint = 166;
+		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
@@ -94,6 +97,10 @@ package {
 		public var shootAngle:int;
 		public var handReturnedToBody:Boolean = false;
 		
+		public var buttonGroup:FlxGroup = new FlxGroup();
+		public var buttonStateArray:Array = new Array();
+		public var buttonReactionArray:Array = new Array();
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
@@ -126,6 +133,8 @@ package {
 		[Embed("assets/block_32x32_w4.png")] public var block32x32w4Sheet:Class;
 		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
+		
+		[Embed("assets/button.png")] public var buttonSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -181,7 +190,7 @@ package {
 						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
 						var gearSheet:Class;
 						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
-						FlxG.log(gearGaugeNumber);
+						//FlxG.log(gearGaugeNumber);
 						if (gearGaugeNumber < 3) {gearSheet = gear64x64Sheet;}
 						else if (gearGaugeNumber < 5) {gearSheet = gear32x32Sheet;}
 						else {gearSheet = gear16x16Sheet;}
@@ -229,12 +238,12 @@ package {
 			}
 			add(steams);
 
-			/* Foreground */
+			/* Level */
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -309,6 +318,56 @@ package {
 				}
 			}
 			add(blockGroup);
+			
+			// Buttons
+			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var buttonArray:Array = level.getTileInstances(i);
+				if (buttonArray) {
+					for (j = 0; j < buttonArray.length; j++) {
+						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],level);
+						
+						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
+						button.loadGraphic(buttonSheet,true,false,32,32,true);
+						button.addAnimation("up",[0]);
+						button.addAnimation("down",[1]);
+						button.play("up");
+						
+						// Decide button angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
+						if (buttonGaugeNumber == 0) {button.angle = 90;}
+						else if (buttonGaugeNumber == 1) {button.angle = 180;}
+						else if (buttonGaugeNumber == 2) {button.angle = 270;}
+						
+						buttonGroup.add(button);
+						buttonStateArray.push(false);
+						
+						// not sure how to handle different buttons doing different things?
+						// presumably, they sholud be linked to specific things in the room?
+						// I'm... not quite sure...
+						var buttonReaction:Function = function():void {
+							if (reinvigorated) {
+								reinvigorated = false;
+								for (var m:String in steams.members) {
+									var steam:FlxSprite = steams.members[m];
+									steam.play("idle");
+								}
+								
+							} else {
+								reinvigorated = true;
+								for (m in steams.members) {
+									steam = steams.members[m];
+									steam.play("puff");
+								}
+							}
+						}
+							
+						buttonReactionArray.push(buttonReaction);
+					}
+				}
+			}
+			add(buttonGroup);
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -385,7 +444,25 @@ package {
 				bodyGear.angle = -arrow.angle;
 			}
 			
+			// Press Buttons!
+			// right now, implemented buttons that go back to original state after pressed,
+			// this can change, this was just easier (I think)
+			for (var mm:String in buttonGroup.members) {
+				var button:FlxSprite = buttonGroup.members[mm];
+				var buttonState:Boolean = buttonStateArray[mm];
+				if (hand.overlaps(button) && !buttonState) { // should change this to make it only recognize the space where the button is visually
+					button.play("down");
+					buttonStateArray[mm] = true;
+					buttonReactionArray[mm]();
+					//FlxG.log("pressed button");
+				} else if (!hand.overlaps(button)) {
+					button.play("up");
+					buttonStateArray[mm] = false;
+				}
+			}
+			
 			// Bring Midground to Life!
+			/*
 			if (FlxG.keys.justPressed("A")) {// for debugging
 				if (reinvigorated) {
 					reinvigorated = false;
@@ -402,8 +479,11 @@ package {
 					}
 				}
 			}
+			*/
 			
 			if (reinvigorated) {
+				
+				// Steam
 				
 				// Spin Gears // should eventually make them accel in/out of spinning
 				var gear:FlxSprite;
