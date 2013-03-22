@@ -389,7 +389,8 @@ package {
 			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
 			hand.addAnimation("crawl left",[20,19,18,17,16,15,14],22,true);
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
-			hand.addAnimation("idle body", [21],10,true);
+			hand.addAnimation("idle body right", [21,21,21,21,21,21,21,22,23,23,23,23,23,23,22],10,true);
+			hand.addAnimation("idle body left", [25,25,25,25,25,25,25,26,27,27,27,27,27,27,26],10,true);
 			handDir = FlxObject.RIGHT;
 			hand.play("idle right");
 			hand.maxVelocity.x = MAX_MOVE_VEL;
@@ -576,10 +577,11 @@ package {
 				if (!handOut) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
-					hand.play("idle body");
+					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
+					else {hand.play("idle body right");}
 					// The hand is about to dismount 
 					if (FlxG.keys.justPressed("DOWN")) {
-						//
+						// play falling animations
 					}
 					// Keep arms hidden
 					for (var i:String in arms.members) {
