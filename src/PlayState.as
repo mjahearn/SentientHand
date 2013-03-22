@@ -242,8 +242,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -414,17 +414,6 @@ package {
 			arrow.loadGraphic(arrowSheet);
 			arrow.visible = false;
 			add(arrow);
-			
-			/*
-			var steam:FlxSprite = new FlxSprite(32,32);
-			steam.loadGraphic(steamSheet,true,false,32,32,true);
-			steam.addAnimation("idle",[0]);
-			steam.addAnimation("puff",[1,2,3,0,0,0,0,0,0],11,true);
-			steam.play("puff");
-			steams.add(steam);
-			add(steams);
-			*/
-			
 		}
 		
 		override public function update():void {
@@ -462,26 +451,7 @@ package {
 				}
 			}
 			
-			// Bring Midground to Life!
-			/*
-			if (FlxG.keys.justPressed("A")) {// for debugging
-				if (reinvigorated) {
-					reinvigorated = false;
-					for (var m:String in steams.members) {
-						var steam:FlxSprite = steams.members[m];
-						steam.play("idle");
-					}
-					
-				} else {
-					reinvigorated = true;
-					for (m in steams.members) {
-						steam = steams.members[m];
-						steam.play("puff");
-					}
-				}
-			}
-			*/
-			
+			// Bring midground to life
 			if (reinvigorated) {
 				
 				// Steam
@@ -501,7 +471,6 @@ package {
 			}
 			
 			/* Begin Audio */
-			
 			if (SOUND_ON) {
 				
 				// The hand is crawling on wood or metal
@@ -518,11 +487,9 @@ package {
 					metalCrawlSound.stop();
 				}
 			}
-			
 			/* End Audio */
 			
 			/* Begin Animations */
-			
 			// The hand is not attached to a body
 			if (!bodyMode) {
 				// The hand is about to mount a body
@@ -655,11 +622,10 @@ package {
 					}
 					// The hand is retracting without having touched anything
 					if (!FlxG.keys.SPACE && !hand.touching) {
-						//
+						
 					}
 				}
 			}
-		
 			/* End Animations */
 			
 			if (bodyMode) {
@@ -845,16 +811,12 @@ package {
 					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
 					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						//hand.velocity.x = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.LEFT,true);
 					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						//hand.velocity.x = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.RIGHT,true);
 					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						//hand.velocity.y = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.UP,true);
 					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						//hand.velocity.y = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.DOWN,true);
 					}
 					
