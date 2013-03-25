@@ -440,6 +440,10 @@ package {
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
 			hand.addAnimation("idle body right", [21,21,21,21,21,21,21,22,23,23,23,23,23,23,22],10,true);
 			hand.addAnimation("idle body left", [25,25,25,25,25,25,25,26,27,27,27,27,27,27,26],10,true);
+			hand.addAnimation("fall right",[28,29],22,false);
+			hand.addAnimation("fall left",[33,34],22,false);
+			hand.addAnimation("extend right",[35,36],22,false);
+			hand.addAnimation("extend left",[40,41],22,false);
 			handDir = FlxObject.RIGHT;
 			hand.play("idle right");
 			hand.maxVelocity.x = MAX_MOVE_VEL;
@@ -502,7 +506,7 @@ package {
 			for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				if (hand.overlaps(button) && !buttonState) { // should change this to make it only recognize the space where the button is visually
+				if ((hand.overlaps(button) && !buttonState) || (button.overlaps(blockGroup) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
 					button.play("down");
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
@@ -616,8 +620,8 @@ package {
 					}
 					// The hand is about to jump from a flat surface
 					if (FlxG.keys.justPressed("UP")) {
-						if (handDir == FlxObject.LEFT) {hand.play("idle left");} //<- placeholder {hand.play("jump left");}
-						else if (handDir == FlxObject.RIGHT) {hand.play("idle right");} //<- placeholder {hand.play("jump right");}
+						if (handDir == FlxObject.LEFT) {hand.play("fall left");} //<- placeholder {hand.play("jump left");}
+						else if (handDir == FlxObject.RIGHT) {hand.play("fall right");} //<- placeholder {hand.play("jump right");}
 					}
 				}
 				// The hand is rounding a convex corner
@@ -629,7 +633,7 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
 						*/
 						hand.angle -= 2.2;
-						hand.play("idle left"); //<- placeholder {hand.play("jump left");
+						hand.play("fall left"); //<- placeholder {hand.play("jump left");
 						//}
 					} else if (handDir == FlxObject.RIGHT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
@@ -638,21 +642,21 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
 						*/
 						hand.angle += 2.2;
-						hand.play("idle right"); //<- placeholder {hand.play("jump right");
+						hand.play("fall right"); //<- placeholder {hand.play("jump right");
 						//}
 					}
 				}
 				// The hand is falling (with style!)
 				else {
-					if (hand.angle > 0 && hand.angle < 360) {
+					//if (hand.angle > 0) && hand.angle < 360) { // maybe cooler if it just spins, metroid style
 						if (handDir == FlxObject.LEFT) {
-							hand.play("idle left"); //<- placeholder hand.play("fall left");
+							hand.play("fall left");
 							hand.angle += 10;
 						} else if (handDir == FlxObject.RIGHT) {
-							hand.play("idle right"); //<- placeholder hand.play("fall right");
+							hand.play("fall right");
 							hand.angle -= 10;
 						}
-					}
+					//}
 				}
 			}
 			
@@ -676,6 +680,16 @@ package {
 				// The hand is extended
 				else if (handOut) {
 					
+					
+					if (FlxG.keys.SPACE && !hand.touching) {
+						if (handDir == FlxObject.LEFT) {hand.play("extend left");}
+						else {hand.play("extend right");} // maybe there should be an animation for extending?
+					} else {
+						FlxG.log("poop");
+						if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
+						else {hand.play("idle body right");}
+					}
+					
 					// Properly space and rotate the arm segments
 					var deltaX:Number = -body.x + hand.x;
 					var deltaY:Number = -body.y + hand.y;
@@ -693,6 +707,7 @@ package {
 					
 					// The hand has come in contact with a wall
 					if (hand.touching && !lastTouchedWood) {
+						
 						if (hand.isTouching(FlxObject.DOWN)) {hand.angle = 0;}
 						else if (hand.isTouching(FlxObject.LEFT)) {hand.angle = 90;}
 						else if (hand.isTouching(FlxObject.UP)) {hand.angle = 180;}
