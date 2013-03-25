@@ -69,6 +69,7 @@ package {
 		public var arrow:FlxSprite;
 		//public var bodyGear:FlxSprite;
 		public var bodyGearGroup:FlxGroup;
+		public var bodyHeadGroup:FlxGroup;
 		
 		public var bodyTargetAngle:Number;
 		
@@ -138,7 +139,11 @@ package {
 		
 		[Embed("assets/block_96x96_w6.png")] public var block96x96w6Sheet:Class;
 		
-		[Embed("assets/button.png")] public var buttonSheet:Class;
+		//[Embed("assets/button.png")] public var buttonSheet:Class;
+		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
+		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
+		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
+		[Embed("assets/button_r.png")] public var buttonRSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -152,6 +157,8 @@ package {
 		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
+		
+		[Embed("assets/head.png")] public var headSheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -198,12 +205,11 @@ package {
 						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
 						var gearSheet:Class;
 						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
-						//FlxG.log(gearGaugeNumber);
-						if (gearGaugeNumber < 3) {gearSheet = gear64x64Sheet;}
-						else if (gearGaugeNumber < 5) {gearSheet = gear32x32Sheet;}
+						if (gearGaugeNumber < 2) {gearSheet = gear64x64Sheet;}
+						else if (gearGaugeNumber < 4) {gearSheet = gear32x32Sheet;}
 						else {gearSheet = gear16x16Sheet;}
 						
-						// do something for gear speed...
+						// do something for gear speed...?  Do we need gears to spin at different speeds?  Maybe not...
 						
 						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
 						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
@@ -233,6 +239,7 @@ package {
 						
 						// Decide steam pattern
 						// n.b. Steam is group in 3 patterns
+						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
 						steamGaugeNumber = (i-STEAM_MIN);
 						var steamPuffFrames:Array;
 						if (steamGaugeNumber < 4)      {steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
@@ -267,12 +274,14 @@ package {
 			// Bodies
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
+			bodyHeadGroup = new FlxGroup();
 			for (i = BODY_MIN; i <= BODY_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
 				var bodyArray:Array = level.getTileInstances(i);
 				if (bodyArray) {
-					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
-						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj],level);
+					for (j= 0; j < bodyArray.length; j++) {
+						level.setTileByIndex(bodyArray[j],0);
+						var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
 						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
 						if (bmass == 0) {bmass = 6;}
 						
@@ -292,11 +301,16 @@ package {
 						bodyGroup.add(body);
 						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
 						bodyGearGroup.add(bodyGear);
+						// the positioning should be based on angle too
+						var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
+						bodyHead.y -= bodyHead.height;
+						bodyHeadGroup.add(bodyHead);
 					}
 				}
 			}			
 			add(bodyGroup);
 			add(bodyGearGroup);
+			add(bodyHeadGroup);
 			
 			// Blocks
 			blockGroup = new FlxGroup();
@@ -304,10 +318,11 @@ package {
 				level.setTileProperties(i,FlxObject.NONE);
 				var blockArray:Array = level.getTileInstances(i);
 				if (blockArray) {
-					for (var jj:int = 0; jj < blockArray.length; jj++) {
+					for (j = 0; j < blockArray.length; j++) {
+						level.setTileByIndex(blockArray[j],0);
 						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
 						if (mass == 0) {mass = 6};
-						var blockPoint:FlxPoint = pointForTile(blockArray[jj],level);
+						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
 						
 						var imgClass:Class;
 						
@@ -345,21 +360,34 @@ package {
 				var buttonArray:Array = level.getTileInstances(i);
 				if (buttonArray) {
 					for (j = 0; j < buttonArray.length; j++) {
+						level.setTileByIndex(buttonArray[j],0);
 						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],level);
 						
+						// Decide button graphic
+						var buttonSheet:Class;
+						var w:Number;
+						var h:Number;
+						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
+						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 5; h = 32;}
+						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 5;}
+						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x += 3; w = 5; h = 32;}
+						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y += 3; w = 32; h = 5;}
+						
+						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
-						button.loadGraphic(buttonSheet,true,false,32,5,true);
+						button.loadGraphic(buttonSheet,true,false,w,h,true);
 						button.addAnimation("up",[0]);
 						button.addAnimation("down",[1]);
 						button.play("up");
 						
+						/*
 						// Decide button angle
-						// n.b. Steam is grouped in 3 frequencies, 4 angles
 						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
 						if (buttonGaugeNumber == 0) {button.angle = 90; button.x -= 14; button.y += 14;}
 						else if (buttonGaugeNumber == 1) {button.angle = 180;}
 						else if (buttonGaugeNumber == 2) {button.angle = 270; button.x -= 10; button.y += 14;}
 						else if (buttonGaugeNumber == 3) {button.y += 3;}
+						*/
 						
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
@@ -394,6 +422,7 @@ package {
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
 			var array:Array = level.getTileInstances(HAND_SPAWN);
 			var handPoint:FlxPoint = pointForTile(array[0],level);
+			level.setTileByIndex(array[0],0);
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -441,10 +470,11 @@ package {
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
-			var bodyGearMarker: FlxSprite;
+			var bodyHead:FlxSprite;
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
+				bodyHead = bodyHeadGroup.members[curBody];
 			}
 			
 			if (hand.touching) {handFalling = false;}
@@ -452,6 +482,13 @@ package {
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			if (bodyMode) {
 				
+				// Ugh.  Math sucks.  I suck at math...
+				// Anyway, I should probably properly transform these...
+				bodyHead.x = body.x;
+				bodyHead.y = body.y-bodyHead.height;
+				
+				bodyHead.origin = body.origin;
+				bodyHead.angle = body.angle;
 				//var theta:Number = body.angle*Math.PI/180;
 				
 				bodyGear.x = body.x;// - body.width/2 + (body.width/2)*Math.sin(theta);
@@ -519,7 +556,9 @@ package {
 					} else {
 						robodyAimSound.stop();
 					}
-				} else if (bodyMode && handOut) {
+				}
+				// The hand is launching out of the body
+				else if (bodyMode && handOut) {
 					robodyAimSound.stop();
 					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
 						grappleExtendSound.stop();
@@ -860,12 +899,16 @@ package {
 						setGravity(hand,FlxObject.DOWN,true);
 					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
 						setGravity(hand,FlxObject.LEFT,true);
+						hand.acceleration.x -= MOVE_ACCEL;
 					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
 						setGravity(hand,FlxObject.RIGHT,true);
+						hand.acceleration.x += MOVE_ACCEL;
 					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
 						setGravity(hand,FlxObject.UP,true);
+						hand.acceleration.y -= MOVE_ACCEL;
 					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
 						setGravity(hand,FlxObject.DOWN,true);
+						hand.acceleration.y += MOVE_ACCEL;
 					}
 					
 					hand.drag.x = 0;
