@@ -144,8 +144,12 @@ package {
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
+		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
+		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
+		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -246,8 +250,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -437,6 +441,7 @@ package {
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
+			var bodyGearMarker: FlxSprite;
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
@@ -446,8 +451,11 @@ package {
 			
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			if (bodyMode) {
-				bodyGear.x = body.x;
-				bodyGear.y = body.y;
+				
+				//var theta:Number = body.angle*Math.PI/180;
+				
+				bodyGear.x = body.x;// - body.width/2 + (body.width/2)*Math.sin(theta);
+				bodyGear.y = body.y;// - body.height/2 + (body.height/2)*(1-Math.cos(theta));
 				bodyGear.angle = -arrow.angle;
 			}
 			
@@ -502,6 +510,28 @@ package {
 				} else {
 					woodCrawlSound.stop();
 					metalCrawlSound.stop();
+				}
+				// The hand is in the body, aiming
+				if (bodyMode && !handOut) {
+					grappleExtendSound.stop();
+					if (FlxG.keys.RIGHT || FlxG.keys.LEFT) {
+						robodyAimSound.play();
+					} else {
+						robodyAimSound.stop();
+					}
+				} else if (bodyMode && handOut) {
+					robodyAimSound.stop();
+					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
+						grappleExtendSound.stop();
+					}
+					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
+						grappleExtendSound.play();
+					} else {
+						grappleExtendSound.stop();
+					}
+				} else {
+					grappleExtendSound.stop();
+					robodyAimSound.stop();
 				}
 			}
 			/* End Audio */
