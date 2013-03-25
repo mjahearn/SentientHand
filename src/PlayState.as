@@ -44,7 +44,18 @@ package {
 		public const BODY_MIN:uint = 185;
 		public const BODY_MAX:uint = 190;
 		public const BLOCK_MIN:uint = 167;
-		public const BLOCK_MAX:uint = 184
+		public const BLOCK_MAX:uint = 184;
+		
+		public const BUTTON_MIN:uint = 163;
+		public const BUTTON_MAX:uint = 166;
+		
+		/* midground spawn points: */
+		public const GEAR_MIN:uint = 1;
+		public const GEAR_MAX:uint = 18;
+		public const STEAM_MIN:uint = 19;
+		public const STEAM_MAX:uint = 30;
+		
+		public var reinvigorated:Boolean = false;
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -77,15 +88,22 @@ package {
 		public var handBlockFlag:uint;
 		public var handBlockRel:FlxPoint;
 		
-		public var gears:FlxGroup = new FlxGroup();
+		public var gearInGroup:FlxGroup = new FlxGroup();
+		public var gearOutGroup:FlxGroup = new FlxGroup();
+		public var steams:FlxGroup = new FlxGroup();
 		
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
 		public var shootAngle:int;
 		public var handReturnedToBody:Boolean = false;
 		
+		public var buttonGroup:FlxGroup = new FlxGroup();
+		public var buttonStateArray:Array = new Array();
+		public var buttonReactionArray:Array = new Array();
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
+		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
 		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
@@ -99,11 +117,15 @@ package {
 		[Embed("assets/body_w5.png")] public var bodyw5Sheet:Class;
 		[Embed("assets/body_w6.png")] public var bodyw6Sheet:Class;
 		
-		[Embed("assets/gear_64x64.png")] public var gearSheet:Class;
+		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
+		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
+		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
+		
 		
 		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
+		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
 		
 		[Embed("assets/block_32x32_w1.png")] public var block32x32w1Sheet:Class;
 		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
@@ -112,12 +134,24 @@ package {
 		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
 		
+		[Embed("assets/block_64x64_w6.png")] public var block64x64w6Sheet:Class;
+		
+		[Embed("assets/block_96x96_w6.png")] public var block96x96w6Sheet:Class;
+		
+		[Embed("assets/button.png")] public var buttonSheet:Class;
+		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
+		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
+		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
+		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
+		
+		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		override public function create():void {
 			dbg = 0;
@@ -140,27 +174,89 @@ package {
 				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
 			
-			// background
-			levelBack = new FlxTilemap();
-			levelBack.loadMap(new backgroundMap,backgroundset,8,8);
-			add(levelBack);
+			/* Background */
 			
-			// midground objects
-			var gear000:FlxSprite = new FlxSprite(0,480-64,gearSheet);
-			gears.add(gear000);
+			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
-			add(gears);
+			/* Midground */
 			
-			// foreground
+			var midground:FlxTilemap = new FlxTilemap();
+			midground.loadMap(new midgroundMap,midgroundset,8,8);
+			
+			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
+				var gearArray:Array = midground.getTileInstances(i);
+				if (gearArray) {
+					for (var j:int = 0; j < gearArray.length; j++) {
+						
+						// Decide gear spin (In or Out)
+						// n.b. Every other gear in the sheet is In or Out
+						var gearGroup:FlxGroup;
+						if (i%2 == 0) {gearGroup = gearInGroup;}
+						else {gearGroup = gearOutGroup;}
+						
+						// Decide gear size
+						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
+						var gearSheet:Class;
+						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
+						//FlxG.log(gearGaugeNumber);
+						if (gearGaugeNumber < 3) {gearSheet = gear64x64Sheet;}
+						else if (gearGaugeNumber < 5) {gearSheet = gear32x32Sheet;}
+						else {gearSheet = gear16x16Sheet;}
+						
+						// do something for gear speed...
+						
+						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
+						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
+						gearGroup.add(gear);
+					}
+				}
+			}
+			add(gearInGroup);
+			add(gearOutGroup);
+			
+			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
+				var steamArray:Array = midground.getTileInstances(i);
+				if (steamArray) {
+					for (j = 0; j < steamArray.length; j++) {
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
+						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
+						steam.loadGraphic(steamSheet,true,false,32,32,true);
+						steam.addAnimation("idle",[0]);
+						steam.play("idle");
+						
+						// Decide steam angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
+						if (steamGaugeNumber == 0) {steam.angle = 90;}
+						else if (steamGaugeNumber == 1) {steam.angle = 180;}
+						else if (steamGaugeNumber == 2) {steam.angle = 270;}
+						
+						// Decide steam pattern
+						// n.b. Steam is group in 3 patterns
+						steamGaugeNumber = (i-STEAM_MIN);
+						var steamPuffFrames:Array;
+						if (steamGaugeNumber < 4)      {steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
+						else if (steamGaugeNumber < 8) {steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
+						else                           {steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];}
+						steam.addAnimation("puff",steamPuffFrames,11,true);
+						
+						steams.add(steam);
+					}
+				}
+			}
+			add(steams);
+
+			/* Level */
+			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
 			
-			for (var i:int = WOOD_MIN; i <= WOOD_MAX; i++) {
+			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
@@ -176,7 +272,7 @@ package {
 				var bodyArray:Array = level.getTileInstances(i);
 				if (bodyArray) {
 					for (var jjj:int = 0; jjj < bodyArray.length; jjj++) {
-						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj]);
+						var bodyPoint:FlxPoint = pointForTile(bodyArray[jjj],level);
 						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
 						if (bmass == 0) {bmass = 6;}
 						
@@ -211,15 +307,27 @@ package {
 					for (var jj:int = 0; jj < blockArray.length; jj++) {
 						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
 						if (mass == 0) {mass = 6};
-						var blockPoint:FlxPoint = pointForTile(blockArray[jj]);
+						var blockPoint:FlxPoint = pointForTile(blockArray[jj],level);
 						
 						var imgClass:Class;
-						if (mass == 1) {imgClass = block32x32w1Sheet;}
-						else if (mass == 2) {imgClass = block32x32w2Sheet;}
-						else if (mass == 3) {imgClass = block32x32w3Sheet;}
-						else if (mass == 4) {imgClass = block32x32w4Sheet;}
-						else if (mass == 5) {imgClass = block32x32w5Sheet;}
-						else if (mass == 6) {imgClass = block32x32w6Sheet;}
+						
+						// there are six sizes total
+						//var blockGaugeNumber:Number = (i-BLOCK_MIN)%6;
+						
+						if (i>178) {//(blockGaugeNumber > 12) {
+							if (mass == 1) {imgClass = block32x32w1Sheet;}
+							else if (mass == 2) {imgClass = block32x32w2Sheet;}
+							else if (mass == 3) {imgClass = block32x32w3Sheet;}
+							else if (mass == 4) {imgClass = block32x32w4Sheet;}
+							else if (mass == 5) {imgClass = block32x32w5Sheet;}
+							else if (mass == 6) {imgClass = block32x32w6Sheet;}
+						}
+							// not all are implemented yet
+						else if (i>172) {//(blockGaugeNumber > 6) {
+							imgClass = block64x64w6Sheet;
+						} else {
+							imgClass = block96x96w6Sheet;
+						}
 						
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
 						setBlockState(testBlock,0);
@@ -231,10 +339,61 @@ package {
 			}
 			add(blockGroup);
 			
+			// Buttons
+			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var buttonArray:Array = level.getTileInstances(i);
+				if (buttonArray) {
+					for (j = 0; j < buttonArray.length; j++) {
+						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],level);
+						
+						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
+						button.loadGraphic(buttonSheet,true,false,32,5,true);
+						button.addAnimation("up",[0]);
+						button.addAnimation("down",[1]);
+						button.play("up");
+						
+						// Decide button angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
+						if (buttonGaugeNumber == 0) {button.angle = 90; button.x -= 14; button.y += 14;}
+						else if (buttonGaugeNumber == 1) {button.angle = 180;}
+						else if (buttonGaugeNumber == 2) {button.angle = 270; button.x -= 10; button.y += 14;}
+						else if (buttonGaugeNumber == 3) {button.y += 3;}
+						
+						buttonGroup.add(button);
+						buttonStateArray.push(false);
+						
+						// not sure how to handle different buttons doing different things?
+						// presumably, they sholud be linked to specific things in the room?
+						// I'm... not quite sure...
+						var buttonReaction:Function = function():void {
+							if (reinvigorated) {
+								reinvigorated = false;
+								for (var m:String in steams.members) {
+									var steam:FlxSprite = steams.members[m];
+									steam.play("idle");
+								}
+								
+							} else {
+								reinvigorated = true;
+								for (m in steams.members) {
+									steam = steams.members[m];
+									steam.play("puff");
+								}
+							}
+						}
+							
+						buttonReactionArray.push(buttonReaction);
+					}
+				}
+			}
+			add(buttonGroup);
+			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
 			var array:Array = level.getTileInstances(HAND_SPAWN);
-			var handPoint:FlxPoint = pointForTile(array[0]);
+			var handPoint:FlxPoint = pointForTile(array[0],level);
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -250,7 +409,8 @@ package {
 			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
 			hand.addAnimation("crawl left",[20,19,18,17,16,15,14],22,true);
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
-			hand.addAnimation("idle body", [21],10,true);
+			hand.addAnimation("idle body right", [21,21,21,21,21,21,21,22,23,23,23,23,23,23,22],10,true);
+			hand.addAnimation("idle body left", [25,25,25,25,25,25,25,26,27,27,27,27,27,27,26],10,true);
 			handDir = FlxObject.RIGHT;
 			hand.play("idle right");
 			hand.maxVelocity.x = MAX_MOVE_VEL;
@@ -260,7 +420,6 @@ package {
 			setGravity(hand, FlxObject.DOWN, true);
 			onGround = true;
 			add(hand);
-			
 			
 			bodyMode = false;
 			curBody = uint.MAX_VALUE;
@@ -282,6 +441,7 @@ package {
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
+			var bodyGearMarker: FlxSprite;
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
@@ -291,43 +451,92 @@ package {
 			
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			if (bodyMode) {
-				bodyGear.x = body.x;
-				bodyGear.y = body.y;
+				
+				//var theta:Number = body.angle*Math.PI/180;
+				
+				bodyGear.x = body.x;// - body.width/2 + (body.width/2)*Math.sin(theta);
+				bodyGear.y = body.y;// - body.height/2 + (body.height/2)*(1-Math.cos(theta));
 				bodyGear.angle = -arrow.angle;
 			}
 			
-			// spin midground gears
-			var gear:FlxSprite;
-			for (var jjj:String in gears.members) {
-				gear = gears.members[jjj];
-				gear.angle += 0.5;
-				if (gear.angle > 360) {gear.angle = 0;}
+			// Press Buttons!
+			// right now, implemented buttons that go back to original state after pressed,
+			// this can change, this was just easier (I think)
+			for (var mm:String in buttonGroup.members) {
+				var button:FlxSprite = buttonGroup.members[mm];
+				var buttonState:Boolean = buttonStateArray[mm];
+				if (hand.overlaps(button) && !buttonState) { // should change this to make it only recognize the space where the button is visually
+					button.play("down");
+					buttonStateArray[mm] = true;
+					buttonReactionArray[mm]();
+					//FlxG.log("pressed button");
+				} else if (!hand.overlaps(button)) {
+					button.play("up");
+					buttonStateArray[mm] = false;
+				}
+			}
+			
+			// Bring midground to life
+			if (reinvigorated) {
+				
+				// Steam
+				
+				// Spin Gears // should eventually make them accel in/out of spinning
+				var gear:FlxSprite;
+				for (var jjj:String in gearInGroup.members) {
+					gear = gearInGroup.members[jjj];
+					gear.angle += 0.5;
+					if (gear.angle > 360) {gear.angle = 0;}
+				}
+				for (jjj in gearOutGroup.members) {
+					gear = gearOutGroup.members[jjj];
+					gear.angle -= 0.5;
+					if (gear.angle < 0) {gear.angle = 360;}
+				}
 			}
 			
 			/* Begin Audio */
 			if (SOUND_ON) {
+				
+				// The hand is crawling on wood or metal
 				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-					//sound.play();
 					if (lastTouchedWood) {
 						metalCrawlSound.stop();
 						woodCrawlSound.play();
-						//sound = FlxG.play(woodFootstepsSFX);
 					} else {
 						woodCrawlSound.stop();
 						metalCrawlSound.play();
-						//sound = FlxG.play(metalFootstepsSFX);
 					}
 				} else {
 					woodCrawlSound.stop();
 					metalCrawlSound.stop();
-					//sound.stop();
+				}
+				// The hand is in the body, aiming
+				if (bodyMode && !handOut) {
+					grappleExtendSound.stop();
+					if (FlxG.keys.RIGHT || FlxG.keys.LEFT) {
+						robodyAimSound.play();
+					} else {
+						robodyAimSound.stop();
+					}
+				} else if (bodyMode && handOut) {
+					robodyAimSound.stop();
+					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
+						grappleExtendSound.stop();
+					}
+					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
+						grappleExtendSound.play();
+					} else {
+						grappleExtendSound.stop();
+					}
+				} else {
+					grappleExtendSound.stop();
+					robodyAimSound.stop();
 				}
 			}
-			
 			/* End Audio */
 			
 			/* Begin Animations */
-			
 			// The hand is not attached to a body
 			if (!bodyMode) {
 				// The hand is about to mount a body
@@ -381,6 +590,7 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle > 180)) {
 						*/
 						hand.angle -= 2.2;
+						hand.play("idle left"); //<- placeholder {hand.play("jump left");
 						//}
 					} else if (handDir == FlxObject.RIGHT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle < 270) ||
@@ -389,6 +599,7 @@ package {
 						(hand.facing == FlxObject.RIGHT && hand.angle < 360)) { <- this line's not working
 						*/
 						hand.angle += 2.2;
+						hand.play("idle right"); //<- placeholder {hand.play("jump right");
 						//}
 					}
 				}
@@ -412,10 +623,11 @@ package {
 				if (!handOut) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
-					hand.play("idle body");
+					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
+					else {hand.play("idle body right");}
 					// The hand is about to dismount 
 					if (FlxG.keys.justPressed("DOWN")) {
-						//
+						// play falling animations
 					}
 					// Keep arms hidden
 					for (var i:String in arms.members) {
@@ -458,11 +670,10 @@ package {
 					}
 					// The hand is retracting without having touched anything
 					if (!FlxG.keys.SPACE && !hand.touching) {
-						//
+						
 					}
 				}
 			}
-		
 			/* End Animations */
 			
 			if (bodyMode) {
@@ -648,16 +859,12 @@ package {
 					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
 					} else if (hand.velocity.x > 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						//hand.velocity.x = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.LEFT,true);
 					} else if (hand.velocity.x < 0 && (hand.facing == FlxObject.UP || hand.facing == FlxObject.DOWN)) {
-						//hand.velocity.x = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.RIGHT,true);
 					} else if (hand.velocity.y > 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						//hand.velocity.y = -MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.UP,true);
 					} else if (hand.velocity.y < 0 && (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT)) {
-						//hand.velocity.y = MAX_MOVE_VEL*0.00000022;
 						setGravity(hand,FlxObject.DOWN,true);
 					}
 					
@@ -807,9 +1014,9 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
-		public function pointForTile(tile:uint):FlxPoint {
-			var X:Number = 8*(int)(tile%level.widthInTiles);
-			var Y:Number = 8*(int)(tile/level.widthInTiles);
+		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
+			var X:Number = 8*(int)(tile%map.widthInTiles);
+			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
 		}
