@@ -24,6 +24,7 @@ package {
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		public const SOUND_ON:Boolean = true;
 		
 		/* Spawn point info
 		
@@ -112,6 +113,11 @@ package {
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
+		
+		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
+		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
+		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		
 		override public function create():void {
 			dbg = 0;
@@ -297,6 +303,28 @@ package {
 				gear.angle += 0.5;
 				if (gear.angle > 360) {gear.angle = 0;}
 			}
+			
+			/* Begin Audio */
+			if (SOUND_ON) {
+				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+					//sound.play();
+					if (lastTouchedWood) {
+						metalCrawlSound.stop();
+						woodCrawlSound.play();
+						//sound = FlxG.play(woodFootstepsSFX);
+					} else {
+						woodCrawlSound.stop();
+						metalCrawlSound.play();
+						//sound = FlxG.play(metalFootstepsSFX);
+					}
+				} else {
+					woodCrawlSound.stop();
+					metalCrawlSound.stop();
+					//sound.stop();
+				}
+			}
+			
+			/* End Audio */
 			
 			/* Begin Animations */
 			
