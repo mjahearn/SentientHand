@@ -102,6 +102,8 @@ package {
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
 		
+		public var timeFallen:Number = 0;
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
@@ -491,7 +493,8 @@ package {
 				bodyHead = bodyHeadGroup.members[curBody];
 			}
 			
-			if (hand.touching) {handFalling = false;}
+			if (hand.touching) {handFalling = false; timeFallen = 0;}
+			timeFallen += FlxG.elapsed;
 			
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			if (bodyMode) {
@@ -664,7 +667,7 @@ package {
 				}
 				// The hand is falling (with style!)
 				else {
-					//if (hand.angle > 0) && hand.angle < 360) { // maybe cooler if it just spins, metroid style
+					if (hand.angle > 0 && hand.angle < 360) {
 						if (handDir == FlxObject.LEFT) {
 							hand.play("fall left");
 							hand.angle += 10;
@@ -672,7 +675,11 @@ package {
 							hand.play("fall right");
 							hand.angle -= 10;
 						}
-					//}
+					}
+					if (timeFallen > 0.66) {
+						if (handDir == FlxObject.LEFT) {hand.angle += 10;}
+						else if (handDir == FlxObject.RIGHT) {hand.angle -= 10;}
+					}
 				}
 			}
 			
