@@ -151,10 +151,20 @@ package {
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
+		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
+		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
+		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
+		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
 		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
+		public var jumpSound:FlxSound = new FlxSound().loadEmbedded(jumpSFX);
+		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
+		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
+		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
+		
+		
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -539,6 +549,12 @@ package {
 			/* Begin Audio */
 			if (SOUND_ON) {
 				
+				// Something's not quite right here...
+				// The hand jumped
+				if (!bodyMode && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
+					jumpSound.play();
+				}
+				
 				// The hand is crawling on wood or metal
 				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
 					if (lastTouchedWood) {
@@ -685,7 +701,6 @@ package {
 						if (handDir == FlxObject.LEFT) {hand.play("extend left");}
 						else {hand.play("extend right");} // maybe there should be an animation for extending?
 					} else {
-						FlxG.log("poop");
 						if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 						else {hand.play("idle body right");}
 					}
