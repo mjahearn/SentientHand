@@ -102,6 +102,8 @@ package {
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
 		
+		public var timeFallen:Number = 0;
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
@@ -151,10 +153,20 @@ package {
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
+		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
+		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
+		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
+		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
 		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
+		public var jumpSound:FlxSound = new FlxSound().loadEmbedded(jumpSFX);
+		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
+		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
+		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
+		
+		
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -257,8 +269,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -481,7 +493,8 @@ package {
 				bodyHead = bodyHeadGroup.members[curBody];
 			}
 			
-			if (hand.touching) {handFalling = false;}
+			if (hand.touching) {handFalling = false; timeFallen = 0;}
+			timeFallen += FlxG.elapsed;
 			
 			// janky way of moving body gear (this only works for one body, should really classify it)
 			if (bodyMode) {
@@ -538,6 +551,12 @@ package {
 			
 			/* Begin Audio */
 			if (SOUND_ON) {
+				
+				// Something's not quite right here...
+				// The hand jumped
+				if (!bodyMode && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
+					jumpSound.play();
+				}
 				
 				// The hand is crawling on wood or metal
 				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
@@ -648,7 +667,7 @@ package {
 				}
 				// The hand is falling (with style!)
 				else {
-					//if (hand.angle > 0) && hand.angle < 360) { // maybe cooler if it just spins, metroid style
+					if (hand.angle > 0 && hand.angle < 360) {
 						if (handDir == FlxObject.LEFT) {
 							hand.play("fall left");
 							hand.angle += 10;
@@ -656,7 +675,11 @@ package {
 							hand.play("fall right");
 							hand.angle -= 10;
 						}
-					//}
+					}
+					if (timeFallen > 0.66) {
+						if (handDir == FlxObject.LEFT) {hand.angle += 10;}
+						else if (handDir == FlxObject.RIGHT) {hand.angle -= 10;}
+					}
 				}
 			}
 			
@@ -685,7 +708,6 @@ package {
 						if (handDir == FlxObject.LEFT) {hand.play("extend left");}
 						else {hand.play("extend right");} // maybe there should be an animation for extending?
 					} else {
-						FlxG.log("poop");
 						if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 						else {hand.play("idle body right");}
 					}
@@ -778,6 +800,7 @@ package {
 								body.x = hand.x;
 								body.y = hand.y;
 							}
+							hand.allowCollisions = FlxObject.ANY;
 							//showArrow();
 						}
 					}
@@ -801,6 +824,17 @@ package {
 						//arrow.visible = false;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+						hand.allowCollisions = 0;
+						if (hand.velocity.x > 0) {
+							hand.allowCollisions |= FlxObject.RIGHT;
+						} else if (hand.velocity.x < 0) {
+							hand.allowCollisions |= FlxObject.LEFT;
+						}
+						if (hand.velocity.y > 0) {
+							hand.allowCollisions |= FlxObject.DOWN;
+						} else if (hand.velocity.y < 0) {
+							hand.allowCollisions |= FlxObject.UP;
+						}
 					}
 				}
 			} else {
