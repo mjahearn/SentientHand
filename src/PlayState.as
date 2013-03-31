@@ -166,6 +166,8 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		
+		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackground:Class;
+		public var musicBackgroundSound:FlxSound = new FlxSound().loadEmbedded(musicBackground,true);
 		
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
@@ -269,8 +271,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
@@ -480,6 +482,10 @@ package {
 			arrow.loadGraphic(arrowSheet);
 			arrow.visible = false;
 			add(arrow);
+			
+			if (SOUND_ON) {
+				musicBackgroundSound.play();
+			}
 		}
 		
 		override public function update():void {
@@ -556,6 +562,8 @@ package {
 				// The hand jumped
 				if (!bodyMode && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
 					jumpSound.play();
+				} else if (!bodyMode && hand.touching) {
+					jumpSound.stop();
 				}
 				
 				// The hand is crawling on wood or metal
@@ -574,7 +582,7 @@ package {
 				// The hand is in the body, aiming
 				if (bodyMode && !handOut) {
 					grappleExtendSound.stop();
-					if (FlxG.keys.RIGHT || FlxG.keys.LEFT) {
+					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 						robodyAimSound.play();
 					} else {
 						robodyAimSound.stop();
@@ -582,6 +590,7 @@ package {
 				}
 				// The hand is launching out of the body
 				else if (bodyMode && handOut) {
+					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
 					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
 						grappleExtendSound.stop();
@@ -594,6 +603,11 @@ package {
 				} else {
 					grappleExtendSound.stop();
 					robodyAimSound.stop();
+				}
+				
+				// The body just hit a wall
+				if (bodyMode && handOut && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+					robodyLandOnWallSound.play();
 				}
 			}
 			/* End Audio */
@@ -689,6 +703,15 @@ package {
 				if (!handOut) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
+					
+					//FlxG.log(body.angle);
+					
+					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
+					else if (body.angle == 270) {body.facing = FlxObject.RIGHT;}
+					else if (body.angle == 180) {body.facing = FlxObject.UP;}
+					else if (body.angle == 90) {body.facing = FlxObject.LEFT;}
+					
+					
 					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 					else {hand.play("idle body right");}
 					// The hand is about to dismount 
@@ -751,6 +774,10 @@ package {
 				}
 			}
 			/* End Animations */
+			
+			if (bodyMode && !handOut) {
+				setGravity(body,body.facing,true);
+			}
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
