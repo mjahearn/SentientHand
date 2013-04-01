@@ -760,14 +760,16 @@ package {
 				if (handOut) {
 					var diffX:Number = hand.x-body.x;
 					var diffY:Number = hand.y-body.y;
-					rad = Math.atan2(diffY, diffX);
-					arrow.angle = 180*rad/Math.PI;
+					//rad = Math.atan2(diffY, diffX);
+					//arrow.angle = 180*rad/Math.PI;
+					rad = arrow.angle*Math.PI/180;
 					if (FlxG.keys.SPACE) {
-						if (hand.touching <= 0 && Math.sqrt(Math.pow(hand.x-body.x, 2) + Math.pow(hand.y-body.y, 2)) < GRAPPLE_LENGTH) {
+						if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
 							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						}
 					} else {
+						rad = Math.atan2(diffY, diffX);
 						if ((hand.touching > 0 && hand.facing == hand.touching) || (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
