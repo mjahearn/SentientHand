@@ -7,6 +7,8 @@ package {
 	
 	public class PlayState extends FlxState {
 		
+		//public var time:Number = 0;
+		
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
@@ -131,15 +133,18 @@ package {
 		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
 		
 		[Embed("assets/block_32x32_w1.png")] public var block32x32w1Sheet:Class;
+		[Embed("assets/block_48x48_w3.png")] public var block48x48w3Sheet:Class;
+		[Embed("assets/block_64x64_w5.png")] public var block64x64w5Sheet:Class;
+		
+		/*
 		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
 		[Embed("assets/block_32x32_w3.png")] public var block32x32w3Sheet:Class;
 		[Embed("assets/block_32x32_w4.png")] public var block32x32w4Sheet:Class;
 		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
 		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
-		
 		[Embed("assets/block_64x64_w6.png")] public var block64x64w6Sheet:Class;
-		
 		[Embed("assets/block_96x96_w6.png")] public var block96x96w6Sheet:Class;
+		*/
 		
 		//[Embed("assets/button.png")] public var buttonSheet:Class;
 		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
@@ -343,6 +348,12 @@ package {
 						// there are six sizes total
 						//var blockGaugeNumber:Number = (i-BLOCK_MIN)%6;
 						
+						if      (mass == 1) {imgClass = block32x32w1Sheet;}
+						else if (mass == 3) {imgClass = block48x48w3Sheet;}
+						else if (mass == 5) {imgClass = block64x64w5Sheet}
+						else {FlxG.log("Invalid block mass in tilesheet");}
+						
+						/*
 						if (i>178) {//(blockGaugeNumber > 12) {
 							if (mass == 1) {imgClass = block32x32w1Sheet;}
 							else if (mass == 2) {imgClass = block32x32w2Sheet;}
@@ -357,6 +368,7 @@ package {
 						} else {
 							imgClass = block96x96w6Sheet;
 						}
+						*/
 						
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
 						setBlockState(testBlock,0);
@@ -489,6 +501,7 @@ package {
 		}
 		
 		override public function update():void {
+			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
@@ -679,6 +692,16 @@ package {
 						//}
 					}
 				}
+				/*
+				// The hand ran off a wooden platform
+				else if (lastTouchedWood) {
+					FlxG.log("hi");
+					if (handDir == FlxObject.LEFT) {
+						hand.play("fall left");
+					} else if (handDir == FlxObject.RIGHT) {
+						hand.play("fall right");
+					}
+				} */
 				// The hand is falling (with style!)
 				else {
 					if (hand.angle > 0 && hand.angle < 360) {
@@ -775,9 +798,13 @@ package {
 			}
 			/* End Animations */
 			
+			/*
 			if (bodyMode && !handOut) {
 				setGravity(body,body.facing,true);
+			} else if (bodyMode) {
+				setGravity(body,body.facing,false);
 			}
+			*/
 			
 			if (bodyMode) {
 				body.velocity.x = 0;
@@ -992,6 +1019,14 @@ package {
 					hand.maxVelocity.x = MAX_GRAV_VEL;
 					hand.maxVelocity.y = MAX_GRAV_VEL;
 				} else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE || hand.isTouching(FlxObject.DOWN))) {
+					
+					// probably this should happen when it loses contact with the surface in the first place
+					if      (hand.isTouching(FlxObject.LEFT)) {hand.facing = FlxObject.LEFT;}
+					else if (hand.isTouching(FlxObject.UP  )) {hand.facing = FlxObject.UP;}
+					else if (hand.isTouching(FlxObject.RIGHT)) {hand.facing = FlxObject.RIGHT;}
+					else                                       {hand.facing = FlxObject.DOWN;}
+					
+					
 					onGround = true;
 					setGravity(hand, hand.facing, true);
 					hand.drag.x = MOVE_DECEL;
