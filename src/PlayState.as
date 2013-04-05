@@ -9,6 +9,7 @@ package {
 		
 		//public var time:Number = 0;
 		
+		public const CANNON_ACCEL:Number = 1600; // the acceleration (in pixels per second per second) the hand is given upon being fired from a cannon
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
@@ -48,6 +49,7 @@ package {
 		public const BLOCK_MIN:uint = 167;
 		public const BLOCK_MAX:uint = 184;
 		
+		public const CANNON_SPAWN:uint = 162;
 		public const BUTTON_MIN:uint = 163;
 		public const BUTTON_MAX:uint = 166;
 		
@@ -68,6 +70,7 @@ package {
 		//public var body:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
+		public var curCannon:uint;
 		public var arrow:FlxSprite;
 		//public var bodyGear:FlxSprite;
 		public var bodyGearGroup:FlxGroup;
@@ -81,6 +84,7 @@ package {
 		
 		public var handFalling:Boolean;
 		public var bodyMode:Boolean;
+		public var cannonMode:Boolean;
 		public var handOut:Boolean;
 		public var handGrab:Boolean;
 		public var handMetalFlag:uint;
@@ -108,6 +112,10 @@ package {
 		
 		public var timeFallen:Number = 0;
 		
+		public var cannonGroup:FlxGroup = new FlxGroup();
+		
+		[Embed("assets/cannon.png")] public var cannonSheet:Class;
+		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
@@ -129,7 +137,6 @@ package {
 		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
-		
 		
 		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
@@ -177,7 +184,6 @@ package {
 		
 		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackground:Class;
 		public var musicBackgroundSound:FlxSound = new FlxSound().loadEmbedded(musicBackground,true);
-		
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -293,6 +299,22 @@ package {
 			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
+			
+			// Cannons
+			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
+			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
+			if (cannonArray) {
+				for (j = 0; j < cannonArray.length; j++) {
+					level.setTileByIndex(cannonArray[j],0);
+					var cannonPoint:FlxPoint = pointForTile(cannonArray[j],level);
+					var cannon:FlxSprite = new FlxSprite(cannonPoint.x,cannonPoint.y,cannonSheet);
+					//setGravity(cannon,FlxObject.DOWN,true);
+					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
+					cannon.angle = 0;
+					cannonGroup.add(cannon);
+				}
+			}
+			add(cannonGroup);
 			
 			// Bodies
 			bodyGroup = new FlxGroup();
@@ -493,6 +515,7 @@ package {
 			electricity.play("electricute");
 			
 			bodyMode = false;
+			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
 			handGrab = false;
@@ -523,7 +546,10 @@ package {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
+			} if (cannonMode) {
+				body = cannonGroup.members[curCannon];
 			}
+			
 			
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
@@ -586,14 +612,14 @@ package {
 				
 				// Something's not quite right here...
 				// The hand jumped
-				if (!bodyMode && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
+				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
 					jumpSound.play();
-				} else if (!bodyMode && hand.touching) {
+				} else if ((!bodyMode && !cannonMode) && hand.touching) {
 					jumpSound.stop();
 				}
 				
 				// The hand is crawling on wood or metal
-				if (!bodyMode && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+				if ((!bodyMode &&!cannonMode) && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
 					if (lastTouchedWood) {
 						metalCrawlSound.stop();
 						woodCrawlSound.play();
@@ -606,7 +632,7 @@ package {
 					metalCrawlSound.stop();
 				}
 				// The hand is in the body, aiming
-				if (bodyMode && !handOut) {
+				if ((bodyMode || cannonMode) && !handOut) {
 					grappleExtendSound.stop();
 					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 						robodyAimSound.play();
@@ -640,7 +666,7 @@ package {
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
-			if (!bodyMode) {
+			if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
 				if (FlxG.keys.justPressed("DOWN")) {
 					bodyTargetAngle = hand.angle;
@@ -739,7 +765,7 @@ package {
 			}
 			
 			// The hand is attached to a body
-			else if (bodyMode) {
+			else if (bodyMode || cannonMode) {
 				// The hand is idling in the body
 				if (!handOut) {
 					hand.angle = arrow.angle - 90;
@@ -757,7 +783,7 @@ package {
 					else {hand.play("idle body right");}
 					// The hand is about to dismount 
 					if (FlxG.keys.justPressed("DOWN")) {
-						// play falling animations
+						// play falling animations?
 					}
 					// Keep arms hidden
 					for (var i:String in arms.members) {
@@ -834,7 +860,7 @@ package {
 			}
 			*/
 			
-			if (bodyMode) {
+			if (bodyMode || cannonMode) {
 				body.velocity.x = 0;
 				body.velocity.y = 0;
 				hand.velocity.x = 0;
@@ -896,11 +922,12 @@ package {
 					}
 					if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
+						cannonMode = false;
 						//arrow.visible = false;
 						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed("SPACE")) {
+					if (FlxG.keys.justPressed("SPACE") && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
 						//arrow.visible = false;
@@ -917,9 +944,30 @@ package {
 						} else if (hand.velocity.y < 0) {
 							hand.allowCollisions |= FlxObject.UP;
 						}
+					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
+						cannonMode = false;
+						rad = Math.PI*arrow.angle/180;
+						hand.acceleration.x = CANNON_ACCEL * Math.cos(rad);
+						hand.acceleration.y = CANNON_ACCEL * Math.sin(rad);
+						//FlxG.log("cannon fire!");
 					}
 				}
 			} else {
+				var hoc:uint = handOverlapsCannon();
+				if (FlxG.keys.justPressed("DOWN") && hoc < uint.MAX_VALUE) {
+					curCannon = hoc;
+					body = cannonGroup.members[curCannon];
+					cannonMode = true;
+					hand.velocity.x = 0;
+					hand.velocity.y = 0;
+					hand.acceleration.x = 0;
+					hand.acceleration.y = 0;
+					hand.x = body.x;
+					hand.y = body.y;
+					showArrow();
+				}
+				
+				
 				var hob:uint = handOverlapsBody();
 				if (FlxG.keys.justPressed("DOWN") && hob < uint.MAX_VALUE) {
 					curBody = hob;
@@ -1190,6 +1238,15 @@ package {
 		public function handOverlapsBody():uint {
 			for (var b:int = 0; b < bodyGroup.length; b++) {
 				if (hand.overlaps(bodyGroup.members[b])) {
+					return(b);
+				}
+			}
+			return(uint.MAX_VALUE);
+		}
+		
+		public function handOverlapsCannon():uint {
+			for (var b:int = 0; b < cannonGroup.length; b++) {
+				if (hand.overlaps(cannonGroup.members[b])) {
 					return(b);
 				}
 			}
