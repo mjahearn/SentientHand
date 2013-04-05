@@ -286,8 +286,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
 			FlxG.camera.bounds = FlxG.worldBounds;
