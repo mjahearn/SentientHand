@@ -26,7 +26,7 @@ package {
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
-		public const SOUND_ON:Boolean = true;
+		public const SOUND_ON:Boolean = false;
 		
 		/* Spawn point info
 		
@@ -319,7 +319,7 @@ package {
 						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodyImgClass); // need to adjust graphic
 						//FlxG.log(body.mass);
 						bodyTargetAngle = body.angle;
-						body.mass = bmass;
+						//body.mass = bmass;
 						setGravity(body,FlxObject.DOWN,true);
 						bodyGroup.add(body);
 						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
@@ -376,7 +376,7 @@ package {
 						
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
 						setBlockState(testBlock,0);
-						testBlock.mass = mass;
+						//testBlock.mass = mass;
 						//FlxG.log(testBlock.mass);
 						blockGroup.add(testBlock);
 					}
@@ -852,7 +852,7 @@ package {
 						}
 					} else {
 						rad = Math.atan2(diffY, diffX);
-						if ((hand.touching > 0 && hand.facing == hand.touching) || (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)) {
+						if ((hand.touching > 0 && hand.facing == hand.touching) /*|| (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)*/) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 							showArrow();
@@ -994,7 +994,7 @@ package {
 				FlxG.collide(blockGroup, bodyGroup, blockCallback);
 			}
 			FlxG.collide(level, blockGroup, levelBlockCallback);
-			FlxG.log(handWoodFlag);
+			//FlxG.log(handWoodFlag);
 			//FlxG.log(blockGroup.members[0].immovable);
 			//FlxG.collide(blockGroup); //Need to figure out how to make this work
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
@@ -1013,7 +1013,7 @@ package {
 			if (bodyMode) {
 				if (onGround && handBlockFlag < uint.MAX_VALUE) {
 					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
-					if (curBlock.mass < body.mass) {
+					//if (curBlock.mass < body.mass) {
 						if (curBlock.immovable) {
 							setBlockState(curBlock, 1);
 							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
@@ -1027,7 +1027,7 @@ package {
 							setBlockState(curBlock, 2);
 							handBlockFlag = uint.MAX_VALUE;
 						}
-					}
+					//}
 				}
 			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
@@ -1073,7 +1073,7 @@ package {
 		}
 		
 		public function levelHandCallback(a:FlxObject, b:FlxObject):void {
-			FlxG.log("okay");
+			//FlxG.log("okay");
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
@@ -1102,9 +1102,9 @@ package {
 					fixGravity(spr2);
 					lastTouchedWood = false;
 				}
-			} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
-				fixGravity(spr2);
-			} else { //spr2 is probably a block
+			/*} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
+				fixGravity(spr2);*/
+			} else if (spr2 in blockGroup) {
 				if (spr1 == hand) {
 					if (bodyMode) {
 						handBlockFlag = blockGroup.members.indexOf(spr2);
@@ -1113,9 +1113,9 @@ package {
 						fixGravity(spr1);
 						lastTouchedWood = false;
 					}
-				} else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
+				}/* else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
 					fixGravity(spr1);
-				}
+				}*/
 			}
 		}
 		
