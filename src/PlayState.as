@@ -1,7 +1,5 @@
 package {
 	
-	import flash.display.Graphics;
-	
 	import flashx.textLayout.formats.Float;
 	
 	import org.flixel.*;
@@ -567,8 +565,48 @@ package {
 				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
 				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+				
+				// make objects glow
 			}
 			
+			// marker glow (for hand overlapping)
+			if (!bodyMode && !cannonMode) {
+				var handOverlaps:Boolean = false;
+				
+				var bodyOverlapId:uint = handOverlapsBody();
+				if (bodyOverlapId < uint.MAX_VALUE) {
+					handOverlaps = true;
+					bodyGroup.members[bodyOverlapId].color = 0xff0000;
+				} else {
+					for (var mmm:String in bodyGroup.members) {
+						bodyGroup.members[mmm].color = 0xffffff;
+					}
+				}
+				
+				var cannonOverlapId:uint = handOverlapsCannon();
+				if (cannonOverlapId < uint.MAX_VALUE) {
+					handOverlaps = true;
+					cannonGroup.members[cannonOverlapId].color = 0xff0000;
+				} else {
+					for (mmm in cannonGroup.members) {
+						cannonGroup.members[mmm].color = 0xffffff;
+					}
+				}
+				
+				if (handOverlaps) {hand.color = 0xff0000;}
+				else {hand.color = 0xffffff;}
+			} else {
+				for (mmm in cannonGroup.members) {
+					cannonGroup.members[mmm].color = 0xffffff;
+				}
+				for (mmm in bodyGroup.members) {
+					bodyGroup.members[mmm].color = 0xffffff;
+				}
+				hand.color = 0xffffff;
+			}
+			
+			
+			// to time the fall for the different falling rot, really belongs with anim stuff
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
 			
