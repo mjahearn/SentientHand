@@ -104,6 +104,8 @@ package {
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
 		
+		public var electricity:FlxSprite;
+		
 		public var timeFallen:Number = 0;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
@@ -114,6 +116,8 @@ package {
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		//[Embed("assets/body.png")] public var bodySheet:Class;
+		
+		[Embed("assets/electricity.png")] public var electricitySheet:Class;
 		
 		[Embed("assets/body_w1.png")] public var bodyw1Sheet:Class;
 		[Embed("assets/body_w2.png")] public var bodyw2Sheet:Class;
@@ -480,6 +484,14 @@ package {
 			onGround = true;
 			add(hand);
 			
+			electricity = new FlxSprite(hand.x,hand.y);
+			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
+			electricity.addAnimation("electricute",[1,2,3],22,true);
+			electricity.addAnimation("stop",[0]);
+			add(electricity);
+			
+			electricity.play("electricute");
+			
 			bodyMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
@@ -501,6 +513,7 @@ package {
 		}
 		
 		override public function update():void {
+			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
@@ -704,6 +717,8 @@ package {
 				} */
 				// The hand is falling (with style!)
 				else {
+					
+					
 					if (hand.angle > 0 && hand.angle < 360) {
 						if (handDir == FlxObject.LEFT) {
 							hand.play("fall left");
@@ -713,9 +728,12 @@ package {
 							hand.angle -= 10;
 						}
 					}
-					if (timeFallen > 0.66) {
-						if (handDir == FlxObject.LEFT) {hand.angle += 10;}
-						else if (handDir == FlxObject.RIGHT) {hand.angle -= 10;}
+					else if (timeFallen > 0.44) {//if (timeFallen > 0.66) {
+						
+						var vSquared:Number = Math.pow(hand.velocity.x,2) + Math.pow(hand.velocity.y,2);
+						
+						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}//{hand.angle += 10;}
+						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}//{hand.angle -= 10;}
 					}
 				}
 			}
@@ -796,6 +814,16 @@ package {
 					}
 				}
 			}
+			
+			if (hand.touching && !lastTouchedWood) {
+				electricity.play("electricute");
+				electricity.angle = hand.angle;
+				electricity.x = hand.x;
+				electricity.y = hand.y;
+			} else {
+				electricity.play("stop");
+			}
+			
 			/* End Animations */
 			
 			/*
