@@ -1,5 +1,7 @@
 package {
 	
+	import flash.display.Graphics;
+	
 	import flashx.textLayout.formats.Float;
 	
 	import org.flixel.*;
@@ -111,6 +113,8 @@ package {
 		public var electricity:FlxSprite;
 		
 		public var timeFallen:Number = 0;
+		
+		public var markerLine:FlxSprite = new FlxSprite();
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
@@ -533,6 +537,10 @@ package {
 			if (SOUND_ON) {
 				musicBackgroundSound.play();
 			}
+			
+			// marker line
+			markerLine.makeGraphic(level.width,level.height,0x00000000);
+			add(markerLine);
 		}
 		
 		override public function update():void {
@@ -550,6 +558,16 @@ package {
 				body = cannonGroup.members[curCannon];
 			}
 			
+			// marker line
+			markerLine.fill(0x00000000);
+			if ((bodyMode && !handOut) || cannonMode) {
+				rad = arrow.angle*Math.PI/180;
+				var startX:Number = hand.x+hand.width/2.0;
+				var startY:Number = hand.y+hand.height/2.0;
+				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
+				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
+				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+			}
 			
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
