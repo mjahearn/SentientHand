@@ -576,7 +576,7 @@ package {
 				var bodyOverlapId:uint = handOverlapsBody();
 				if (bodyOverlapId < uint.MAX_VALUE) {
 					handOverlaps = true;
-					bodyGroup.members[bodyOverlapId].color = 0xff0000;
+					bodyGroup.members[bodyOverlapId].color = 0xff8000;
 				} else {
 					for (var mmm:String in bodyGroup.members) {
 						bodyGroup.members[mmm].color = 0xffffff;
@@ -586,14 +586,14 @@ package {
 				var cannonOverlapId:uint = handOverlapsCannon();
 				if (cannonOverlapId < uint.MAX_VALUE) {
 					handOverlaps = true;
-					cannonGroup.members[cannonOverlapId].color = 0xff0000;
+					cannonGroup.members[cannonOverlapId].color = 0xff8000;
 				} else {
 					for (mmm in cannonGroup.members) {
 						cannonGroup.members[mmm].color = 0xffffff;
 					}
 				}
 				
-				if (handOverlaps) {hand.color = 0xff0000;}
+				if (handOverlaps) {hand.color = 0xff8000;}
 				else {hand.color = 0xffffff;}
 			} else {
 				for (mmm in cannonGroup.members) {
