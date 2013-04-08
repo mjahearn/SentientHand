@@ -288,8 +288,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
 			//FlxG.camera.bounds = FlxG.worldBounds;
@@ -646,10 +646,10 @@ package {
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
 					//FlxG.log("pressed button");
-				} else if (!hand.overlaps(button)) {
+				}/* else if (!hand.overlaps(button)) {
 					button.play("up");
 					buttonStateArray[mm] = false;
-				}
+				}*/
 			}
 			
 			// Bring midground to life
