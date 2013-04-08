@@ -191,6 +191,28 @@ package {
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
 		
+		/*public var buttonReaction:Function = function():void {
+			if (buttonStateArray.indexOf(false) == -1) {
+				Registry.iteration++;
+				FlxG.log(Registry.iteration);
+				FlxG.resetState();
+			}
+			if (reinvigorated) {
+				reinvigorated = false;
+				for (var m:String in steams.members) {
+					var steam:FlxSprite = steams.members[m];
+					steam.play("idle");
+				}
+				
+			} else {
+				reinvigorated = true;
+				for (m in steams.members) {
+					steam = steams.members[m];
+					steam.play("puff");
+				}
+			}
+		}*/
+		
 		override public function create():void {
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -449,27 +471,12 @@ package {
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
 						
-						// not sure how to handle different buttons doing different things?
-						// presumably, they sholud be linked to specific things in the room?
-						// I'm... not quite sure...
-						var buttonReaction:Function = function():void {
-							if (reinvigorated) {
-								reinvigorated = false;
-								for (var m:String in steams.members) {
-									var steam:FlxSprite = steams.members[m];
-									steam.play("idle");
-								}
-								
-							} else {
-								reinvigorated = true;
-								for (m in steams.members) {
-									steam = steams.members[m];
-									steam.play("puff");
-								}
-							}
-						}
-							
-						buttonReactionArray.push(buttonReaction);
+						//how to handle different buttons doing different things:
+						/*if ( BUTTON IS A SPECIFIC BUTTON ) {
+							specialFunctionDefinedBelowButtonReactionThatCallsButtonReaction();
+						} else {*/
+							buttonReactionArray.push(buttonReaction);
+						//}
 					}
 				}
 			}
@@ -545,7 +552,6 @@ package {
 		}
 		
 		override public function update():void {
-			
 			FlxG.camera.follow(hand, FlxCamera.STYLE_PLATFORMER);
 			
 			//time += FlxG.elapsed;
@@ -626,7 +632,7 @@ package {
 				//bodyHead.x = body.x + GRAPPLE_LENGTH*Math.cos(theta);
 				//bodyHead.y = body.y + GRAPPLE_LENGTH*Math.sin(theta);
 				
-				FlxG.log(Math.sin(theta));
+				//FlxG.log(Math.sin(theta));
 				
 				theta = (body.angle-135)*Math.PI/180;
 				
@@ -1352,6 +1358,27 @@ package {
 				b.drag.x = 0;
 				b.drag.y = 0;
 				b.acceleration.y = GRAV_RATE;
+			}
+		}
+		
+		public function buttonReaction():void {
+			if (buttonStateArray.indexOf(false) == -1) {
+				Registry.iteration++;
+				FlxG.resetState();
+			}
+			if (reinvigorated) {
+				reinvigorated = false;
+				for (var m:String in steams.members) {
+					var steam:FlxSprite = steams.members[m];
+					steam.play("idle");
+				}
+				
+			} else {
+				reinvigorated = true;
+				for (m in steams.members) {
+					steam = steams.members[m];
+					steam.play("puff");
+				}
 			}
 		}
 	}
