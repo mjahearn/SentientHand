@@ -34,17 +34,18 @@ package {
 		hand: 191
 		body: 190
 		cannon: 189
-		blocks (from small to large): 186, 187, 188
-		doors: 184 (vert), 185 horiz
-		buttons: 180 -> 183
+		blocks 186, 187, 188 -> (small, medium, large)
+		doors: 184, 185 -> (vertical, horizontal)
+		buttons: 180, 181, 182, 183 -> (L, U, R, D)
 		*/
-		
 		
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
 		public const CANNON_SPAWN:uint = 189;
-		public const BLOCK_MIN:uint = 167;
-		public const BLOCK_MAX:uint = 184;
+		public const BLOCK_MIN:uint = 186;
+		public const BLOCK_MAX:uint = 188;
+		public const DOOR_MIN:uint = 184;
+		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 180;
 		public const BUTTON_MAX:uint = 183;
 		
@@ -120,19 +121,9 @@ package {
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
-		//[Embed("assets/body.png")] public var bodySheet:Class;
+		[Embed("assets/body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/electricity.png")] public var electricitySheet:Class;
-		
-		/*
-		[Embed("assets/body_w1.png")] public var bodyw1Sheet:Class;
-		[Embed("assets/body_w2.png")] public var bodyw2Sheet:Class;
-		[Embed("assets/body_w3.png")] public var bodyw3Sheet:Class;
-		[Embed("assets/body_w4.png")] public var bodyw4Sheet:Class;
-		[Embed("assets/body_w5.png")] public var bodyw5Sheet:Class;
-		[Embed("assets/body_w6.png")] public var bodyw6Sheet:Class;
-		*/
-		[Embed("assets/body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
@@ -147,17 +138,6 @@ package {
 		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
 		[Embed("assets/block_64x64.png")] public var block64x64Sheet:Class;
 		
-		/*
-		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
-		[Embed("assets/block_32x32_w3.png")] public var block32x32w3Sheet:Class;
-		[Embed("assets/block_32x32_w4.png")] public var block32x32w4Sheet:Class;
-		[Embed("assets/block_32x32_w5.png")] public var block32x32w5Sheet:Class;
-		[Embed("assets/block_32x32_w6.png")] public var block32x32w6Sheet:Class;
-		[Embed("assets/block_64x64_w6.png")] public var block64x64w6Sheet:Class;
-		[Embed("assets/block_96x96_w6.png")] public var block96x96w6Sheet:Class;
-		*/
-		
-		//[Embed("assets/button.png")] public var buttonSheet:Class;
 		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
 		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
 		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
@@ -315,7 +295,6 @@ package {
 			//FlxG.camera.bounds = FlxG.worldBounds;
 			FlxG.worldBounds = level.getBounds();
 			FlxG.camera.setBounds(0,0,level.width,level.height,true);
-			//FlxG.camera.follow(hand, FlxCamera.STYLE_PLATFORMER);
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -333,7 +312,6 @@ package {
 					level.setTileByIndex(cannonArray[j],0);
 					var cannonPoint:FlxPoint = pointForTile(cannonArray[j],level);
 					var cannon:FlxSprite = new FlxSprite(cannonPoint.x,cannonPoint.y,cannonSheet);
-					//setGravity(cannon,FlxObject.DOWN,true);
 					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
 					cannon.angle = 0;
 					cannonGroup.add(cannon);
@@ -352,24 +330,9 @@ package {
 					for (j= 0; j < bodyArray.length; j++) {
 						level.setTileByIndex(bodyArray[j],0);
 						var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
-						
-						/*
-						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
-						if (bmass == 0) {bmass = 6;}
-						
-						var bodyImgClass:Class;
-						if (bmass == 1) {bodyImgClass = bodyw1Sheet;}
-						else if (bmass == 2) {bodyImgClass = bodyw2Sheet;}
-						else if (bmass == 3) {bodyImgClass = bodyw3Sheet;}
-						else if (bmass == 4) {bodyImgClass = bodyw4Sheet;}
-						else if (bmass == 5) {bodyImgClass = bodyw5Sheet;}
-						else if (bmass == 6) {bodyImgClass = bodyw6Sheet;}
-						*/
-						
+
 						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-						//FlxG.log(body.mass);
 						bodyTargetAngle = body.angle;
-						//body.mass = bmass;
 						setGravity(body,FlxObject.DOWN,true);
 						bodyGroup.add(body);
 						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
@@ -393,50 +356,17 @@ package {
 				if (blockArray) {
 					for (j = 0; j < blockArray.length; j++) {
 						level.setTileByIndex(blockArray[j],0);
-						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
-						/*
-						if (mass == 0) {mass = 6};
-						*/
 						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
-						
-						
+
 						var blockImgClass:Class;
-						var blockSizeNumber:Number = (i-BLOCK_MIN)%(BLOCK_MAX-BLOCK_MIN);
+						var blockSizeNumber:Number = (i-BLOCK_MIN)%3;
+						FlxG.log(blockSizeNumber);
 						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
-						else if (blockSizeNumber == 1) {blockImgClass = block64x64Sheet;}
+						else if (blockSizeNumber == 1) {blockImgClass = block48x48Sheet;}
 						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
-						
-						// there are six sizes total
-						//var blockGaugeNumber:Number = (i-BLOCK_MIN)%6;
-						
-						/*
-						if      (mass == 1) {imgClass = block32x32w1Sheet;}
-						else if (mass == 3) {imgClass = block48x48w3Sheet;}
-						else if (mass == 5) {imgClass = block64x64w5Sheet}
-						else {FlxG.log("Invalid block mass in tilesheet");}
-						*/
-						
-						/*
-						if (i>178) {//(blockGaugeNumber > 12) {
-							if (mass == 1) {imgClass = block32x32w1Sheet;}
-							else if (mass == 2) {imgClass = block32x32w2Sheet;}
-							else if (mass == 3) {imgClass = block32x32w3Sheet;}
-							else if (mass == 4) {imgClass = block32x32w4Sheet;}
-							else if (mass == 5) {imgClass = block32x32w5Sheet;}
-							else if (mass == 6) {imgClass = block32x32w6Sheet;}
-						}
-							// not all are implemented yet
-						else if (i>172) {//(blockGaugeNumber > 6) {
-							imgClass = block64x64w6Sheet;
-						} else {
-							imgClass = block96x96w6Sheet;
-						}
-						*/
-						
+
 						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,blockImgClass);
 						setBlockState(testBlock,0);
-						//testBlock.mass = mass;
-						//FlxG.log(testBlock.mass);
 						blockGroup.add(testBlock);
 					}
 				}
