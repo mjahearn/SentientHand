@@ -29,29 +29,24 @@ package {
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		public const SOUND_ON:Boolean = true;
 		
-		/* Spawn point info
-		
-		Spawn point indices:
+		/*
+		Spawn Point Info:
 		hand: 191
-		bodies (weights 1-6): 190-185
-		blocks 32x32 (weights 1-6): 184-179
-		blocks 64x64 (weights 1-6): 178-173
-		blocks 96x96 (weights 1-6): 172-167
-		
-		Spawn point markings:
-		hand: H
-		bodies: arabic numerals
-		blocks: relative block size, roman numerals
+		body: 190
+		cannon: 189
+		blocks (from small to large): 186, 187, 188
+		doors: 184 (vert), 185 horiz
+		buttons: 180 -> 183
 		*/
+		
+		
 		public const HAND_SPAWN:uint = 191;
-		public const BODY_MIN:uint = 185;
-		public const BODY_MAX:uint = 190;
+		public const BODY_SPAWN:uint = 190;
+		public const CANNON_SPAWN:uint = 189;
 		public const BLOCK_MIN:uint = 167;
 		public const BLOCK_MAX:uint = 184;
-		
-		public const CANNON_SPAWN:uint = 162;
-		public const BUTTON_MIN:uint = 163;
-		public const BUTTON_MAX:uint = 166;
+		public const BUTTON_MIN:uint = 180;
+		public const BUTTON_MAX:uint = 183;
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -129,12 +124,15 @@ package {
 		
 		[Embed("assets/electricity.png")] public var electricitySheet:Class;
 		
+		/*
 		[Embed("assets/body_w1.png")] public var bodyw1Sheet:Class;
 		[Embed("assets/body_w2.png")] public var bodyw2Sheet:Class;
 		[Embed("assets/body_w3.png")] public var bodyw3Sheet:Class;
 		[Embed("assets/body_w4.png")] public var bodyw4Sheet:Class;
 		[Embed("assets/body_w5.png")] public var bodyw5Sheet:Class;
 		[Embed("assets/body_w6.png")] public var bodyw6Sheet:Class;
+		*/
+		[Embed("assets/body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
@@ -145,9 +143,9 @@ package {
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
 		
-		[Embed("assets/block_32x32_w1.png")] public var block32x32w1Sheet:Class;
-		[Embed("assets/block_48x48_w3.png")] public var block48x48w3Sheet:Class;
-		[Embed("assets/block_64x64_w5.png")] public var block64x64w5Sheet:Class;
+		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
+		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
+		[Embed("assets/block_64x64.png")] public var block64x64Sheet:Class;
 		
 		/*
 		[Embed("assets/block_32x32_w2.png")] public var block32x32w2Sheet:Class;
@@ -288,8 +286,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
 			//FlxG.camera.bounds = FlxG.worldBounds;
@@ -325,13 +323,15 @@ package {
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
-			for (i = BODY_MIN; i <= BODY_MAX; i++) {
+			//for (i = BODY_MIN; i <= BODY_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
-				var bodyArray:Array = level.getTileInstances(i);
+				var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
 				if (bodyArray) {
 					for (j= 0; j < bodyArray.length; j++) {
 						level.setTileByIndex(bodyArray[j],0);
 						var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
+						
+						/*
 						var bmass:Number = (BODY_MAX-i+1)%(BODY_MAX-BODY_MIN);
 						if (bmass == 0) {bmass = 6;}
 						
@@ -342,8 +342,9 @@ package {
 						else if (bmass == 4) {bodyImgClass = bodyw4Sheet;}
 						else if (bmass == 5) {bodyImgClass = bodyw5Sheet;}
 						else if (bmass == 6) {bodyImgClass = bodyw6Sheet;}
+						*/
 						
-						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodyImgClass); // need to adjust graphic
+						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
 						//FlxG.log(body.mass);
 						bodyTargetAngle = body.angle;
 						//body.mass = bmass;
@@ -357,7 +358,7 @@ package {
 						bodyHeadGroup.add(bodyHead);
 					}
 				}
-			}			
+			//}			
 			add(bodyGroup);
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
@@ -371,18 +372,27 @@ package {
 					for (j = 0; j < blockArray.length; j++) {
 						level.setTileByIndex(blockArray[j],0);
 						var mass:Number = (BLOCK_MAX-i+1)%(BLOCK_MAX-BLOCK_MIN);
+						/*
 						if (mass == 0) {mass = 6};
+						*/
 						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
 						
-						var imgClass:Class;
+						
+						var blockImgClass:Class;
+						var blockSizeNumber:Number = (i-BLOCK_MIN)%(BLOCK_MAX-BLOCK_MIN);
+						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
+						else if (blockSizeNumber == 1) {blockImgClass = block64x64Sheet;}
+						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
 						
 						// there are six sizes total
 						//var blockGaugeNumber:Number = (i-BLOCK_MIN)%6;
 						
+						/*
 						if      (mass == 1) {imgClass = block32x32w1Sheet;}
 						else if (mass == 3) {imgClass = block48x48w3Sheet;}
 						else if (mass == 5) {imgClass = block64x64w5Sheet}
 						else {FlxG.log("Invalid block mass in tilesheet");}
+						*/
 						
 						/*
 						if (i>178) {//(blockGaugeNumber > 12) {
@@ -401,7 +411,7 @@ package {
 						}
 						*/
 						
-						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,imgClass);
+						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,blockImgClass);
 						setBlockState(testBlock,0);
 						//testBlock.mass = mass;
 						//FlxG.log(testBlock.mass);
