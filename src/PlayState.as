@@ -9,7 +9,7 @@ package {
 		
 		//public var time:Number = 0;
 		
-		public const CANNON_VEL:Number = 3200; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
+		public const CANNON_VEL:Number = 6400; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
@@ -111,6 +111,8 @@ package {
 		public var electricity:FlxSprite;
 		
 		public var timeFallen:Number = 0;
+		
+		public var markerLine:FlxSprite = new FlxSprite();
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
@@ -286,11 +288,14 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
-			FlxG.worldBounds = new FlxRect(0, 0, 640, 480);
-			FlxG.camera.bounds = FlxG.worldBounds;
+			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
+			//FlxG.camera.bounds = FlxG.worldBounds;
+			FlxG.worldBounds = level.getBounds();
+			FlxG.camera.setBounds(0,0,level.width,level.height,true);
+			//FlxG.camera.follow(hand, FlxCamera.STYLE_PLATFORMER);
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -533,9 +538,15 @@ package {
 			if (SOUND_ON) {
 				musicBackgroundSound.play();
 			}
+			
+			// marker line
+			markerLine.makeGraphic(level.width,level.height,0x00000000);
+			add(markerLine);
 		}
 		
 		override public function update():void {
+			
+			FlxG.camera.follow(hand, FlxCamera.STYLE_PLATFORMER);
 			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
@@ -550,25 +561,78 @@ package {
 				body = cannonGroup.members[curCannon];
 			}
 			
+			// marker line
+			markerLine.fill(0x00000000);
+			if ((bodyMode && !handOut) || cannonMode) {
+				rad = arrow.angle*Math.PI/180;
+				var startX:Number = hand.x+hand.width/2.0;
+				var startY:Number = hand.y+hand.height/2.0;
+				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
+				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
+				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+				
+				// make objects glow
+			}
 			
+			// marker glow (for hand overlapping)
+			if (!bodyMode && !cannonMode) {
+				var handOverlaps:Boolean = false;
+				
+				var bodyOverlapId:uint = handOverlapsBody();
+				if (bodyOverlapId < uint.MAX_VALUE) {
+					handOverlaps = true;
+					bodyGroup.members[bodyOverlapId].color = 0xff8000;
+				} else {
+					for (var mmm:String in bodyGroup.members) {
+						bodyGroup.members[mmm].color = 0xffffff;
+					}
+				}
+				
+				var cannonOverlapId:uint = handOverlapsCannon();
+				if (cannonOverlapId < uint.MAX_VALUE) {
+					handOverlaps = true;
+					cannonGroup.members[cannonOverlapId].color = 0xff8000;
+				} else {
+					for (mmm in cannonGroup.members) {
+						cannonGroup.members[mmm].color = 0xffffff;
+					}
+				}
+				
+				if (handOverlaps) {hand.color = 0xff8000;}
+				else {hand.color = 0xffffff;}
+			} else {
+				for (mmm in cannonGroup.members) {
+					cannonGroup.members[mmm].color = 0xffffff;
+				}
+				for (mmm in bodyGroup.members) {
+					bodyGroup.members[mmm].color = 0xffffff;
+				}
+				hand.color = 0xffffff;
+			}
+			
+			
+			// to time the fall for the different falling rot, really belongs with anim stuff
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
 			
-			// janky way of moving body gear (this only works for one body, should really classify it)
+			// janky way of moving body gear
 			if (bodyMode) {
 				
-				// Ugh.  Math sucks.  I suck at math...
-				// Anyway, I should probably properly transform these...
-				bodyHead.x = body.x;
-				bodyHead.y = body.y-bodyHead.height;
+				var theta:Number = (body.angle-90)*Math.PI/180;
 				
-				bodyHead.origin = body.origin;
 				bodyHead.angle = body.angle;
-				//var theta:Number = body.angle*Math.PI/180;
+				bodyHead.x = body.x;
+				bodyHead.y = body.y;
+				//bodyHead.x = body.x + GRAPPLE_LENGTH*Math.cos(theta);
+				//bodyHead.y = body.y + GRAPPLE_LENGTH*Math.sin(theta);
 				
-				bodyGear.x = body.x;// - body.width/2 + (body.width/2)*Math.sin(theta);
-				bodyGear.y = body.y;// - body.height/2 + (body.height/2)*(1-Math.cos(theta));
-				bodyGear.angle = -arrow.angle;
+				FlxG.log(Math.sin(theta));
+				
+				theta = (body.angle-135)*Math.PI/180;
+				
+				bodyGear.angle = -hand.angle + body.angle;
+				bodyGear.x = body.x + (body.height/4)*Math.cos(theta);
+				bodyGear.y = body.y + (body.height/4)*Math.sin(theta);
 			}
 			
 			// Press Buttons!
@@ -582,10 +646,10 @@ package {
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
 					//FlxG.log("pressed button");
-				} else if (!hand.overlaps(button)) {
+				}/* else if (!hand.overlaps(button)) {
 					button.play("up");
 					buttonStateArray[mm] = false;
-				}
+				}*/
 			}
 			
 			// Bring midground to life
