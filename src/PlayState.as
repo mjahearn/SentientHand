@@ -9,7 +9,7 @@ package {
 		
 		//public var time:Number = 0;
 		
-		public const CANNON_ACCEL:Number = 1600; // the acceleration (in pixels per second per second) the hand is given upon being fired from a cannon
+		public const CANNON_VEL:Number = 3200; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
@@ -949,8 +949,9 @@ package {
 					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
 						cannonMode = false;
 						rad = Math.PI*arrow.angle/180;
-						hand.acceleration.x = CANNON_ACCEL * Math.cos(rad);
-						hand.acceleration.y = CANNON_ACCEL * Math.sin(rad);
+						hand.velocity.x = CANNON_VEL * Math.cos(rad);
+						hand.velocity.y = CANNON_VEL * Math.sin(rad);
+						setGravity(hand,FlxObject.DOWN,true);
 						//FlxG.log("cannon fire!");
 					}
 				}
