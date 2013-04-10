@@ -21,7 +21,7 @@ package {
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 127; //maximum index number of metal in the tilemap
+		public const METAL_MAX:uint = 179; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
@@ -133,6 +133,7 @@ package {
 		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
 		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
 		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
+		[Embed("assets/tallMap.csv", mimeType = 'application/octet-stream')] public static var tallMap:Class;
 		
 		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
 		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
@@ -288,8 +289,9 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
 			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new tallMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
 			//FlxG.camera.bounds = FlxG.worldBounds;
@@ -489,11 +491,10 @@ package {
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
+			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 		}
 		
 		override public function update():void {
-			FlxG.camera.follow(hand, FlxCamera.STYLE_PLATFORMER);
-			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
