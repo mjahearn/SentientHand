@@ -104,6 +104,8 @@ package {
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
 		
+		public var doorGroup:FlxGroup = new FlxGroup();
+		
 		public var electricity:FlxSprite;
 		
 		public var timeFallen:Number = 0;
@@ -142,6 +144,9 @@ package {
 		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
 		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
 		[Embed("assets/button_r.png")] public var buttonRSheet:Class;
+		
+		[Embed("assets/door_h.png")] public var doorHSheet:Class;
+		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -288,8 +293,8 @@ package {
 			
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			level.loadMap(new testMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
+			//level.loadMap(new testMap,tileset,8,8);
+			level.loadMap(new factoryDemoMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
 			//FlxG.camera.bounds = FlxG.worldBounds;
@@ -421,6 +426,35 @@ package {
 				}
 			}
 			add(buttonGroup);
+			
+			// Doors
+			for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var doorArray:Array = level.getTileInstances(i);
+				if (doorArray) {
+					for (j = 0; j < doorArray.length; j++) {
+						level.setTileByIndex(doorArray[j],0);
+						var doorPoint:FlxPoint = pointForTile(doorArray[j],level);
+						
+						// Decide button graphic
+						var doorSheet:Class;
+						if      (i == DOOR_MAX) {doorSheet = doorHSheet; w = 96; h = 16;}
+						else if (i == DOOR_MIN) {doorSheet = doorVSheet; w = 16; h = 96;}
+						
+						
+						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
+						door.immovable = true;
+						door.loadGraphic(doorSheet,true,false,w,h,true);
+						door.addAnimation("closed",[0]);
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],10,true);
+						door.play("closed");
+						
+						doorGroup.add(door);
+					}
+				}
+			}
+			add(doorGroup);
+			
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -1046,6 +1080,7 @@ package {
 			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand, levelHandCallback);
 			FlxG.collide(blockGroup, hand, blockCallback);
+			FlxG.collide(doorGroup, hand);
 			FlxG.collide(level, bodyGroup);
 			if (bodyMode) {
 				FlxG.collide(blockGroup, body, blockCallback);
