@@ -296,7 +296,6 @@ package {
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			//level.loadMap(new testMap,tileset,8,8);
 			level.loadMap(new factoryDemoMap,tileset,8,8);
-			//level.loadMap(new factoryDemoMap,tileset,8,8);
 			//level.loadMap(new tallMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
@@ -368,7 +367,6 @@ package {
 
 						var blockImgClass:Class;
 						var blockSizeNumber:Number = (i-BLOCK_MIN)%3;
-						FlxG.log(blockSizeNumber);
 						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
 						else if (blockSizeNumber == 1) {blockImgClass = block48x48Sheet;}
 						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
@@ -1082,7 +1080,7 @@ package {
 			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand, levelHandCallback);
 			FlxG.collide(blockGroup, hand, blockCallback);
-			FlxG.collide(doorGroup, hand);
+			FlxG.collide(doorGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			if (bodyMode) {
 				FlxG.collide(blockGroup, body, blockCallback);
@@ -1200,7 +1198,7 @@ package {
 				}
 			/*} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
 				fixGravity(spr2);*/
-			} else if (spr2 in blockGroup) {
+			} else if (spr2 in blockGroup.members) {
 				if (spr1 == hand) {
 					if (bodyMode) {
 						handBlockFlag = blockGroup.members.indexOf(spr2);
@@ -1212,6 +1210,18 @@ package {
 				}/* else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
 					fixGravity(spr1);
 				}*/
+			}
+		}
+		
+		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
+			if (spr2 == hand) {
+				handMetalFlag = 1;
+				fixGravity(spr2);
+				lastTouchedWood = false;
+			} else {
+				handMetalFlag = 1;
+				fixGravity(spr1);
+				lastTouchedWood = false;
 			}
 		}
 		
