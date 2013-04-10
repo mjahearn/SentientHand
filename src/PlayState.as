@@ -21,7 +21,7 @@ package {
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 179; //maximum index number of metal in the tilemap
+		public const METAL_MAX:uint = 171; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
@@ -46,7 +46,7 @@ package {
 		public const BLOCK_MAX:uint = 188;
 		public const DOOR_MIN:uint = 184;
 		public const DOOR_MAX:uint = 185;
-		public const BUTTON_MIN:uint = 180;
+		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
 		
 		/* midground spawn points: */
@@ -449,8 +449,8 @@ package {
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],10,true);
-						door.play("closed");
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,true);
+						door.play("open");
 						
 						doorGroup.add(door);
 					}
