@@ -182,9 +182,6 @@ package {
 		override public function create():void {
 			
 			/* Background */
-
-			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
-			
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
@@ -493,6 +490,12 @@ package {
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
 			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
+			
+			
+			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
+			text.scrollFactor = new FlxPoint(0,0);
+			add(text);
+			
 		}
 		
 		override public function update():void {
