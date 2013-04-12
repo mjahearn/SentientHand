@@ -173,27 +173,6 @@ package {
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
 		
-		/*public var buttonReaction:Function = function():void {
-			if (buttonStateArray.indexOf(false) == -1) {
-				Registry.iteration++;
-				FlxG.log(Registry.iteration);
-				FlxG.resetState();
-			}
-			if (reinvigorated) {
-				reinvigorated = false;
-				for (var m:String in steams.members) {
-					var steam:FlxSprite = steams.members[m];
-					steam.play("idle");
-				}
-				
-			} else {
-				reinvigorated = true;
-				for (m in steams.members) {
-					steam = steams.members[m];
-					steam.play("puff");
-				}
-			}
-		}*/
 		public function PlayState(level:Class,midground:Class,background:Class) {
 			levelMap = level;
 			midgroundMap = midground;
@@ -202,6 +181,8 @@ package {
 		
 		override public function create():void {
 			
+			/* Background */
+
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			
 			dbg = 0;
@@ -434,8 +415,8 @@ package {
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,true);
-						door.play("open");
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
+						//door.play("open");
 						
 						doorGroup.add(door);
 					}
@@ -1062,6 +1043,12 @@ package {
 			
 			super.update();
 			
+			for (var a:int = doorGroup.length-1; a >= 0; a--) {
+				if (doorGroup.members[a].frame == 11) {
+					doorGroup.members[a].kill();
+				}
+			}
+			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 			//handBlockFlag = uint.MAX_VALUE;
@@ -1337,8 +1324,11 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				Registry.iteration++;
-				FlxG.resetState();
+				/*Registry.iteration++;
+				FlxG.resetState();*/
+				for (var a:int = 0; a < doorGroup.length; a++) {
+					doorGroup.members[a].play("open");
+				}
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
