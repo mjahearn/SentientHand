@@ -131,11 +131,9 @@ package {
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
 		
-		[Embed("assets/testMap.csv", mimeType = 'application/octet-stream')] public static var testMap:Class;
-		[Embed("assets/factory-demo.csv", mimeType = 'application/octet-stream')] public static var factoryDemoMap:Class;
-		[Embed("assets/factory-demo-background.csv", mimeType = 'application/octet-stream')] public static var backgroundMap:Class;
-		[Embed("assets/factory-demo-midground.csv", mimeType = 'application/octet-stream')] public static var midgroundMap:Class;
-		[Embed("assets/tallMap.csv", mimeType = 'application/octet-stream')] public static var tallMap:Class;
+		public static var levelMap:Class;
+		public static var midgroundMap:Class;
+		public static var backgroundMap:Class;
 		
 		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
 		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
@@ -196,29 +194,18 @@ package {
 				}
 			}
 		}*/
+		public function PlayState(level:Class,midground:Class,background:Class) {
+			levelMap = level;
+			midgroundMap = midground;
+			backgroundMap = background;
+		}
 		
 		override public function create():void {
+			
+			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
+			
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
-			
-			/*var data:Array = new Array(
-				2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-				1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
-				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-				1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-				1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);*/
-			
-			/* Background */
 			
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
@@ -295,7 +282,7 @@ package {
 			level = new FlxTilemap();
 			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
 			//level.loadMap(new testMap,tileset,8,8);
-			level.loadMap(new factoryDemoMap,tileset,8,8);
+			level.loadMap(new levelMap,tileset,8,8);
 			//level.loadMap(new tallMap,tileset,8,8);
 			add(level);
 			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
@@ -528,6 +515,12 @@ package {
 		}
 		
 		override public function update():void {
+			
+			if (FlxG.keys.justPressed("ESCAPE")) {
+				FlxG.switchState(new LevelSelect);
+			}
+			
+			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
