@@ -15,7 +15,7 @@ package
 		
 		override public function create():void {
 			
-			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> level 1 \n B -> level 2 \n C -> level 3 \n D -> testMap \n E -> factory-demo \n F -> tallMap");
+			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv");
 			add(text);
 		}
 		
