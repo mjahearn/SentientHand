@@ -408,8 +408,8 @@ package {
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,true);
-						door.play("open");
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
+						//door.play("open");
 						
 						doorGroup.add(door);
 					}
@@ -556,24 +556,18 @@ package {
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
 			
-			// janky way of moving body gear
+			// less janky way of getting gears/heads to move with body...
 			if (bodyMode) {
 				
-				var theta:Number = (body.angle-90)*Math.PI/180;
+				var theta:Number = (body.angle-90)*Math.PI/180.0;
 				
+				bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
 				bodyHead.angle = body.angle;
-				bodyHead.x = body.x;
-				bodyHead.y = body.y;
-				//bodyHead.x = body.x + GRAPPLE_LENGTH*Math.cos(theta);
-				//bodyHead.y = body.y + GRAPPLE_LENGTH*Math.sin(theta);
 				
-				//FlxG.log(Math.sin(theta));
-				
-				theta = (body.angle-135)*Math.PI/180;
-				
-				bodyGear.angle = -hand.angle + body.angle;
-				bodyGear.x = body.x + (body.height/4)*Math.cos(theta);
-				bodyGear.y = body.y + (body.height/4)*Math.sin(theta);
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/4.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/4.0);
+				bodyGear.angle = -hand.angle;
 			}
 			
 			// Press Buttons!
@@ -1036,6 +1030,12 @@ package {
 			
 			super.update();
 			
+			for (var a:int = doorGroup.length-1; a >= 0; a--) {
+				if (doorGroup.members[a].frame == 11) {
+					doorGroup.members[a].kill();
+				}
+			}
+			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 			//handBlockFlag = uint.MAX_VALUE;
@@ -1311,8 +1311,11 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				Registry.iteration++;
-				FlxG.resetState();
+				/*Registry.iteration++;
+				FlxG.resetState();*/
+				for (var a:int = 0; a < doorGroup.length; a++) {
+					doorGroup.members[a].play("open");
+				}
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
