@@ -595,24 +595,18 @@ package {
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
 			
-			// janky way of moving body gear
+			// less janky way of getting gears/heads to move with body...
 			if (bodyMode) {
 				
-				var theta:Number = (body.angle-90)*Math.PI/180;
+				var theta:Number = (body.angle-90)*Math.PI/180.0;
 				
+				bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
 				bodyHead.angle = body.angle;
-				bodyHead.x = body.x;
-				bodyHead.y = body.y;
-				//bodyHead.x = body.x + GRAPPLE_LENGTH*Math.cos(theta);
-				//bodyHead.y = body.y + GRAPPLE_LENGTH*Math.sin(theta);
 				
-				//FlxG.log(Math.sin(theta));
-				
-				theta = (body.angle-135)*Math.PI/180;
-				
-				bodyGear.angle = -hand.angle + body.angle;
-				bodyGear.x = body.x + (body.height/4)*Math.cos(theta);
-				bodyGear.y = body.y + (body.height/4)*Math.sin(theta);
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/4.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/4.0);
+				bodyGear.angle = -hand.angle;
 			}
 			
 			// Press Buttons!
