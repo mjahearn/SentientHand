@@ -923,6 +923,10 @@ package {
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
 					rad = arrow.angle*Math.PI/180;
+					if (handBlockFlag < uint.MAX_VALUE && FlxG.keys.UP) {
+						setBlockState(blockGroup.members[handBlockFlag], 2);
+						handBlockFlag = uint.MAX_VALUE;
+					}
 					if (FlxG.keys.SPACE) {
 						if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
 							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
