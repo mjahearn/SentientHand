@@ -21,7 +21,7 @@ package {
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 171; //maximum index number of metal in the tilemap
+		public const METAL_MAX:uint = 165; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
@@ -35,8 +35,9 @@ package {
 		body: 190
 		cannon: 189
 		blocks 186, 187, 188 -> (small, medium, large)
-		doors: 184, 185 -> (vertical, horizontal)
-		buttons: 180, 181, 182, 183 -> (L, U, R, D)
+		doors: 184-185, every 2 -> (vertical, horizontal)
+		buttons: 172-186, every 4 -> (L, U, R, D)
+		flaps: 166-171, every 2 -> (vertical, horizotonal)
 		*/
 		
 		public const HAND_SPAWN:uint = 191;
@@ -48,6 +49,8 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
+		public const FLAP_MIN:uint = 166;
+		public const FLAP_MAX:uint = 171
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -105,6 +108,7 @@ package {
 		public var buttonReactionArray:Array = new Array();
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
+		public var flapGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -146,6 +150,9 @@ package {
 		
 		[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
+		
+		[Embed("assets/flap_h.png")] public var flapHSheet:Class;
+		[Embed("assets/flap_v.png")] public var flapVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -263,10 +270,10 @@ package {
 			level.loadMap(new levelMap,tileset,8,8);
 			//level.loadMap(new tallMap,tileset,8,8);
 			add(level);
-			//FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
-			//FlxG.camera.bounds = FlxG.worldBounds;
-			FlxG.worldBounds = level.getBounds();
-			FlxG.camera.setBounds(0,0,level.width,level.height,true);
+			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
+			FlxG.camera.bounds = FlxG.worldBounds;
+			//FlxG.worldBounds = level.getBounds();
+			//FlxG.camera.setBounds(0,0,level.width,level.height,true);
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -402,11 +409,11 @@ package {
 						level.setTileByIndex(doorArray[j],0);
 						var doorPoint:FlxPoint = pointForTile(doorArray[j],level);
 						
-						// Decide button graphic
+						// Decide door graphic
 						var doorSheet:Class;
-						if      (i == DOOR_MAX) {doorSheet = doorHSheet; w = 96; h = 16;}
-						else if (i == DOOR_MIN) {doorSheet = doorVSheet; w = 16; h = 96;}
-						
+						var doorNumber:Number = (i-DOOR_MIN)%2;
+						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 96;}
+						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 96; h = 16;}
 						
 						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
 						door.immovable = true;
@@ -421,6 +428,37 @@ package {
 			}
 			add(doorGroup);
 			
+			// Flaps
+			for (i = FLAP_MIN; i <= FLAP_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var flapArray:Array = level.getTileInstances(i);
+				if (flapArray) {
+					for (j = 0; j < flapArray.length; j++) {
+						level.setTileByIndex(flapArray[j],0);
+						var flapPoint:FlxPoint = pointForTile(flapArray[j],level);
+						
+						// Decide flap graphic
+						var flapSheet:Class = flapHSheet;
+						var flapNumber:Number = (i-FLAP_MIN)%2;
+						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
+						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
+						
+						FlxG.log(flapNumber);
+						
+						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
+						flap.immovable = true;
+						flap.loadGraphic(flapSheet,true,false,w,h,true);
+						flap.addAnimation("close",[11,10,9,8,7,6,5,4,3,2,2,2,2,2,2,2,2,2,2,2,2,1],22,false);
+						flap.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
+						flap.addAnimation("closed",[0]);
+						flap.addAnimation("opened",[11]);
+						flap.play("closed");
+						
+						flapGroup.add(flap);
+					}
+				}
+			}
+			add(flapGroup);
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -495,7 +533,6 @@ package {
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			text.scrollFactor = new FlxPoint(0,0);
 			add(text);
-			
 		}
 		
 		override public function update():void {
@@ -1058,6 +1095,7 @@ package {
 			FlxG.collide(level, hand, levelHandCallback);
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(doorGroup, hand, doorCallback);
+			FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			if (bodyMode) {
 				FlxG.collide(blockGroup, body, blockCallback);
