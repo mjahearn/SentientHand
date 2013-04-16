@@ -67,6 +67,7 @@ package {
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
+		public var hint:FlxSprite;
 		//public var body:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
@@ -127,6 +128,7 @@ package {
 		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
+		[Embed("assets/hint.png")] public var hintSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
 		
@@ -385,7 +387,7 @@ package {
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
 						button.addAnimation("up open door",[6]);
-						button.play("up");
+						button.play("up state C");
 						
 						/*
 						// Decide button angle
@@ -453,7 +455,7 @@ package {
 						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
 						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
 						
-						FlxG.log(flapNumber);
+						//FlxG.log(flapNumber);
 						
 						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
 						flap.immovable = true;
@@ -505,6 +507,14 @@ package {
 			setGravity(hand, FlxObject.DOWN, true);
 			onGround = true;
 			add(hand);
+			
+			hint = new FlxSprite(0,0);
+			hint.loadGraphic(hintSheet,true,false,64,64,true);
+			hint.addAnimation("idle",[0]);
+			hint.addAnimation("think",[1,2,3,4],10,false);
+			hint.addAnimation("thinking",[4]);
+			hint.play("idle");
+			add(hint);
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
@@ -615,6 +625,14 @@ package {
 				// make objects glow
 			}
 			
+			// hint system
+			//theta = (hand.angle)*Math.PI/180.0;
+			
+			hint.x = hand.x + hand.width - hint.width/2.0;// + (hint.width/2.0)*Math.sin(theta);
+			hint.y = hand.y + hand.height - hint.height;// - (hint.height/2.0)*Math.cos(theta);
+			//hint.angle = hand.angle;
+			hint.play("idle");
+			
 			// marker glow (for hand overlapping)
 			if (!bodyMode && !cannonMode) {
 				var handOverlaps:Boolean = false;
@@ -639,7 +657,10 @@ package {
 					}
 				}
 				
-				if (handOverlaps) {hand.color = 0xff8000;}
+				if (handOverlaps) {
+					hand.color = 0xff8000;
+					hint.play("thinking");
+				}
 				else {hand.color = 0xffffff;}
 			} else {
 				for (mmm in cannonGroup.members) {
@@ -1133,7 +1154,7 @@ package {
 						}
 					}
 				}
-				FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
+				//FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
 			}
 			
 			super.update();
