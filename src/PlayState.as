@@ -174,8 +174,10 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		
-		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackground:Class;
-		public var musicBackgroundSound:FlxSound = new FlxSound().loadEmbedded(musicBackground,true);
+		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
+		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
+		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
+		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -528,10 +530,6 @@ package {
 			arrow.visible = false;
 			add(arrow);
 			
-			if (SOUND_ON) {
-				musicBackgroundSound.play();
-			}
-			
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
@@ -543,9 +541,29 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				FlxG.switchState(new LevelSelect);
 			}
+			
+			// music -- this should probably be moved to the registry if we want to do layering
+			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
+			if (SOUND_ON) {
+				//FlxG.playMusic(musicBackgroundB,1.0);
+				
+				//musicBackgroundSoundB.play();
+				musicBackgroundSoundA.play();
+				/*
+				if (FlxG.keys.A) {
+					musicBackgroundSoundB.volume -= 0.22;
+				} else {musicBackgroundSoundB.volume += 0.022;}
+				if (FlxG.keys.B) {
+					musicBackgroundSoundA.volume -= 0.22;
+				} else {musicBackgroundSoundA.volume += 0.22;}
+				*/
+			}
+			
 			
 			if (FlxG.keys.justPressed("LEFT")) {
 				controlDirs |= FlxObject.LEFT;
