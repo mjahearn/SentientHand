@@ -12,9 +12,9 @@ package {
 		[Embed("assets/tsh_level02.csv", mimeType = 'application/octet-stream')] public static const level02:Class;
 		[Embed("assets/tsh_level03.csv", mimeType = 'application/octet-stream')] public static const level03:Class;
 		
-		public static const levelOrder:Array = new Array();
+		public static const levelOrder:Array = new Array(level01, testMap);
 		
 		public static var iteration:uint = 0;
-		public static var level:uint = 0;
+		public static var levelNum:uint = 0;
 	}
 }

@@ -174,8 +174,10 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		
-		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackground:Class;
-		public var musicBackgroundSound:FlxSound = new FlxSound().loadEmbedded(musicBackground,true);
+		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
+		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
+		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
+		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -376,8 +378,13 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.addAnimation("up",[0]);
+						button.addAnimation("up inactive",[0]);
 						button.addAnimation("down",[1]);
+						button.addAnimation("up state A",[2]);
+						button.addAnimation("up state B",[3]);
+						button.addAnimation("up state C",[4]);
+						button.addAnimation("up activate",[5]);
+						button.addAnimation("up open door",[6]);
 						button.play("up");
 						
 						/*
@@ -523,10 +530,6 @@ package {
 			arrow.visible = false;
 			add(arrow);
 			
-			if (SOUND_ON) {
-				musicBackgroundSound.play();
-			}
-			
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
@@ -538,9 +541,29 @@ package {
 		}
 		
 		override public function update():void {
+			
+			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				FlxG.switchState(new LevelSelect);
 			}
+			
+			// music -- this should probably be moved to the registry if we want to do layering
+			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
+			if (SOUND_ON) {
+				//FlxG.playMusic(musicBackgroundB,1.0);
+				
+				//musicBackgroundSoundB.play();
+				musicBackgroundSoundA.play();
+				/*
+				if (FlxG.keys.A) {
+					musicBackgroundSoundB.volume -= 0.22;
+				} else {musicBackgroundSoundB.volume += 0.022;}
+				if (FlxG.keys.B) {
+					musicBackgroundSoundA.volume -= 0.22;
+				} else {musicBackgroundSoundA.volume += 0.22;}
+				*/
+			}
+			
 			
 			if (FlxG.keys.justPressed("LEFT")) {
 				controlDirs |= FlxObject.LEFT;
@@ -653,10 +676,13 @@ package {
 			for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				if ((hand.overlaps(button) && !buttonState) || (button.overlaps(blockGroup) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-					button.play("down");
-					buttonStateArray[mm] = true;
-					buttonReactionArray[mm]();
+				for (var m:String in blockGroup.members) {
+					var block:FlxSprite = blockGroup.members[m];
+					if ((hand.overlaps(button) && !buttonState) || (block.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+						button.play("down");
+						buttonStateArray[mm] = true;
+						buttonReactionArray[mm]();
+					}
 					//FlxG.log("pressed button");
 				}/* else if (!hand.overlaps(button)) {
 					button.play("up");
@@ -1396,8 +1422,13 @@ package {
 			if (buttonStateArray.indexOf(false) == -1) {
 				/*Registry.iteration++;
 				FlxG.resetState();*/
-				for (var a:int = 0; a < doorGroup.length; a++) {
-					doorGroup.members[a].play("open");
+				if (Registry.levelNum < Registry.levelOrder.length-1) {
+					for (var a:int = 0; a < doorGroup.length; a++) {
+						doorGroup.members[a].play("open");
+					}
+				} else {
+					Registry.iteration++;
+					FlxG.resetState();
 				}
 			} else {
 				FlxG.log(buttonStateArray);
