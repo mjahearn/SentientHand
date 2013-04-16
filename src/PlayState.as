@@ -557,6 +557,11 @@ package {
 				FlxG.switchState(new LevelSelect);
 			}
 			
+			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
+				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
+				goToNextLevel();
+			}
+			
 			// music -- this should probably be moved to the registry if we want to do layering
 			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
 			if (SOUND_ON) {
@@ -1450,11 +1455,15 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				/*Registry.iteration++;
-				FlxG.resetState();*/
-				for (var a:int = 0; a < doorGroup.length; a++) {
-					doorGroup.members[a].play("open");
+				if (Registry.levelNum < Registry.levelOrder.length-1) {
+					for (var a:int = 0; a < doorGroup.length; a++) {
+						doorGroup.members[a].play("open");
+					}
+				} else {
+					goToNextIteration();
 				}
+			} else {
+				FlxG.log(buttonStateArray);
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
@@ -1474,6 +1483,21 @@ package {
 		
 		public function playerIsPressing(dir:uint):Boolean {
 			return (controlDirs & dir) == dir;
+		}
+		
+		public function goToNextLevel():void {
+			Registry.levelNum++;
+			if (Registry.levelNum < Registry.levelOrder.length) {
+				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
+			} else {
+				goToNextIteration();
+			}
+		}
+		
+		public function goToNextIteration():void {
+			Registry.iteration++;
+			Registry.levelNum = 0;
+			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
 		}
 	}
 }
