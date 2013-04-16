@@ -376,8 +376,13 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.addAnimation("up",[0]);
+						button.addAnimation("up inactive",[0]);
 						button.addAnimation("down",[1]);
+						button.addAnimation("up state A",[2]);
+						button.addAnimation("up state B",[3]);
+						button.addAnimation("up state C",[4]);
+						button.addAnimation("up activate",[5]);
+						button.addAnimation("up open door",[6]);
 						button.play("up");
 						
 						/*
@@ -653,10 +658,13 @@ package {
 			for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				if ((hand.overlaps(button) && !buttonState) || (button.overlaps(blockGroup) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-					button.play("down");
-					buttonStateArray[mm] = true;
-					buttonReactionArray[mm]();
+				for (var m:String in blockGroup.members) {
+					var block:FlxSprite = blockGroup.members[m];
+					if ((hand.overlaps(button) && !buttonState) || (block.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+						button.play("down");
+						buttonStateArray[mm] = true;
+						buttonReactionArray[mm]();
+					}
 					//FlxG.log("pressed button");
 				}/* else if (!hand.overlaps(button)) {
 					button.play("up");
