@@ -1399,6 +1399,8 @@ package {
 				for (var a:int = 0; a < doorGroup.length; a++) {
 					doorGroup.members[a].play("open");
 				}
+			} else {
+				FlxG.log(buttonStateArray);
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
