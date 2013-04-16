@@ -547,6 +547,11 @@ package {
 				FlxG.switchState(new LevelSelect);
 			}
 			
+			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
+				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
+				goToNextLevel();
+			}
+			
 			// music -- this should probably be moved to the registry if we want to do layering
 			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
 			if (SOUND_ON) {
@@ -676,18 +681,18 @@ package {
 			for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				for (var m:String in blockGroup.members) {
-					var block:FlxSprite = blockGroup.members[m];
-					if ((hand.overlaps(button) && !buttonState) || (block.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+				//for (var m:String in blockGroup.members) {
+					//var block:FlxSprite = blockGroup.members[m];
+					if ((hand.overlaps(button) && !buttonState) || (blockOvelapsButton(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
 						button.play("down");
 						buttonStateArray[mm] = true;
 						buttonReactionArray[mm]();
 					}
 					//FlxG.log("pressed button");
-				}/* else if (!hand.overlaps(button)) {
-					button.play("up");
-					buttonStateArray[mm] = false;
-				}*/
+				//} else if (!hand.overlaps(button)) {
+					//button.play("up");
+					//buttonStateArray[mm] = false;
+				//}
 			}
 			
 			// Bring midground to life
@@ -1390,6 +1395,15 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
+		public function blockOvelapsButton(spr:FlxSprite):Boolean {
+			for (var m:String in blockGroup.members) {
+				if (spr.overlaps(blockGroup.members[m])) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
 		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
 			var X:Number = 8*(int)(tile%map.widthInTiles);
 			var Y:Number = 8*(int)(tile/map.widthInTiles);
@@ -1420,15 +1434,12 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				/*Registry.iteration++;
-				FlxG.resetState();*/
 				if (Registry.levelNum < Registry.levelOrder.length-1) {
 					for (var a:int = 0; a < doorGroup.length; a++) {
 						doorGroup.members[a].play("open");
 					}
 				} else {
-					Registry.iteration++;
-					FlxG.resetState();
+					goToNextIteration();
 				}
 			} else {
 				FlxG.log(buttonStateArray);
@@ -1451,6 +1462,21 @@ package {
 		
 		public function playerIsPressing(dir:uint):Boolean {
 			return (controlDirs & dir) == dir;
+		}
+		
+		public function goToNextLevel():void {
+			Registry.levelNum++;
+			if (Registry.levelNum < Registry.levelOrder.length) {
+				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
+			} else {
+				goToNextIteration();
+			}
+		}
+		
+		public function goToNextIteration():void {
+			Registry.iteration++;
+			Registry.levelNum = 0;
+			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
 		}
 	}
 }
