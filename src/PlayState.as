@@ -62,6 +62,7 @@ package {
 		
 		public var dbg:int;
 		public var rad:Number;
+		public var controlDirs:uint;
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
@@ -78,7 +79,7 @@ package {
 		public var bodyTargetAngle:Number;
 		
 		public var arms:FlxGroup = new FlxGroup();
-		public var numArms:int = 22;
+		public const numArms:int = 22;
 		public var handDir:uint;
 		
 		public var handFalling:Boolean;
@@ -112,7 +113,7 @@ package {
 		
 		public var electricity:FlxSprite;
 		
-		public var timeFallen:Number = 0;
+		public var timeFallen:Number;
 		
 		public var markerLine:FlxSprite = new FlxSprite();
 		
@@ -187,6 +188,8 @@ package {
 		}
 		
 		override public function create():void {
+			timeFallen = 0; //this was initialized above, so I moved it here - mjahearn
+			controlDirs = 0;
 			
 			/* Background */
 			dbg = 0;
@@ -529,18 +532,39 @@ package {
 			add(markerLine);
 			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 			
-			
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			text.scrollFactor = new FlxPoint(0,0);
 			add(text);
 		}
 		
 		override public function update():void {
-			
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				FlxG.switchState(new LevelSelect);
 			}
 			
+			if (FlxG.keys.justPressed("LEFT")) {
+				controlDirs |= FlxObject.LEFT;
+				if (playerIsPressing(FlxObject.RIGHT)) {
+					controlDirs ^= FlxObject.RIGHT;
+				}
+			} else if (FlxG.keys.justPressed("RIGHT")) {
+				controlDirs |= FlxObject.RIGHT;
+				if (playerIsPressing(FlxObject.LEFT)) {
+					controlDirs ^= FlxObject.LEFT;
+				}
+			}
+			if (FlxG.keys.justReleased("LEFT") && playerIsPressing(FlxObject.LEFT)) {
+				controlDirs ^= FlxObject.LEFT;
+				if (FlxG.keys.RIGHT) {
+					controlDirs |= FlxObject.RIGHT;
+				}
+			}
+			if (FlxG.keys.justReleased("RIGHT") && playerIsPressing(FlxObject.RIGHT)) {
+				controlDirs ^= FlxObject.RIGHT;
+				if (FlxG.keys.LEFT) {
+					controlDirs |= FlxObject.LEFT;
+				}
+			}
 			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
@@ -732,8 +756,8 @@ package {
 					else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
 					// The hand is changing direction
 					// (because the sprite's not ambidexterous)
-					if (FlxG.keys.LEFT) {handDir = FlxObject.LEFT;}
-					if (FlxG.keys.RIGHT) {handDir = FlxObject.RIGHT;}
+					if (playerIsPressing(FlxObject.LEFT)) {handDir = FlxObject.LEFT;}
+					if (playerIsPressing(FlxObject.RIGHT)) {handDir = FlxObject.RIGHT;}
 					// Make the hand crawl or idle
 					// (this relies on the facing and direction because the sprite's not ambidexterous)
 					if (handDir == FlxObject.LEFT) {
@@ -971,10 +995,10 @@ package {
 						}
 					}
 				} else {
-					if (FlxG.keys.LEFT) {
+					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
-					} if (FlxG.keys.RIGHT) {
+					} if (playerIsPressing(FlxObject.RIGHT)) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
 					}
@@ -1047,7 +1071,7 @@ package {
 						} else if (hand.facing == FlxObject.LEFT || hand.facing == FlxObject.RIGHT) {
 							hand.acceleration.y = 0;
 						}
-						if (FlxG.keys.LEFT) {
+						if (playerIsPressing(FlxObject.LEFT)) {
 							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT)) {
 								hand.acceleration.x = -MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
@@ -1057,7 +1081,7 @@ package {
 							} else if (handIsFacing(FlxObject.RIGHT)) {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.RIGHT) {
+						} if (playerIsPressing(FlxObject.RIGHT)) {
 							if (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT)) {
 								hand.acceleration.x = MOVE_ACCEL;
 							} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
@@ -1083,6 +1107,7 @@ package {
 						}
 					}
 				}
+				FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
 			}
 			
 			super.update();
@@ -1389,6 +1414,10 @@ package {
 					steam.play("puff");
 				}
 			}
+		}
+		
+		public function playerIsPressing(dir:uint):Boolean {
+			return (controlDirs & dir) == dir;
 		}
 	}
 }
