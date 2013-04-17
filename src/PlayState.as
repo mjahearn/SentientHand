@@ -512,7 +512,8 @@ package {
 			hint.loadGraphic(hintSheet,true,false,64,64,true);
 			hint.addAnimation("idle",[0]);
 			hint.addAnimation("think",[1,2,3,4],10,false);
-			hint.addAnimation("thinking",[4]);
+			hint.addAnimation("thinking up",[4]);
+			hint.addAnimation("thinking space",[5]);
 			hint.play("idle");
 			add(hint);
 			
@@ -551,7 +552,6 @@ package {
 		}
 		
 		override public function update():void {
-			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				FlxG.switchState(new LevelSelect);
@@ -664,7 +664,7 @@ package {
 				
 				if (handOverlaps) {
 					hand.color = 0xff8000;
-					hint.play("thinking");
+					hint.play("thinking up");
 				}
 				else {hand.color = 0xffffff;}
 			} else {
@@ -675,6 +675,9 @@ package {
 					bodyGroup.members[mmm].color = 0xffffff;
 				}
 				hand.color = 0xffffff;
+			}
+			if (cannonMode || (bodyMode && !handOut)){
+				hint.play("thinking space");
 			}
 			
 			
@@ -1089,22 +1092,20 @@ package {
 				}
 			} else {
 				var hoc:uint = handOverlapsCannon();
-				if (FlxG.keys.justPressed("DOWN") && hoc < uint.MAX_VALUE) {
-					curCannon = hoc;
-					body = cannonGroup.members[curCannon];
-					cannonMode = true;
-					hand.velocity.x = 0;
-					hand.velocity.y = 0;
-					hand.acceleration.x = 0;
-					hand.acceleration.y = 0;
-					hand.x = body.x;
-					hand.y = body.y;
-					showArrow();
-				}
-				
-				
 				var hob:uint = handOverlapsBody();
-				if (FlxG.keys.justPressed("DOWN") && hob < uint.MAX_VALUE) {
+				if (FlxG.keys.justPressed("DOWN")) {
+					if (hoc < uint.MAX_VALUE) {
+						curCannon = hoc;
+						body = cannonGroup.members[curCannon];
+						cannonMode = true;
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						showArrow();
+					} else if (hob < uint.MAX_VALUE) {
 					curBody = hob;
 					body = bodyGroup.members[curBody];
 					bodyGear = bodyGearGroup.members[curBody];
@@ -1116,6 +1117,7 @@ package {
 					hand.x = body.x;
 					hand.y = body.y;
 					showArrow();
+					}
 				} else {
 					if (onGround) {
 						if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
