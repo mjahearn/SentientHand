@@ -67,6 +67,7 @@ package {
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
+		public var hint:FlxSprite;
 		//public var body:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
@@ -127,6 +128,7 @@ package {
 		
 		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
+		[Embed("assets/hint.png")] public var hintSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
 		
@@ -385,7 +387,7 @@ package {
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
 						button.addAnimation("up open door",[6]);
-						button.play("up");
+						button.play("up state C");
 						
 						/*
 						// Decide button angle
@@ -453,7 +455,7 @@ package {
 						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
 						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
 						
-						FlxG.log(flapNumber);
+						//FlxG.log(flapNumber);
 						
 						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
 						flap.immovable = true;
@@ -506,6 +508,15 @@ package {
 			onGround = true;
 			add(hand);
 			
+			hint = new FlxSprite(0,0);
+			hint.loadGraphic(hintSheet,true,false,64,64,true);
+			hint.addAnimation("idle",[0]);
+			hint.addAnimation("think",[1,2,3,4],10,false);
+			hint.addAnimation("thinking up",[4]);
+			hint.addAnimation("thinking space",[5]);
+			hint.play("idle");
+			add(hint);
+			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
 			electricity.addAnimation("electricute",[1,2,3],22,true);
@@ -541,7 +552,6 @@ package {
 		}
 		
 		override public function update():void {
-			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				FlxG.switchState(new LevelSelect);
@@ -620,6 +630,14 @@ package {
 				// make objects glow
 			}
 			
+			// hint system
+			//theta = (hand.angle)*Math.PI/180.0;
+			
+			hint.x = hand.x + hand.width - hint.width/2.0;// + (hint.width/2.0)*Math.sin(theta);
+			hint.y = hand.y + hand.height - hint.height;// - (hint.height/2.0)*Math.cos(theta);
+			//hint.angle = hand.angle;
+			hint.play("idle");
+			
 			// marker glow (for hand overlapping)
 			if (!bodyMode && !cannonMode) {
 				var handOverlaps:Boolean = false;
@@ -644,7 +662,10 @@ package {
 					}
 				}
 				
-				if (handOverlaps) {hand.color = 0xff8000;}
+				if (handOverlaps) {
+					hand.color = 0xff8000;
+					hint.play("thinking up");
+				}
 				else {hand.color = 0xffffff;}
 			} else {
 				for (mmm in cannonGroup.members) {
@@ -654,6 +675,9 @@ package {
 					bodyGroup.members[mmm].color = 0xffffff;
 				}
 				hand.color = 0xffffff;
+			}
+			if (cannonMode || (bodyMode && !handOut)){
+				hint.play("thinking space");
 			}
 			
 			
@@ -1068,22 +1092,20 @@ package {
 				}
 			} else {
 				var hoc:uint = handOverlapsCannon();
-				if (FlxG.keys.justPressed("DOWN") && hoc < uint.MAX_VALUE) {
-					curCannon = hoc;
-					body = cannonGroup.members[curCannon];
-					cannonMode = true;
-					hand.velocity.x = 0;
-					hand.velocity.y = 0;
-					hand.acceleration.x = 0;
-					hand.acceleration.y = 0;
-					hand.x = body.x;
-					hand.y = body.y;
-					showArrow();
-				}
-				
-				
 				var hob:uint = handOverlapsBody();
-				if (FlxG.keys.justPressed("DOWN") && hob < uint.MAX_VALUE) {
+				if (FlxG.keys.justPressed("DOWN")) {
+					if (hoc < uint.MAX_VALUE) {
+						curCannon = hoc;
+						body = cannonGroup.members[curCannon];
+						cannonMode = true;
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						showArrow();
+					} else if (hob < uint.MAX_VALUE) {
 					curBody = hob;
 					body = bodyGroup.members[curBody];
 					bodyGear = bodyGearGroup.members[curBody];
@@ -1095,6 +1117,7 @@ package {
 					hand.x = body.x;
 					hand.y = body.y;
 					showArrow();
+					}
 				} else {
 					if (onGround) {
 						if (hand.facing == FlxObject.DOWN || hand.facing == FlxObject.UP) {
@@ -1138,7 +1161,7 @@ package {
 						}
 					}
 				}
-				FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
+				//FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
 			}
 			
 			super.update();
