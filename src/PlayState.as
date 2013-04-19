@@ -20,10 +20,12 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 165; //maximum index number of metal in the tilemap
+		public const METAL_MIN:uint = 65; //minimum index number of metal in the tilemap
+		public const METAL_MAX:uint = 141; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
+		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
+		public const UNTOUCHABLE_MIN:uint = 142;
+		public const UNTOUCHABLE_MAX:uint = 171;
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
@@ -49,8 +51,8 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
-		public const FLAP_MIN:uint = 166;
-		public const FLAP_MAX:uint = 171
+		//public const FLAP_MIN:uint = 166;
+		//public const FLAP_MAX:uint = 171
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -110,7 +112,7 @@ package {
 		public var buttonReactionArray:Array = new Array();
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
-		public var flapGroup:FlxGroup = new FlxGroup();
+		//public var flapGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -154,8 +156,8 @@ package {
 		[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		[Embed("assets/flap_h.png")] public var flapHSheet:Class;
-		[Embed("assets/flap_v.png")] public var flapVSheet:Class;
+		//[Embed("assets/flap_h.png")] public var flapHSheet:Class;
+		//[Embed("assets/flap_v.png")] public var flapVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -288,6 +290,10 @@ package {
 			
 			for (i = METAL_MIN; i <= METAL_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
+			}
+			
+			for (i = UNTOUCHABLE_MIN; i <= UNTOUCHABLE_MAX; i++) {
+				level.setTileProperties(i, FlxObject.NONE);
 			}
 			
 			// Cannons
@@ -440,6 +446,7 @@ package {
 			}
 			add(doorGroup);
 			
+			/*
 			// Flaps
 			for (i = FLAP_MIN; i <= FLAP_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
@@ -471,6 +478,7 @@ package {
 				}
 			}
 			add(flapGroup);
+			*/
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -1178,7 +1186,7 @@ package {
 			FlxG.collide(level, hand, levelHandCallback);
 			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(doorGroup, hand, doorCallback);
-			FlxG.collide(flapGroup, hand, doorCallback);
+			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			if (bodyMode) {
 				FlxG.collide(blockGroup, body, blockCallback);
