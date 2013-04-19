@@ -21,10 +21,10 @@ package {
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
 		public const METAL_MIN:uint = 65; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 141; //maximum index number of metal in the tilemap
+		public const METAL_MAX:uint = 147; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
-		public const UNTOUCHABLE_MIN:uint = 142;
+		public const UNTOUCHABLE_MIN:uint = 148;
 		public const UNTOUCHABLE_MAX:uint = 171;
 		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
