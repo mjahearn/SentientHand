@@ -162,7 +162,8 @@ package {
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		//[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
@@ -178,10 +179,12 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		
+		/*
 		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
 		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
 		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
 		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
+		*/
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -196,6 +199,8 @@ package {
 		override public function create():void {
 			timeFallen = 0; //this was initialized above, so I moved it here - mjahearn
 			controlDirs = 0;
+			
+			Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 			
 			/* Background */
 			dbg = 0;
@@ -562,6 +567,7 @@ package {
 		override public function update():void {
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
+				//Registry.music.kill();
 				FlxG.switchState(new LevelSelect);
 			}
 			
@@ -570,6 +576,7 @@ package {
 				goToNextLevel();
 			}
 			
+			/*
 			// music -- this should probably be moved to the registry if we want to do layering
 			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
 			if (SOUND_ON) {
@@ -577,14 +584,20 @@ package {
 				
 				//musicBackgroundSoundB.play();
 				musicBackgroundSoundA.play();
-				/*
+				
 				if (FlxG.keys.A) {
 					musicBackgroundSoundB.volume -= 0.22;
 				} else {musicBackgroundSoundB.volume += 0.022;}
 				if (FlxG.keys.B) {
 					musicBackgroundSoundA.volume -= 0.22;
 				} else {musicBackgroundSoundA.volume += 0.22;}
-				*/
+				
+			}
+			*/
+			if (SOUND_ON) {
+				
+				//FlxG.playMusic(Registry.musicBackgroundA);
+				Registry.music.play();
 			}
 			
 			
