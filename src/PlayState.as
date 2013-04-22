@@ -58,7 +58,7 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
-		public var reinvigorated:Boolean = false;
+		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -108,6 +108,7 @@ package {
 		public var buttonGroup:FlxGroup = new FlxGroup();
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
+		public var buttonMode:uint;
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
 		public var flapGroup:FlxGroup = new FlxGroup();
@@ -192,7 +193,8 @@ package {
 		}
 		
 		override public function create():void {
-			timeFallen = 0; //this was initialized above, so I moved it here - mjahearn
+			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
+			reinvigorated = false; //ditto
 			controlDirs = 0;
 			
 			/* Background */
@@ -387,7 +389,15 @@ package {
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
 						button.addAnimation("up open door",[6]);
-						button.play("up state C");
+						if (Registry.iteration > 0) {
+							FlxG.log(Registry.firstButton[Registry.levelNum] + " " + j);
+						}
+						if ((Registry.iteration > 0 && Registry.firstButton[Registry.levelNum] == j) 
+							|| (Registry.iteration > 1 && Registry.secondButton[Registry.levelNum] == j)) {
+							button.play("up inactive");
+						} else {
+							button.play("up state A");
+						}
 						
 						/*
 						// Decide button angle
@@ -411,6 +421,7 @@ package {
 				}
 			}
 			add(buttonGroup);
+			buttonMode = 0;
 			
 			// Doors
 			for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
@@ -702,13 +713,21 @@ package {
 			// Press Buttons!
 			// right now, implemented buttons that go back to original state after pressed,
 			// this can change, this was just easier (I think)
-			for (var mm:String in buttonGroup.members) {
+			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
+			//for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
 				//for (var m:String in blockGroup.members) {
 					//var block:FlxSprite = blockGroup.members[m];
-					if ((hand.overlaps(button) && !buttonState) || (blockOvelapsButton(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+					if (button.frame != 0 && ((hand.overlaps(button) && !buttonState) || (blockOvelapsButton(button) && !buttonState))) { // should change this to make it only recognize the space where the button is visually
 						button.play("down");
+						if (buttonStateArray.indexOf(true) == -1) {
+							if (Registry.iteration == 0) {
+								Registry.firstButton.push(mm);
+							} else if (Registry.iteration == 1) {
+								Registry.secondButton.push(mm);
+							}
+						}
 						buttonStateArray[mm] = true;
 						buttonReactionArray[mm]();
 					}
@@ -1464,8 +1483,20 @@ package {
 				} else {
 					goToNextIteration();
 				}
+			}
+			buttonMode++;
+			if (buttonMode == 1) {
+				for (var b:uint = 0; b < buttonGroup.length; b++) {
+					if (buttonGroup.members[b].frame != 1) {
+						buttonGroup.members[b].play("up activate");
+					}
+				}
 			} else {
-				FlxG.log(buttonStateArray);
+				for (var c:uint = 0; c < buttonGroup.length; c++) {
+					if (buttonGroup.members[c].frame != 1) {
+						buttonGroup.members[c].play("up open door");
+					}
+				}
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
