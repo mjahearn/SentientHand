@@ -57,6 +57,9 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
+		public const BUTTON_PRESSED:uint = 1;
+		public const BUTTON_INIT:uint = 0;
+		
 		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
@@ -363,7 +366,7 @@ package {
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
 						button.addAnimation("up open door",[6]);*/
-						button.frame = 1;
+						button.frame = BUTTON_INIT;
 						
 						/*
 						// Decide button angle
@@ -691,8 +694,8 @@ package {
 				var buttonState:Boolean = buttonStateArray[mm];
 				//for (var m:String in blockGroup.members) {
 					//var block:FlxSprite = blockGroup.members[m];
-					if (button.frame != 0 && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-						button.frame = 0;
+					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+						button.frame = BUTTON_PRESSED;
 						/*if (buttonStateArray.indexOf(true) == -1) {
 							if (Registry.iteration == 0) {
 								Registry.firstButton.push(mm);
@@ -1355,13 +1358,13 @@ package {
 			buttonMode++;
 			if (buttonMode == 1) {
 				for (var b:uint = 0; b < buttonGroup.length; b++) {
-					if (buttonGroup.members[b].frame != 0) {
+					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
 						buttonGroup.members[b].frame = 2;
 					}
 				}
 			} else {
 				for (var c:uint = 0; c < buttonGroup.length; c++) {
-					if (buttonGroup.members[c].frame != 0) {
+					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
 						buttonGroup.members[c].frame = 3;
 					}
 				}
