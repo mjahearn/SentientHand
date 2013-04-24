@@ -18,7 +18,10 @@ package {
 		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB);
 		public static var music:FlxSound = new FlxSound();
 		
-		public static var iteration:uint = 0;
+		//public static var firstButton:Array = new Array();
+		//public static var secondButton:Array = new Array();
+		
+		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
 		
 		public static function update():void {

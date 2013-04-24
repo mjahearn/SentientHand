@@ -26,7 +26,6 @@ package {
 		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
 		public const UNTOUCHABLE_MAX:uint = 171;
-		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		public const SOUND_ON:Boolean = true;
@@ -45,14 +44,12 @@ package {
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
 		public const CANNON_SPAWN:uint = 189;
-		public const BLOCK_MIN:uint = 186;
-		public const BLOCK_MAX:uint = 188;
 		public const DOOR_MIN:uint = 184;
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
 		//public const FLAP_MIN:uint = 166;
-		//public const FLAP_MAX:uint = 171
+		//public const FLAP_MAX:uint = 171;
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -60,7 +57,10 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
-		public var reinvigorated:Boolean = false;
+		public const BUTTON_PRESSED:uint = 1;
+		public const BUTTON_INIT:uint = 0;
+		
+		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -70,12 +70,10 @@ package {
 		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
 		public var hint:FlxSprite;
-		//public var body:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
 		public var curCannon:uint;
 		public var arrow:FlxSprite;
-		//public var bodyGear:FlxSprite;
 		public var bodyGearGroup:FlxGroup;
 		public var bodyHeadGroup:FlxGroup;
 		
@@ -89,14 +87,11 @@ package {
 		public var bodyMode:Boolean;
 		public var cannonMode:Boolean;
 		public var handOut:Boolean;
+		public var handIn:Boolean;
 		public var handGrab:Boolean;
 		public var handMetalFlag:uint;
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
-		
-		public var blockGroup:FlxGroup;
-		public var handBlockFlag:uint;
-		public var handBlockRel:FlxPoint;
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
@@ -110,6 +105,7 @@ package {
 		public var buttonGroup:FlxGroup = new FlxGroup();
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
+		public var buttonMode:uint;
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
 		//public var flapGroup:FlxGroup = new FlxGroup();
@@ -143,10 +139,6 @@ package {
 		public static var levelMap:Class;
 		public static var midgroundMap:Class;
 		public static var backgroundMap:Class;
-		
-		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
-		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
-		[Embed("assets/block_64x64.png")] public var block64x64Sheet:Class;
 		
 		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
 		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
@@ -197,7 +189,8 @@ package {
 		}
 		
 		override public function create():void {
-			timeFallen = 0; //this was initialized above, so I moved it here - mjahearn
+			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
+			reinvigorated = false; //ditto
 			controlDirs = 0;
 			
 			Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
@@ -345,30 +338,6 @@ package {
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
 			
-			// Blocks
-			blockGroup = new FlxGroup();
-			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var blockArray:Array = level.getTileInstances(i);
-				if (blockArray) {
-					for (j = 0; j < blockArray.length; j++) {
-						level.setTileByIndex(blockArray[j],0);
-						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
-
-						var blockImgClass:Class;
-						var blockSizeNumber:Number = (i-BLOCK_MIN)%3;
-						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
-						else if (blockSizeNumber == 1) {blockImgClass = block48x48Sheet;}
-						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
-
-						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,blockImgClass);
-						setBlockState(testBlock,0);
-						blockGroup.add(testBlock);
-					}
-				}
-			}
-			add(blockGroup);
-			
 			// Buttons
 			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
@@ -391,14 +360,14 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.addAnimation("up inactive",[0]);
+						/*button.addAnimation("up inactive",[0]);
 						button.addAnimation("down",[1]);
 						button.addAnimation("up state A",[2]);
 						button.addAnimation("up state B",[3]);
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
-						button.addAnimation("up open door",[6]);
-						button.play("up state C");
+						button.addAnimation("up open door",[6]);*/
+						button.frame = BUTTON_INIT;
 						
 						/*
 						// Decide button angle
@@ -422,6 +391,7 @@ package {
 				}
 			}
 			add(buttonGroup);
+			buttonMode = 0;
 			
 			// Doors
 			for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
@@ -466,8 +436,6 @@ package {
 						var flapNumber:Number = (i-FLAP_MIN)%2;
 						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
 						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
-						
-						//FlxG.log(flapNumber);
 						
 						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
 						flap.immovable = true;
@@ -542,11 +510,10 @@ package {
 			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
+			handIn = false;
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			handBlockFlag = uint.MAX_VALUE;
-			handBlockRel = new FlxPoint();
 			rad = 0;
 			
 			arrow = new FlxSprite();
@@ -642,7 +609,7 @@ package {
 			
 			// marker line
 			markerLine.fill(0x00000000);
-			if ((bodyMode && !handOut) || cannonMode) {
+			if ((bodyMode && !handOut && !handIn) || cannonMode) {
 				rad = arrow.angle*Math.PI/180;
 				var startX:Number = hand.x+hand.width/2.0;
 				var startY:Number = hand.y+hand.height/2.0;
@@ -699,7 +666,7 @@ package {
 				}
 				hand.color = 0xffffff;
 			}
-			if (cannonMode || (bodyMode && !handOut)){
+			if (cannonMode || (bodyMode && !handOut && !handIn)){
 				hint.play("thinking space");
 			}
 			
@@ -725,17 +692,24 @@ package {
 			// Press Buttons!
 			// right now, implemented buttons that go back to original state after pressed,
 			// this can change, this was just easier (I think)
-			for (var mm:String in buttonGroup.members) {
+			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
+			//for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
 				//for (var m:String in blockGroup.members) {
 					//var block:FlxSprite = blockGroup.members[m];
-					if ((hand.overlaps(button) && !buttonState) || (blockOvelapsButton(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-						button.play("down");
+					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+						button.frame = BUTTON_PRESSED;
+						/*if (buttonStateArray.indexOf(true) == -1) {
+							if (Registry.iteration == 0) {
+								Registry.firstButton.push(mm);
+							} else if (Registry.iteration == 1) {
+								Registry.secondButton.push(mm);
+							}
+						}*/
 						buttonStateArray[mm] = true;
 						buttonReactionArray[mm]();
 					}
-					//FlxG.log("pressed button");
 				//} else if (!hand.overlaps(button)) {
 					//button.play("up");
 					//buttonStateArray[mm] = false;
@@ -786,7 +760,7 @@ package {
 					metalCrawlSound.stop();
 				}
 				// The hand is in the body, aiming
-				if ((bodyMode || cannonMode) && !handOut) {
+				if ((bodyMode || cannonMode) && !handOut && !handIn) {
 					grappleExtendSound.stop();
 					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 						robodyAimSound.play();
@@ -795,12 +769,12 @@ package {
 					}
 				}
 				// The hand is launching out of the body
-				else if (bodyMode && handOut) {
+				else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
-					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
+					/*if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
 						grappleExtendSound.stop();
-					}
+					}*/
 					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
 						grappleExtendSound.play();
 					} else {
@@ -812,7 +786,7 @@ package {
 				}
 				
 				// The body just hit a wall
-				if (bodyMode && handOut && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 					robodyLandOnWallSound.play();
 				}
 			}
@@ -888,7 +862,6 @@ package {
 				/*
 				// The hand ran off a wooden platform
 				else if (lastTouchedWood) {
-					FlxG.log("hi");
 					if (handDir == FlxObject.LEFT) {
 						hand.play("fall left");
 					} else if (handDir == FlxObject.RIGHT) {
@@ -921,11 +894,9 @@ package {
 			// The hand is attached to a body
 			else if (bodyMode || cannonMode) {
 				// The hand is idling in the body
-				if (!handOut) {
+				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
-					
-					//FlxG.log(body.angle);
 					
 					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
 					else if (body.angle == 270) {body.facing = FlxObject.RIGHT;}
@@ -945,10 +916,10 @@ package {
 					}
 				}
 				// The hand is extended
-				else if (handOut) {
+				else if (handOut || handIn) {
 					
 					
-					if (FlxG.keys.SPACE && !hand.touching) {
+					if (/*FlxG.keys.SPACE*/handOut && !hand.touching) {
 						if (handDir == FlxObject.LEFT) {hand.play("extend left");}
 						else {hand.play("extend right");} // maybe there should be an animation for extending?
 					} else {
@@ -980,7 +951,7 @@ package {
 						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
 						bodyTargetAngle = hand.angle;
 						// The arm is retracting while holding
-						if (!FlxG.keys.SPACE) {
+						if (/*!FlxG.keys.SPACE*/handIn) {
 							if (bodyTargetAngle > body.angle) {
 								body.angle += 4;
 							} else if (bodyTargetAngle < body.angle) {
@@ -1019,60 +990,53 @@ package {
 				body.velocity.y = 0;
 				hand.velocity.x = 0;
 				hand.velocity.y = 0;
+				var diffX:Number = hand.x-body.x;
+				var diffY:Number = hand.y-body.y;
 				if (handOut) {
-					var diffX:Number = hand.x-body.x;
-					var diffY:Number = hand.y-body.y;
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
-					rad = arrow.angle*Math.PI/180;
-					if (handBlockFlag < uint.MAX_VALUE && FlxG.keys.UP) {
-						setBlockState(blockGroup.members[handBlockFlag], 2);
-						handBlockFlag = uint.MAX_VALUE;
-					}
-					if (FlxG.keys.SPACE) {
-						if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
-							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
-							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
-						}
+					//rad = arrow.angle*Math.PI/180;
+					if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
+						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
+						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 					} else {
-						rad = Math.atan2(diffY, diffX);
-						if ((hand.touching > 0 && hand.facing == hand.touching) /*|| (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)*/) {
-							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
-							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
-							showArrow();
-						} else {
-							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
-							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
-							arrow.angle = shootAngle;
-							handReturnedToBody = true;
-						}
-						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
-							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
-							handOut = false;
-							if (handBlockFlag < uint.MAX_VALUE) {
-								setBlockState(blockGroup.members[handBlockFlag], 2);
-								handBlockFlag = uint.MAX_VALUE;
-							}
-							hand.velocity.x = 0;
-							hand.velocity.y = 0;
-							hand.acceleration.x = 0;
-							hand.acceleration.y = 0;
-							body.velocity.x = 0;
-							body.velocity.y = 0;
-							body.acceleration.x = 0;
-							body.acceleration.y = 0;
-							if (hand.touching == 0) {
-								hand.x = body.x;
-								hand.y = body.y;
-							} else {
-								body.x = hand.x;
-								body.y = hand.y;
-							}
-							hand.allowCollisions = FlxObject.ANY;
-							//showArrow();
-						}
+						handOut = false;
+						handIn = true;
 					}
-				} else {
+				} if (handIn) {
+					//rad = Math.atan2(diffY, diffX);
+					if (hand.touching > 0 && hand.facing == hand.touching) {
+						body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
+						body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+						showArrow();
+					} else {
+						hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
+						hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
+						arrow.angle = shootAngle;
+						handReturnedToBody = true;
+					}
+					if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
+						Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
+						handIn = false;
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						body.velocity.x = 0;
+						body.velocity.y = 0;
+						body.acceleration.x = 0;
+						body.acceleration.y = 0;
+						if (hand.touching == 0) {
+							hand.x = body.x;
+							hand.y = body.y;
+						} else {
+							body.x = hand.x;
+							body.y = hand.y;
+						}
+						hand.allowCollisions = FlxObject.ANY;
+						//showArrow();
+					}
+				} if (!handOut && !handIn) {
 					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
@@ -1110,7 +1074,6 @@ package {
 						hand.velocity.x = CANNON_VEL * Math.cos(rad);
 						hand.velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
 						setGravity(hand,FlxObject.DOWN,true);
-						//FlxG.log("cannon fire!");
 					}
 				}
 			} else {
@@ -1184,7 +1147,6 @@ package {
 						}
 					}
 				}
-				//FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
 			}
 			
 			super.update();
@@ -1197,21 +1159,10 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand, levelHandCallback);
-			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
-			if (bodyMode) {
-				FlxG.collide(blockGroup, body, blockCallback);
-			} else {
-				FlxG.collide(blockGroup, bodyGroup, blockCallback);
-			}
-			FlxG.collide(level, blockGroup, levelBlockCallback);
-			//FlxG.log(handWoodFlag);
-			//FlxG.log(blockGroup.members[0].immovable);
-			//FlxG.collide(blockGroup); //Need to figure out how to make this work
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate
@@ -1226,24 +1177,7 @@ package {
 				}
 			}
 			if (bodyMode) {
-				if (onGround && handBlockFlag < uint.MAX_VALUE) {
-					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
-					//if (curBlock.mass < body.mass) {
-						if (curBlock.immovable) {
-							setBlockState(curBlock, 1);
-							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
-						}
-						if (handOut) {
-							curBlock.x = hand.x + handBlockRel.x;
-							curBlock.y = hand.y + handBlockRel.y;
-							FlxG.collide(level, blockGroup);
-						} else {
-							//prolly won't be reached any more due to handBlockFlag resetting with handOut
-							setBlockState(curBlock, 2);
-							handBlockFlag = uint.MAX_VALUE;
-						}
-					//}
-				}
+				//was block stuff
 			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
@@ -1308,32 +1242,6 @@ package {
 			}
 		}
 		
-		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
-			if (spr2 == hand) {
-				if (bodyMode) {
-					handBlockFlag = blockGroup.members.indexOf(spr1);
-				} else {
-					handMetalFlag = 1;
-					fixGravity(spr2);
-					lastTouchedWood = false;
-				}
-			/*} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
-				fixGravity(spr2);*/
-			} else if (spr2 in blockGroup.members) {
-				if (spr1 == hand) {
-					if (bodyMode) {
-						handBlockFlag = blockGroup.members.indexOf(spr2);
-					} else {
-						handMetalFlag = 1;
-						fixGravity(spr1);
-						lastTouchedWood = false;
-					}
-				}/* else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
-					fixGravity(spr1);
-				}*/
-			}
-		}
-		
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
@@ -1343,12 +1251,6 @@ package {
 				handMetalFlag = 1;
 				fixGravity(spr1);
 				lastTouchedWood = false;
-			}
-		}
-		
-		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
-			if (spr2.isTouching(FlxObject.DOWN)) {
-				setBlockState(spr2, 0);
 			}
 		}
 		
@@ -1441,41 +1343,11 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
-		public function blockOvelapsButton(spr:FlxSprite):Boolean {
-			for (var m:String in blockGroup.members) {
-				if (spr.overlaps(blockGroup.members[m])) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
 		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
 			var X:Number = 8*(int)(tile%map.widthInTiles);
 			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
-		}
-		/* 0 = rest
-		1 = grabbed
-		2 = in air*/
-		public function setBlockState(b:FlxSprite, n:uint):void {
-			if (n == 0) {
-				b.immovable = true;
-				b.drag.x = Number.MAX_VALUE;
-				b.drag.y = Number.MAX_VALUE;
-				b.acceleration.y = 0;
-			} else if (n == 1) {
-				b.immovable = false;
-				b.drag.x = Number.MAX_VALUE;
-				b.drag.y = Number.MAX_VALUE;
-				b.acceleration.y = 0;
-			} else {
-				b.immovable = false;
-				b.drag.x = 0;
-				b.drag.y = 0;
-				b.acceleration.y = GRAV_RATE;
-			}
 		}
 		
 		public function buttonReaction():void {
@@ -1484,11 +1356,23 @@ package {
 					for (var a:int = 0; a < doorGroup.length; a++) {
 						doorGroup.members[a].play("open");
 					}
-				} else {
+				}/* else {
 					goToNextIteration();
+				}*/
+			}
+			buttonMode++;
+			if (buttonMode == 1) {
+				for (var b:uint = 0; b < buttonGroup.length; b++) {
+					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
+						buttonGroup.members[b].frame = 2;
+					}
 				}
 			} else {
-				FlxG.log(buttonStateArray);
+				for (var c:uint = 0; c < buttonGroup.length; c++) {
+					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
+						buttonGroup.members[c].frame = 3;
+					}
+				}
 			}
 			if (reinvigorated) {
 				reinvigorated = false;
@@ -1514,15 +1398,15 @@ package {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
-			} else {
+			}/* else {
 				goToNextIteration();
-			}
+			}*/
 		}
 		
-		public function goToNextIteration():void {
-			Registry.iteration++;
+		/*public function goToNextIteration():void {
+			//Registry.iteration++;
 			Registry.levelNum = 0;
 			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
-		}
+		}*/
 	}
 }
