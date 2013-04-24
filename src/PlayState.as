@@ -87,6 +87,7 @@ package {
 		public var bodyMode:Boolean;
 		public var cannonMode:Boolean;
 		public var handOut:Boolean;
+		public var handIn:Boolean;
 		public var handGrab:Boolean;
 		public var handMetalFlag:uint;
 		public var handWoodFlag:uint;
@@ -509,6 +510,7 @@ package {
 			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
+			handIn = false;
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
@@ -605,7 +607,7 @@ package {
 			
 			// marker line
 			markerLine.fill(0x00000000);
-			if ((bodyMode && !handOut) || cannonMode) {
+			if ((bodyMode && !handOut && !handIn) || cannonMode) {
 				rad = arrow.angle*Math.PI/180;
 				var startX:Number = hand.x+hand.width/2.0;
 				var startY:Number = hand.y+hand.height/2.0;
@@ -662,7 +664,7 @@ package {
 				}
 				hand.color = 0xffffff;
 			}
-			if (cannonMode || (bodyMode && !handOut)){
+			if (cannonMode || (bodyMode && !handOut && !handIn)){
 				hint.play("thinking space");
 			}
 			
@@ -756,7 +758,7 @@ package {
 					metalCrawlSound.stop();
 				}
 				// The hand is in the body, aiming
-				if ((bodyMode || cannonMode) && !handOut) {
+				if ((bodyMode || cannonMode) && !handOut && !handIn) {
 					grappleExtendSound.stop();
 					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 						robodyAimSound.play();
@@ -765,12 +767,12 @@ package {
 					}
 				}
 				// The hand is launching out of the body
-				else if (bodyMode && handOut) {
+				else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
-					if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
+					/*if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
 						grappleExtendSound.stop();
-					}
+					}*/
 					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
 						grappleExtendSound.play();
 					} else {
@@ -782,7 +784,7 @@ package {
 				}
 				
 				// The body just hit a wall
-				if (bodyMode && handOut && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 					robodyLandOnWallSound.play();
 				}
 			}
@@ -890,7 +892,7 @@ package {
 			// The hand is attached to a body
 			else if (bodyMode || cannonMode) {
 				// The hand is idling in the body
-				if (!handOut) {
+				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
 					
@@ -912,10 +914,10 @@ package {
 					}
 				}
 				// The hand is extended
-				else if (handOut) {
+				else if (handOut || handIn) {
 					
 					
-					if (FlxG.keys.SPACE && !hand.touching) {
+					if (/*FlxG.keys.SPACE*/handOut && !hand.touching) {
 						if (handDir == FlxObject.LEFT) {hand.play("extend left");}
 						else {hand.play("extend right");} // maybe there should be an animation for extending?
 					} else {
@@ -947,7 +949,7 @@ package {
 						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
 						bodyTargetAngle = hand.angle;
 						// The arm is retracting while holding
-						if (!FlxG.keys.SPACE) {
+						if (/*!FlxG.keys.SPACE*/handIn) {
 							if (bodyTargetAngle > body.angle) {
 								body.angle += 4;
 							} else if (bodyTargetAngle < body.angle) {
@@ -986,52 +988,53 @@ package {
 				body.velocity.y = 0;
 				hand.velocity.x = 0;
 				hand.velocity.y = 0;
+				var diffX:Number = hand.x-body.x;
+				var diffY:Number = hand.y-body.y;
 				if (handOut) {
-					var diffX:Number = hand.x-body.x;
-					var diffY:Number = hand.y-body.y;
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
-					rad = arrow.angle*Math.PI/180;
-					if (FlxG.keys.SPACE) {
-						if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
-							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
-							hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
-						}
+					//rad = arrow.angle*Math.PI/180;
+					if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
+						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
+						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 					} else {
-						rad = Math.atan2(diffY, diffX);
-						if (hand.touching > 0 && hand.facing == hand.touching) {
-							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
-							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
-							showArrow();
-						} else {
-							hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
-							hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
-							arrow.angle = shootAngle;
-							handReturnedToBody = true;
-						}
-						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
-							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
-							handOut = false;
-							hand.velocity.x = 0;
-							hand.velocity.y = 0;
-							hand.acceleration.x = 0;
-							hand.acceleration.y = 0;
-							body.velocity.x = 0;
-							body.velocity.y = 0;
-							body.acceleration.x = 0;
-							body.acceleration.y = 0;
-							if (hand.touching == 0) {
-								hand.x = body.x;
-								hand.y = body.y;
-							} else {
-								body.x = hand.x;
-								body.y = hand.y;
-							}
-							hand.allowCollisions = FlxObject.ANY;
-							//showArrow();
-						}
+						handOut = false;
+						handIn = true;
 					}
-				} else {
+				} if (handIn) {
+					//rad = Math.atan2(diffY, diffX);
+					if (hand.touching > 0 && hand.facing == hand.touching) {
+						body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
+						body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+						showArrow();
+					} else {
+						hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
+						hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
+						arrow.angle = shootAngle;
+						handReturnedToBody = true;
+					}
+					if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
+						Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
+						handIn = false;
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						body.velocity.x = 0;
+						body.velocity.y = 0;
+						body.acceleration.x = 0;
+						body.acceleration.y = 0;
+						if (hand.touching == 0) {
+							hand.x = body.x;
+							hand.y = body.y;
+						} else {
+							body.x = hand.x;
+							body.y = hand.y;
+						}
+						hand.allowCollisions = FlxObject.ANY;
+						//showArrow();
+					}
+				} if (!handOut && !handIn) {
 					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
