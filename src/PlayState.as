@@ -594,11 +594,13 @@ package {
 				
 			}
 			*/
+			/*
 			if (SOUND_ON) {
 				
 				//FlxG.playMusic(Registry.musicBackgroundA);
-				Registry.music.play();
+				//Registry.music.play();
 			}
+			*/
 			
 			
 			if (FlxG.keys.justPressed("LEFT")) {
@@ -1106,7 +1108,7 @@ package {
 						cannonMode = false;
 						rad = Math.PI*arrow.angle/180;
 						hand.velocity.x = CANNON_VEL * Math.cos(rad);
-						hand.velocity.y = CANNON_VEL * Math.sin(rad);
+						hand.velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
 						setGravity(hand,FlxObject.DOWN,true);
 						//FlxG.log("cannon fire!");
 					}

@@ -20,5 +20,9 @@ package {
 		
 		public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
+		
+		public static function update():void {
+			FlxG.music.play();
+		}
 	}
 }
