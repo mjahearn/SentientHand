@@ -20,11 +20,12 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		public const METAL_MIN:uint = 48; //minimum index number of metal in the tilemap
-		public const METAL_MAX:uint = 165; //maximum index number of metal in the tilemap
+		public const METAL_MIN:uint = 65; //minimum index number of metal in the tilemap
+		public const METAL_MAX:uint = 147; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 47; // maximum index number of wood in the tilemap
-		//public const SPAWN:unit = ???; // index of player spawn point in tilemap (mjahearn: this should probably be a FlxPoint variable, set in create() after we read the tilemap)
+		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
+		public const UNTOUCHABLE_MIN:uint = 148;
+		public const UNTOUCHABLE_MAX:uint = 171;
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		public const SOUND_ON:Boolean = true;
@@ -43,14 +44,12 @@ package {
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
 		public const CANNON_SPAWN:uint = 189;
-		public const BLOCK_MIN:uint = 186;
-		public const BLOCK_MAX:uint = 188;
 		public const DOOR_MIN:uint = 184;
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
-		public const FLAP_MIN:uint = 166;
-		public const FLAP_MAX:uint = 171
+		//public const FLAP_MIN:uint = 166;
+		//public const FLAP_MAX:uint = 171;
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -68,12 +67,10 @@ package {
 		public var levelBack:FlxTilemap;
 		public var hand:FlxSprite;
 		public var hint:FlxSprite;
-		//public var body:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
 		public var curCannon:uint;
 		public var arrow:FlxSprite;
-		//public var bodyGear:FlxSprite;
 		public var bodyGearGroup:FlxGroup;
 		public var bodyHeadGroup:FlxGroup;
 		
@@ -92,10 +89,6 @@ package {
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
 		
-		public var blockGroup:FlxGroup;
-		public var handBlockFlag:uint;
-		public var handBlockRel:FlxPoint;
-		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
 		public var steams:FlxGroup = new FlxGroup();
@@ -111,7 +104,7 @@ package {
 		public var buttonMode:uint;
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
-		public var flapGroup:FlxGroup = new FlxGroup();
+		//public var flapGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -143,10 +136,6 @@ package {
 		public static var midgroundMap:Class;
 		public static var backgroundMap:Class;
 		
-		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
-		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
-		[Embed("assets/block_64x64.png")] public var block64x64Sheet:Class;
-		
 		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
 		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
 		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
@@ -155,13 +144,14 @@ package {
 		[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		[Embed("assets/flap_h.png")] public var flapHSheet:Class;
-		[Embed("assets/flap_v.png")] public var flapVSheet:Class;
+		//[Embed("assets/flap_h.png")] public var flapHSheet:Class;
+		//[Embed("assets/flap_v.png")] public var flapVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		//[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
@@ -177,10 +167,12 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		
+		/*
 		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
 		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
 		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
 		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
+		*/
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -196,6 +188,8 @@ package {
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
 			controlDirs = 0;
+			
+			Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 			
 			/* Background */
 			dbg = 0;
@@ -292,6 +286,10 @@ package {
 				level.setTileProperties(i, FlxObject.ANY, metalCallback);
 			}
 			
+			for (i = UNTOUCHABLE_MIN; i <= UNTOUCHABLE_MAX; i++) {
+				level.setTileProperties(i, FlxObject.NONE);
+			}
+			
 			// Cannons
 			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
 			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
@@ -336,30 +334,6 @@ package {
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
 			
-			// Blocks
-			blockGroup = new FlxGroup();
-			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var blockArray:Array = level.getTileInstances(i);
-				if (blockArray) {
-					for (j = 0; j < blockArray.length; j++) {
-						level.setTileByIndex(blockArray[j],0);
-						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
-
-						var blockImgClass:Class;
-						var blockSizeNumber:Number = (i-BLOCK_MIN)%3;
-						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
-						else if (blockSizeNumber == 1) {blockImgClass = block48x48Sheet;}
-						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
-
-						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,blockImgClass);
-						setBlockState(testBlock,0);
-						blockGroup.add(testBlock);
-					}
-				}
-			}
-			add(blockGroup);
-			
 			// Buttons
 			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
@@ -382,22 +356,14 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.addAnimation("up inactive",[0]);
+						/*button.addAnimation("up inactive",[0]);
 						button.addAnimation("down",[1]);
 						button.addAnimation("up state A",[2]);
 						button.addAnimation("up state B",[3]);
 						button.addAnimation("up state C",[4]);
 						button.addAnimation("up activate",[5]);
-						button.addAnimation("up open door",[6]);
-						if (Registry.iteration > 0) {
-							FlxG.log(Registry.firstButton[Registry.levelNum] + " " + j);
-						}
-						if ((Registry.iteration > 0 && Registry.firstButton[Registry.levelNum] == j) 
-							|| (Registry.iteration > 1 && Registry.secondButton[Registry.levelNum] == j)) {
-							button.play("up inactive");
-						} else {
-							button.play("up state A");
-						}
+						button.addAnimation("up open door",[6]);*/
+						button.frame = 1;
 						
 						/*
 						// Decide button angle
@@ -451,6 +417,7 @@ package {
 			}
 			add(doorGroup);
 			
+			/*
 			// Flaps
 			for (i = FLAP_MIN; i <= FLAP_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
@@ -466,8 +433,6 @@ package {
 						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
 						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
 						
-						//FlxG.log(flapNumber);
-						
 						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
 						flap.immovable = true;
 						flap.loadGraphic(flapSheet,true,false,w,h,true);
@@ -482,6 +447,7 @@ package {
 				}
 			}
 			add(flapGroup);
+			*/
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -543,8 +509,6 @@ package {
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			handBlockFlag = uint.MAX_VALUE;
-			handBlockRel = new FlxPoint();
 			rad = 0;
 			
 			arrow = new FlxSprite();
@@ -565,6 +529,7 @@ package {
 		override public function update():void {
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
+				//Registry.music.kill();
 				FlxG.switchState(new LevelSelect);
 			}
 			
@@ -573,6 +538,7 @@ package {
 				goToNextLevel();
 			}
 			
+			/*
 			// music -- this should probably be moved to the registry if we want to do layering
 			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
 			if (SOUND_ON) {
@@ -580,14 +546,20 @@ package {
 				
 				//musicBackgroundSoundB.play();
 				musicBackgroundSoundA.play();
-				/*
+				
 				if (FlxG.keys.A) {
 					musicBackgroundSoundB.volume -= 0.22;
 				} else {musicBackgroundSoundB.volume += 0.022;}
 				if (FlxG.keys.B) {
 					musicBackgroundSoundA.volume -= 0.22;
 				} else {musicBackgroundSoundA.volume += 0.22;}
-				*/
+				
+			}
+			*/
+			if (SOUND_ON) {
+				
+				//FlxG.playMusic(Registry.musicBackgroundA);
+				Registry.music.play();
 			}
 			
 			
@@ -719,19 +691,18 @@ package {
 				var buttonState:Boolean = buttonStateArray[mm];
 				//for (var m:String in blockGroup.members) {
 					//var block:FlxSprite = blockGroup.members[m];
-					if (button.frame != 0 && ((hand.overlaps(button) && !buttonState) || (blockOvelapsButton(button) && !buttonState))) { // should change this to make it only recognize the space where the button is visually
-						button.play("down");
-						if (buttonStateArray.indexOf(true) == -1) {
+					if (button.frame != 0 && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+						button.frame = 0;
+						/*if (buttonStateArray.indexOf(true) == -1) {
 							if (Registry.iteration == 0) {
 								Registry.firstButton.push(mm);
 							} else if (Registry.iteration == 1) {
 								Registry.secondButton.push(mm);
 							}
-						}
+						}*/
 						buttonStateArray[mm] = true;
 						buttonReactionArray[mm]();
 					}
-					//FlxG.log("pressed button");
 				//} else if (!hand.overlaps(button)) {
 					//button.play("up");
 					//buttonStateArray[mm] = false;
@@ -884,7 +855,6 @@ package {
 				/*
 				// The hand ran off a wooden platform
 				else if (lastTouchedWood) {
-					FlxG.log("hi");
 					if (handDir == FlxObject.LEFT) {
 						hand.play("fall left");
 					} else if (handDir == FlxObject.RIGHT) {
@@ -920,8 +890,6 @@ package {
 				if (!handOut) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
-					
-					//FlxG.log(body.angle);
 					
 					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
 					else if (body.angle == 270) {body.facing = FlxObject.RIGHT;}
@@ -1021,10 +989,6 @@ package {
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
 					rad = arrow.angle*Math.PI/180;
-					if (handBlockFlag < uint.MAX_VALUE && FlxG.keys.UP) {
-						setBlockState(blockGroup.members[handBlockFlag], 2);
-						handBlockFlag = uint.MAX_VALUE;
-					}
 					if (FlxG.keys.SPACE) {
 						if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
 							hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
@@ -1032,7 +996,7 @@ package {
 						}
 					} else {
 						rad = Math.atan2(diffY, diffX);
-						if ((hand.touching > 0 && hand.facing == hand.touching) /*|| (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)*/) {
+						if (hand.touching > 0 && hand.facing == hand.touching) {
 							body.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 							body.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 							showArrow();
@@ -1045,10 +1009,6 @@ package {
 						if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 							Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
 							handOut = false;
-							if (handBlockFlag < uint.MAX_VALUE) {
-								setBlockState(blockGroup.members[handBlockFlag], 2);
-								handBlockFlag = uint.MAX_VALUE;
-							}
 							hand.velocity.x = 0;
 							hand.velocity.y = 0;
 							hand.acceleration.x = 0;
@@ -1106,7 +1066,6 @@ package {
 						hand.velocity.x = CANNON_VEL * Math.cos(rad);
 						hand.velocity.y = CANNON_VEL * Math.sin(rad);
 						setGravity(hand,FlxObject.DOWN,true);
-						//FlxG.log("cannon fire!");
 					}
 				}
 			} else {
@@ -1180,7 +1139,6 @@ package {
 						}
 					}
 				}
-				//FlxG.log(hand.acceleration.x + " " + hand.acceleration.y);
 			}
 			
 			super.update();
@@ -1193,21 +1151,10 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			//handBlockFlag = uint.MAX_VALUE;
 			FlxG.collide(level, hand, levelHandCallback);
-			FlxG.collide(blockGroup, hand, blockCallback);
 			FlxG.collide(doorGroup, hand, doorCallback);
-			FlxG.collide(flapGroup, hand, doorCallback);
+			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
-			if (bodyMode) {
-				FlxG.collide(blockGroup, body, blockCallback);
-			} else {
-				FlxG.collide(blockGroup, bodyGroup, blockCallback);
-			}
-			FlxG.collide(level, blockGroup, levelBlockCallback);
-			//FlxG.log(handWoodFlag);
-			//FlxG.log(blockGroup.members[0].immovable);
-			//FlxG.collide(blockGroup); //Need to figure out how to make this work
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate
@@ -1222,24 +1169,7 @@ package {
 				}
 			}
 			if (bodyMode) {
-				if (onGround && handBlockFlag < uint.MAX_VALUE) {
-					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
-					//if (curBlock.mass < body.mass) {
-						if (curBlock.immovable) {
-							setBlockState(curBlock, 1);
-							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
-						}
-						if (handOut) {
-							curBlock.x = hand.x + handBlockRel.x;
-							curBlock.y = hand.y + handBlockRel.y;
-							FlxG.collide(level, blockGroup);
-						} else {
-							//prolly won't be reached any more due to handBlockFlag resetting with handOut
-							setBlockState(curBlock, 2);
-							handBlockFlag = uint.MAX_VALUE;
-						}
-					//}
-				}
+				//was block stuff
 			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
@@ -1304,32 +1234,6 @@ package {
 			}
 		}
 		
-		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
-			if (spr2 == hand) {
-				if (bodyMode) {
-					handBlockFlag = blockGroup.members.indexOf(spr1);
-				} else {
-					handMetalFlag = 1;
-					fixGravity(spr2);
-					lastTouchedWood = false;
-				}
-			/*} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
-				fixGravity(spr2);*/
-			} else if (spr2 in blockGroup.members) {
-				if (spr1 == hand) {
-					if (bodyMode) {
-						handBlockFlag = blockGroup.members.indexOf(spr2);
-					} else {
-						handMetalFlag = 1;
-						fixGravity(spr1);
-						lastTouchedWood = false;
-					}
-				}/* else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
-					fixGravity(spr1);
-				}*/
-			}
-		}
-		
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
@@ -1339,12 +1243,6 @@ package {
 				handMetalFlag = 1;
 				fixGravity(spr1);
 				lastTouchedWood = false;
-			}
-		}
-		
-		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
-			if (spr2.isTouching(FlxObject.DOWN)) {
-				setBlockState(spr2, 0);
 			}
 		}
 		
@@ -1437,41 +1335,11 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
-		public function blockOvelapsButton(spr:FlxSprite):Boolean {
-			for (var m:String in blockGroup.members) {
-				if (spr.overlaps(blockGroup.members[m])) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
 		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
 			var X:Number = 8*(int)(tile%map.widthInTiles);
 			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
-		}
-		/* 0 = rest
-		1 = grabbed
-		2 = in air*/
-		public function setBlockState(b:FlxSprite, n:uint):void {
-			if (n == 0) {
-				b.immovable = true;
-				b.drag.x = Number.MAX_VALUE;
-				b.drag.y = Number.MAX_VALUE;
-				b.acceleration.y = 0;
-			} else if (n == 1) {
-				b.immovable = false;
-				b.drag.x = Number.MAX_VALUE;
-				b.drag.y = Number.MAX_VALUE;
-				b.acceleration.y = 0;
-			} else {
-				b.immovable = false;
-				b.drag.x = 0;
-				b.drag.y = 0;
-				b.acceleration.y = GRAV_RATE;
-			}
 		}
 		
 		public function buttonReaction():void {
@@ -1480,21 +1348,21 @@ package {
 					for (var a:int = 0; a < doorGroup.length; a++) {
 						doorGroup.members[a].play("open");
 					}
-				} else {
+				}/* else {
 					goToNextIteration();
-				}
+				}*/
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
 				for (var b:uint = 0; b < buttonGroup.length; b++) {
-					if (buttonGroup.members[b].frame != 1) {
-						buttonGroup.members[b].play("up activate");
+					if (buttonGroup.members[b].frame != 0) {
+						buttonGroup.members[b].frame = 2;
 					}
 				}
 			} else {
 				for (var c:uint = 0; c < buttonGroup.length; c++) {
-					if (buttonGroup.members[c].frame != 1) {
-						buttonGroup.members[c].play("up open door");
+					if (buttonGroup.members[c].frame != 0) {
+						buttonGroup.members[c].frame = 3;
 					}
 				}
 			}
@@ -1522,15 +1390,15 @@ package {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
-			} else {
+			}/* else {
 				goToNextIteration();
-			}
+			}*/
 		}
 		
-		public function goToNextIteration():void {
-			Registry.iteration++;
+		/*public function goToNextIteration():void {
+			//Registry.iteration++;
 			Registry.levelNum = 0;
 			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
-		}
+		}*/
 	}
 }

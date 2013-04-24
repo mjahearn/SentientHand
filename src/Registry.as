@@ -11,13 +11,17 @@ package {
 		[Embed("assets/tsh_level01.csv", mimeType = 'application/octet-stream')] public static const level01:Class;
 		[Embed("assets/tsh_level02.csv", mimeType = 'application/octet-stream')] public static const level02:Class;
 		[Embed("assets/tsh_level03.csv", mimeType = 'application/octet-stream')] public static const level03:Class;
+		[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
+		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
-		public static const levelOrder:Array = new Array(testMap, testMap);
+		public static const levelOrder:Array = new Array(level01, level03);
+		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB);
+		public static var music:FlxSound = new FlxSound();
 		
-		public static var firstButton:Array = new Array();
-		public static var secondButton:Array = new Array();
+		//public static var firstButton:Array = new Array();
+		//public static var secondButton:Array = new Array();
 		
-		public static var iteration:uint = 0;
+		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
 	}
 }
