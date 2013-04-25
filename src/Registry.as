@@ -29,7 +29,7 @@ package {
 		
 		public static function update():void {
 			
-			FlxG.log(levelNum);
+			//FlxG.log(levelNum);
 			
 			if (stupid && levelNum < soundOrder.length) {
 				stupid = false;
