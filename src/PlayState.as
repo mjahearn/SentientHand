@@ -77,6 +77,9 @@ package {
 		public var bodyGearGroup:FlxGroup;
 		public var bodyHeadGroup:FlxGroup;
 		
+		public var bodyArmBaseGroup:FlxGroup = new FlxGroup();
+		public var cannonArmBaseGroup:FlxGroup = new FlxGroup();
+		
 		public var bodyTargetAngle:Number;
 		
 		public var arms:FlxGroup = new FlxGroup();
@@ -119,6 +122,8 @@ package {
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
+		
+		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -305,9 +310,12 @@ package {
 					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
 					cannon.angle = 0;
 					cannonGroup.add(cannon);
+					
+					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
 				}
 			}
 			add(cannonGroup);
+			add(cannonArmBaseGroup);
 			
 			// Bodies
 			bodyGroup = new FlxGroup();
@@ -331,12 +339,15 @@ package {
 						var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
 						bodyHead.y -= bodyHead.height;
 						bodyHeadGroup.add(bodyHead);
+						
+						bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
 					}
 				}
 			//}			
 			add(bodyGroup);
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
+			add(bodyArmBaseGroup);
 			
 			// Buttons
 			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
@@ -475,8 +486,8 @@ package {
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
 			hand.addAnimation("idle body right", [21,21,21,21,21,21,21,22,23,23,23,23,23,23,22],10,true);
 			hand.addAnimation("idle body left", [25,25,25,25,25,25,25,26,27,27,27,27,27,27,26],10,true);
-			hand.addAnimation("fall right",[28,29],22,false);
-			hand.addAnimation("fall left",[33,34],22,false);
+			hand.addAnimation("fall right",[29]);//[28,29],22,false);
+			hand.addAnimation("fall left",[33]);//[33,34],22,false);
 			hand.addAnimation("extend right",[35,36],22,false);
 			hand.addAnimation("extend left",[40,41],22,false);
 			handDir = FlxObject.RIGHT;
@@ -532,6 +543,9 @@ package {
 		}
 		
 		override public function update():void {
+			
+			Registry.update();
+			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
 				//Registry.music.kill();
@@ -599,12 +613,15 @@ package {
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
 			var bodyHead:FlxSprite;
+			var armBase:FlxSprite;
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
+				armBase = bodyArmBaseGroup.members[curBody];
 			} if (cannonMode) {
 				body = cannonGroup.members[curCannon];
+				armBase = cannonArmBaseGroup.members[curCannon];
 			}
 			
 			// marker line
@@ -684,9 +701,16 @@ package {
 				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
 				bodyHead.angle = body.angle;
 				
-				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/4.0);
-				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/4.0);
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
+			}
+			if (bodyMode || cannonMode) {
+				if (!handOut) {
+					armBase.angle = hand.angle - 180;
+				}
+				armBase.x = body.x;
+				armBase.y = body.y;
 			}
 			
 			// Press Buttons!

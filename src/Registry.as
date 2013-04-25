@@ -25,7 +25,7 @@ package {
 		public static var levelNum:uint = 0;
 		
 		public static function update():void {
-			FlxG.music.play();
+			Registry.music.play();
 		}
 	}
 }
