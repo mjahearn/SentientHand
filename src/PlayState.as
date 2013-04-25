@@ -105,7 +105,7 @@ package {
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
 		public var shootAngle:int;
-		public var handReturnedToBody:Boolean = false;
+		//public var handReturnedToBody:Boolean = false;
 		
 		public var buttonGroup:FlxGroup = new FlxGroup();
 		public var buttonStateArray:Array = new Array();
@@ -314,6 +314,7 @@ package {
 					cannonGroup.add(cannon);
 					
 					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
+					cannon.facing = FlxObject.DOWN;
 				}
 			}
 			add(cannonGroup);
@@ -333,7 +334,7 @@ package {
 
 						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
 						bodyTargetAngle = body.angle;
-						setGravity(body,FlxObject.DOWN,true);
+						//setGravity(body,FlxObject.DOWN,true);
 						bodyGroup.add(body);
 						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
 						bodyGearGroup.add(bodyGear);
@@ -343,6 +344,7 @@ package {
 						bodyHeadGroup.add(bodyHead);
 						
 						bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+						body.facing = FlxObject.DOWN;
 						
 						var theta:Number = (body.angle-90)*Math.PI/180.0;
 						
@@ -637,7 +639,7 @@ package {
 			
 			// marker line
 			markerLine.fill(0x00000000);
-			if ((bodyMode && !handOut && !handIn) || cannonMode) {
+			if (bodyMode && !handOut && !handIn) {
 				rad = arrow.angle*Math.PI/180;
 				var startX:Number = hand.x+hand.width/2.0;
 				var startY:Number = hand.y+hand.height/2.0;
@@ -646,6 +648,13 @@ package {
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 				
 				// make objects glow
+			} else if (cannonMode) {
+				rad = arrow.angle*Math.PI/180;
+				startX = hand.x+hand.width/2.0;
+				startY = hand.y+hand.height/2.0;
+				endX = startX + GRAPPLE_LENGTH * Math.cos(rad) / 4.0;
+				endY = startY + GRAPPLE_LENGTH * Math.sin(rad) / 4.0;
+				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
 			
 			// hint system
@@ -855,9 +864,9 @@ package {
 				if (hand.touching) {
 					// Set the Angle of the hand
 					if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
-					else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
-					else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
-					else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
+					else if (hand.facing == FlxObject.LEFT && !lastTouchedWood) {hand.angle = 90;}
+					else if (hand.facing == FlxObject.UP && !lastTouchedWood) {hand.angle = 180;}
+					else if (hand.facing == FlxObject.RIGHT && !lastTouchedWood) {hand.angle = 270;}
 					// The hand is changing direction
 					// (because the sprite's not ambidexterous)
 					if (playerIsPressing(FlxObject.LEFT)) {handDir = FlxObject.LEFT;}
@@ -890,7 +899,8 @@ package {
 					}
 				}
 				// The hand is rounding a convex corner
-				else if (!handFalling) {
+				else if (!handFalling) { // (!lastTouchedWood)
+					
 					if (handDir == FlxObject.LEFT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle > 90) ||
 						(hand.facing == FlxObject.DOWN && hand.angle > -90) || <- this line's not working
@@ -911,6 +921,19 @@ package {
 						//}
 					}
 				}
+				
+				/*
+				else if (!onGround && lastTouchedWood) {
+					if (handDir == FlxObject.LEFT) {
+						hand.play("fall left"); //<- placeholder {hand.play("jump left");
+						//}
+					} else if (handDir == FlxObject.RIGHT) {
+						hand.play("fall right"); //<- placeholder {hand.play("jump right");
+						//}
+					}
+				}
+				*/
+				
 				/*
 				// The hand ran off a wooden platform
 				else if (lastTouchedWood) {
@@ -922,7 +945,6 @@ package {
 				} */
 				// The hand is falling (with style!)
 				else {
-					
 					
 					if (hand.angle > 0 && hand.angle < 360) {
 						if (handDir == FlxObject.LEFT) {
@@ -1070,7 +1092,7 @@ package {
 						hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						arrow.angle = shootAngle;
-						handReturnedToBody = true;
+						//handReturnedToBody = true;
 					}
 					if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 						Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
@@ -1141,15 +1163,15 @@ package {
 						
 					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
 						cannonMode = false;
-						rad = Math.PI*arrow.angle/180;
+						//rad = Math.PI*arrow.angle/180;
+						
+						setGravity(hand,FlxObject.DOWN,true);
 						hand.velocity.x = CANNON_VEL * Math.cos(rad);
 						hand.velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
-						setGravity(hand,FlxObject.DOWN,true);
 						
 						if (Registry.neverFiredBodyOrCannon) {
 							Registry.neverFiredBodyOrCannon = false;
 						}
-						
 						
 					}
 				}
@@ -1162,7 +1184,9 @@ package {
 						body = cannonGroup.members[curCannon];
 						cannonMode = true;
 						
-						setGravity(hand,body.facing,true);
+						lastTouchedWood = false;
+						handFalling = false;
+						onGround = true;
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1172,6 +1196,8 @@ package {
 						hand.y = body.y;
 						
 						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						//setGravity(hand,body.facing,false);
 						
 						showArrow();
 						
@@ -1180,27 +1206,28 @@ package {
 						}
 						
 					} else if (hob < uint.MAX_VALUE) {
-					curBody = hob;
-					body = bodyGroup.members[curBody];
-					bodyGear = bodyGearGroup.members[curBody];
-					bodyMode = true;
-					
-					setGravity(hand,body.facing,true);
-					
-					hand.velocity.x = 0;
-					hand.velocity.y = 0;
-					hand.acceleration.x = 0;
-					hand.acceleration.y = 0;
-					hand.x = body.x;
-					hand.y = body.y;
-					
-					bodyTargetAngle = body.angle;
-					
-					showArrow();
-					
-					if (Registry.neverEnteredBodyOrCannon) {
-						Registry.neverEnteredBodyOrCannon = false;
-					}
+						curBody = hob;
+						body = bodyGroup.members[curBody];
+						bodyGear = bodyGearGroup.members[curBody];
+						bodyMode = true;
+						
+						//setGravity(hand,body.facing,false);
+						
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						
+						showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
 					
 					}
 				} else {
@@ -1325,19 +1352,24 @@ package {
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			if (spr == hand) {
+			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
 				fixGravity(spr);
 			} else if (spr in bodyGroup) {
 				fixGravity(spr);
 			}
+			/*else if (spr in cannonGroup) {
+				fixGravity(spr);
+			}*/
 		}
 		
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
 			if (spr == hand) {
 				handWoodFlag = tile.mapIndex;
 				lastTouchedWood = true;
+				
+				if (onGround && !bodyMode) {fixGravity(spr);}
 			}
 		}
 		
