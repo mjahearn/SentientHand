@@ -26,19 +26,10 @@ package {
 		public const UNTOUCHABLE_MAX:uint = 171;
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		
 		public const SOUND_ON:Boolean = true;
 		
-		/*
-		Spawn Point Info:
-		hand: 191
-		body: 190
-		cannon: 189
-		blocks 186, 187, 188 -> (small, medium, large)
-		doors: 184-185, every 2 -> (vertical, horizontal)
-		buttons: 172-186, every 4 -> (L, U, R, D)
-		flaps: 166-171, every 2 -> (vertical, horizotonal)
-		*/
-		
+		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
 		public const CANNON_SPAWN:uint = 189;
@@ -47,7 +38,7 @@ package {
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
 		
-		/* midground spawn points: */
+		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
 		public const STEAM_MIN:uint = 19;
@@ -58,7 +49,7 @@ package {
 		
 		public var reinvigorated:Boolean;
 		
-		public var dbg:int;
+		//public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:uint;
 		
@@ -184,15 +175,14 @@ package {
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
 			controlDirs = 0;
-						
-			/* Background */
-			dbg = 0;
-			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
-			/* Midground */
+			/* Background */
+			//dbg = 0;
+			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
+			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
 			midground.loadMap(new midgroundMap,midgroundset,8,8);
 			
@@ -422,7 +412,6 @@ package {
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
-			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -481,6 +470,8 @@ package {
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			text.scrollFactor = new FlxPoint(0,0);
 			add(text);
+			
+			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 		}
 		
 		override public function update():void {
