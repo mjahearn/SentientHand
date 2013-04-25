@@ -27,6 +27,11 @@ package {
 		public static var levelNum:uint = 0;
 		public static var levelNumPrevious:uint = levelNum;
 		
+		// hint system stuff
+		public static var neverEnteredBodyOrCannon:Boolean = true;
+		public static var neverFiredBodyOrCannon:Boolean = true;
+		public static var neverAimedBodyOrCannon:Boolean = true;
+		
 		public static function update():void {
 			
 			//FlxG.log(levelNum);

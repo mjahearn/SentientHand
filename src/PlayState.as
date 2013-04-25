@@ -691,7 +691,8 @@ package {
 				
 				if (handOverlaps) {
 					hand.color = 0xff8000;
-					hint.play("thinking up");
+					
+					if (Registry.neverEnteredBodyOrCannon) {hint.play("thinking up");}
 				}
 				else {hand.color = 0xffffff;}
 			} else {
@@ -708,7 +709,10 @@ package {
 				hand.color = 0xffffff;
 			}
 			if (cannonMode || (bodyMode && !handOut && !handIn)){
+				
+				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
 				hint.play("thinking space");
+				}
 			}
 			
 			
@@ -1093,9 +1097,18 @@ package {
 					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
+						
+						if (Registry.neverAimedBodyOrCannon) {
+							Registry.neverAimedBodyOrCannon = false;
+						}
+						
 					} if (playerIsPressing(FlxObject.RIGHT)) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
+						
+						if (Registry.neverAimedBodyOrCannon) {
+							Registry.neverAimedBodyOrCannon = false;
+						}
 					}
 					if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
@@ -1121,12 +1134,23 @@ package {
 						} else if (hand.velocity.y < 0) {
 							hand.allowCollisions |= FlxObject.UP;
 						}
+						
+						if (Registry.neverFiredBodyOrCannon) {
+							Registry.neverFiredBodyOrCannon = false;
+						}
+						
 					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
 						cannonMode = false;
 						rad = Math.PI*arrow.angle/180;
 						hand.velocity.x = CANNON_VEL * Math.cos(rad);
 						hand.velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
 						setGravity(hand,FlxObject.DOWN,true);
+						
+						if (Registry.neverFiredBodyOrCannon) {
+							Registry.neverFiredBodyOrCannon = false;
+						}
+						
+						
 					}
 				}
 			} else {
@@ -1144,6 +1168,11 @@ package {
 						hand.x = body.x;
 						hand.y = body.y;
 						showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
+						
 					} else if (hob < uint.MAX_VALUE) {
 					curBody = hob;
 					body = bodyGroup.members[curBody];
@@ -1156,6 +1185,11 @@ package {
 					hand.x = body.x;
 					hand.y = body.y;
 					showArrow();
+					
+					if (Registry.neverEnteredBodyOrCannon) {
+						Registry.neverEnteredBodyOrCannon = false;
+					}
+					
 					}
 				} else {
 					if (onGround) {
