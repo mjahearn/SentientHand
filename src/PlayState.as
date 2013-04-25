@@ -621,12 +621,29 @@ package {
 				}
 			}
 			
+			if (!bodyMode && !cannonMode) {
+				curBody = handOverlapsBody();
+				curCannon = handOverlapsCannon();
+			}
+			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
 			var bodyHead:FlxSprite;
 			var armBase:FlxSprite;
+			
+			if (curBody < uint.MAX_VALUE) {
+				body = bodyGroup.members[curBody];
+				bodyGear = bodyGearGroup.members[curBody];
+				bodyHead = bodyHeadGroup.members[curBody];
+				armBase = bodyArmBaseGroup.members[curBody];
+			} else if (curCannon < uint.MAX_VALUE) {
+				body = cannonGroup.members[curCannon];
+				armBase = cannonArmBaseGroup.members[curCannon];
+			}
+			
+			/*
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
@@ -635,7 +652,7 @@ package {
 			} if (cannonMode) {
 				body = cannonGroup.members[curCannon];
 				armBase = cannonArmBaseGroup.members[curCannon];
-			}
+			}*/
 			
 			// marker line
 			markerLine.fill(0x00000000);
@@ -666,7 +683,33 @@ package {
 			hint.play("idle");
 			
 			// marker glow (for hand overlapping)
+			hand.color = 0xffffff;
+			for (var mmm:String in bodyGroup.members) {
+				bodyGroup.members[mmm].color = 0xffffff;
+				bodyArmBaseGroup.members[mmm].color = 0xffffff;
+				bodyGearGroup.members[mmm].color = 0xffffff;
+				bodyHeadGroup.members[mmm].color = 0xffffff;
+			}
+			for (mmm in cannonGroup.members) {
+				cannonGroup.members[mmm].color = 0xffffff;
+				cannonArmBaseGroup.members[mmm].color = 0xffffff;
+			}
+			if (!cannonMode && !bodyMode) {
+				if (curBody < uint.MAX_VALUE) {
+					hand.color = 0xff0000;
+					body.color = 0xff0000;
+					armBase.color = 0xff0000;
+					bodyGear.color = 0xff0000;
+					bodyHead.color = 0xff0000;
+				} else if (curCannon < uint.MAX_VALUE) {
+					hand.color = 0xff0000;
+					body.color = 0xff0000;
+					armBase.color = 0xff0000;
+				}
+			}
+			
 			// this should be cleaner... but it's not, but whatever, maybe later
+			/*
 			if (!bodyMode && !cannonMode) {
 				var handOverlaps:Boolean = false;
 				
@@ -723,6 +766,7 @@ package {
 				hint.play("thinking space");
 				}
 			}
+			*/
 			
 			
 			// to time the fall for the different falling rot, really belongs with anim stuff
@@ -1176,9 +1220,12 @@ package {
 					}
 				}
 			} else {
+				/*
 				var hoc:uint = handOverlapsCannon();
 				var hob:uint = handOverlapsBody();
+				*/
 				if (FlxG.keys.justPressed("DOWN")) {
+					/*
 					if (hoc < uint.MAX_VALUE) {
 						curCannon = hoc;
 						body = cannonGroup.members[curCannon];
@@ -1229,6 +1276,54 @@ package {
 							Registry.neverEnteredBodyOrCannon = false;
 						}
 					
+					}
+					*/
+					if (curBody < uint.MAX_VALUE) {
+						
+						bodyMode = true;
+						
+						//setGravity(hand,body.facing,false);
+						
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						
+						showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
+						
+					} else if (curCannon < uint.MAX_VALUE) {
+						
+						cannonMode = true;
+						lastTouchedWood = false;
+						handFalling = false;
+						onGround = true;
+						
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						//setGravity(hand,body.facing,false);
+						
+						showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
+						
 					}
 				} else {
 					if (onGround) {
