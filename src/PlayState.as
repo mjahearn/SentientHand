@@ -636,8 +636,10 @@ package {
 				curCannon = handOverlapsCannon();
 			
 				if (curBody < uint.MAX_VALUE && curCannon < uint.MAX_VALUE) {
-					var handToBody:Number = Math.pow(hand.x - bodyGroup.members[curBody].x,2) + Math.pow(hand.y - bodyGroup.members[curBody].y,2);
-					var handToCannon:Number = Math.pow(hand.x - cannonGroup.members[curCannon].x,2) + Math.pow(hand.y - cannonGroup.members[curCannon].y,2);
+					var closeBody:FlxSprite = bodyGroup.members[curBody];
+					var closeCannon:FlxSprite = bodyGroup.members[curCannon];
+					var handToBody:Number = Math.pow(hand.x + hand.width/2.0 - closeBody.x - closeBody.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeBody.y - closeBody.height/2.0,2);
+					var handToCannon:Number = Math.pow(hand.x + hand.width/2.0 - closeCannon.x - closeCannon.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeCannon.y - closeCannon.height/2.0,2);
 					if (handToCannon < handToBody) {enteringCannon = true;}
 					else {enteringBody = true;}
 				} else if (curBody < uint.MAX_VALUE) {enteringBody = true;}
@@ -1564,19 +1566,51 @@ package {
 		}
 		
 		public function handOverlapsBody():uint {
+			var hasOverlapped:Boolean = false;
+			var b_max:int;
+			var b_distSq_Min:Number;
 			for (var b:int = 0; b < bodyGroup.length; b++) {
-				if (hand.overlaps(bodyGroup.members[b])) {
-					return(b);
+				var b_body:FlxSprite = bodyGroup.members[b];
+				if (hand.overlaps(b_body)) {
+					//return(b);
+					var b_distSq:Number = Math.pow(hand.x + hand.width/2.0 - b_body.x - b_body.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - b_body.y - b_body.height/2.0,2);
+					if (!hasOverlapped) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+						hasOverlapped = true;
+					} else if (b_distSq < b_distSq_Min) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+					}
 				}
+			}
+			if (hasOverlapped) {
+				return(b_max);
 			}
 			return(uint.MAX_VALUE);
 		}
 		
 		public function handOverlapsCannon():uint {
+			var hasOverlapped:Boolean = false;
+			var b_max:int;
+			var b_distSq_Min:Number;
 			for (var b:int = 0; b < cannonGroup.length; b++) {
-				if (hand.overlaps(cannonGroup.members[b])) {
-					return(b);
+				var b_cannon:FlxSprite = cannonGroup.members[b];
+				if (hand.overlaps(b_cannon)) {
+					//return(b);
+					var b_distSq:Number = Math.pow(hand.x + hand.width/2.0 - b_cannon.x - b_cannon.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - b_cannon.y - b_cannon.height/2.0,2);
+					if (!hasOverlapped) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+						hasOverlapped = true;
+					} else if (b_distSq < b_distSq_Min) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+					}
 				}
+			}
+			if (hasOverlapped) {
+				return(b_max);
 			}
 			return(uint.MAX_VALUE);
 		}
