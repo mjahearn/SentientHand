@@ -1123,17 +1123,43 @@ package {
 			*/
 			
 			if (bodyMode || cannonMode) {
+				
+				// possibly fixes bugs?
+				/*
+				if (body.x == hand.x && body.y == hand.y) {
+					setGravity(body,FlxObject.NONE,true);
+				}
+				if (hand.overlaps(body) && body.velocity.x != 0 && body.velocity.y != 0) {
+					body.x = hand.x;
+					body.y = hand.y;
+					setGravity(body,hand.facing,true);
+				}
+				*/
+				if (!hand.overlaps(body)) {
+					body.allowCollisions = FlxObject.NONE;
+				} else {
+					body.allowCollisions = FlxObject.ANY;
+					if (body.justTouched(FlxObject.ANY)) {
+						body.x = hand.x;
+						body.y = hand.y;
+					}
+					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0) {
+						hand.x = body.x;
+						hand.y = body.y;
+					}
+				}
+				
 				body.velocity.x = 0;
 				body.velocity.y = 0;
 				hand.velocity.x = 0;
 				hand.velocity.y = 0;
-				var diffX:Number = hand.x-body.x;
-				var diffY:Number = hand.y-body.y;
+				var diffX:Number = hand.x + hand.width/2.0 - body.x - body.width/2.0;
+				var diffY:Number = hand.y + hand.width/2.0 - body.y - body.height/2.0;
 				if (handOut) {
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
 					//rad = arrow.angle*Math.PI/180;
-					if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
+					if (hand.touching <= 0 && Math.pow(diffX, 2) + Math.pow(diffY, 2) < Math.pow(GRAPPLE_LENGTH,2)) {
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 					} else {
@@ -1151,6 +1177,7 @@ package {
 						hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						arrow.angle = shootAngle;
 						//handReturnedToBody = true;
+						
 					}
 					if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 						Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
@@ -1166,10 +1193,10 @@ package {
 						if (hand.touching == 0) {
 							hand.x = body.x;
 							hand.y = body.y;
-						} else {
+						}/* else {
 							body.x = hand.x;
 							body.y = hand.y;
-						}
+						}*/
 						hand.allowCollisions = FlxObject.ANY;
 						//showArrow();
 					}
@@ -1610,10 +1637,8 @@ package {
 				}
 			}
 			if (hasOverlapped) {
-				FlxG.log("overlapped");
 				return(b_max);
 			}
-			FlxG.log("didn't overlap");
 			return(uint.MAX_VALUE);
 		}
 		
