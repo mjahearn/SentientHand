@@ -849,7 +849,7 @@ package {
 			if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
 				if (FlxG.keys.justPressed("DOWN")) {
-					bodyTargetAngle = hand.angle;
+					//bodyTargetAngle = hand.angle;
 				}
 				// The hand is crawling along a flat surface
 				if (hand.touching) {
@@ -1161,12 +1161,18 @@ package {
 						curCannon = hoc;
 						body = cannonGroup.members[curCannon];
 						cannonMode = true;
+						
+						//setGravity(hand,FlxObject.DOWN,true);
+						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
 						hand.acceleration.x = 0;
 						hand.acceleration.y = 0;
 						hand.x = body.x;
 						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						
 						showArrow();
 						
 						if (Registry.neverEnteredBodyOrCannon) {
@@ -1178,12 +1184,18 @@ package {
 					body = bodyGroup.members[curBody];
 					bodyGear = bodyGearGroup.members[curBody];
 					bodyMode = true;
+					
+					//setGravity(hand,FlxObject.DOWN,true);
+					
 					hand.velocity.x = 0;
 					hand.velocity.y = 0;
 					hand.acceleration.x = 0;
 					hand.acceleration.y = 0;
 					hand.x = body.x;
 					hand.y = body.y;
+					
+					bodyTargetAngle = body.angle;
+					
 					showArrow();
 					
 					if (Registry.neverEnteredBodyOrCannon) {
