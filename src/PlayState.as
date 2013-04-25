@@ -1162,7 +1162,7 @@ package {
 						body = cannonGroup.members[curCannon];
 						cannonMode = true;
 						
-						//setGravity(hand,FlxObject.DOWN,true);
+						setGravity(hand,body.facing,true);
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1185,7 +1185,7 @@ package {
 					bodyGear = bodyGearGroup.members[curBody];
 					bodyMode = true;
 					
-					//setGravity(hand,FlxObject.DOWN,true);
+					setGravity(hand,body.facing,true);
 					
 					hand.velocity.x = 0;
 					hand.velocity.y = 0;
