@@ -7,8 +7,6 @@ package {
 	
 	public class PlayState extends FlxState {
 		
-		//public var time:Number = 0;
-		
 		public const CANNON_VEL:Number = 6400; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
@@ -48,8 +46,6 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
-		//public const FLAP_MIN:uint = 166;
-		//public const FLAP_MAX:uint = 171;
 		
 		/* midground spawn points: */
 		public const GEAR_MIN:uint = 1;
@@ -113,7 +109,6 @@ package {
 		public var buttonMode:uint;
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
-		//public var flapGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -155,13 +150,9 @@ package {
 		[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		//[Embed("assets/flap_h.png")] public var flapHSheet:Class;
-		//[Embed("assets/flap_v.png")] public var flapVSheet:Class;
-		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		//[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
@@ -177,13 +168,7 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
-		
-		/*
-		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
-		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
-		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
-		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
-		*/
+
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -199,9 +184,7 @@ package {
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
 			controlDirs = 0;
-			
-			//Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-			
+						
 			/* Background */
 			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -279,15 +262,10 @@ package {
 			/* Level */
 			
 			level = new FlxTilemap();
-			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
 			level.loadMap(new levelMap,tileset,8,8);
-			//level.loadMap(new tallMap,tileset,8,8);
 			add(level);
-			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
+			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			FlxG.camera.bounds = FlxG.worldBounds;
-			//FlxG.worldBounds = level.getBounds();
-			//FlxG.camera.setBounds(0,0,level.width,level.height,true);
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -324,39 +302,37 @@ package {
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
-			//for (i = BODY_MIN; i <= BODY_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
-				if (bodyArray) {
-					for (j= 0; j < bodyArray.length; j++) {
-						level.setTileByIndex(bodyArray[j],0);
-						var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
-
-						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-						bodyTargetAngle = body.angle;
-						//setGravity(body,FlxObject.DOWN,true);
-						bodyGroup.add(body);
-						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
-						bodyGearGroup.add(bodyGear);
-						// the positioning should be based on angle too
-						var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
-						bodyHead.y -= bodyHead.height;
-						bodyHeadGroup.add(bodyHead);
-						
-						bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
-						body.facing = FlxObject.DOWN;
-						
-						var theta:Number = (body.angle-90)*Math.PI/180.0;
-						
-						bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
-						bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
-						bodyHead.angle = body.angle;
-						
-						bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
-						bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
-					}
+			level.setTileProperties(i,FlxObject.NONE);
+			var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
+			if (bodyArray) {
+				for (j= 0; j < bodyArray.length; j++) {
+					level.setTileByIndex(bodyArray[j],0);
+					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
+					
+					var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
+					bodyTargetAngle = body.angle;
+					//setGravity(body,FlxObject.DOWN,true);
+					bodyGroup.add(body);
+					var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+					bodyGearGroup.add(bodyGear);
+					// the positioning should be based on angle too
+					var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
+					bodyHead.y -= bodyHead.height;
+					bodyHeadGroup.add(bodyHead);
+					
+					bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+					body.facing = FlxObject.DOWN;
+					
+					var theta:Number = (body.angle-90)*Math.PI/180.0;
+					
+					bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+					bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+					bodyHead.angle = body.angle;
+					
+					bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+					bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 				}
-			//}			
+			}
 			add(bodyGroup);
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
@@ -384,23 +360,7 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						/*button.addAnimation("up inactive",[0]);
-						button.addAnimation("down",[1]);
-						button.addAnimation("up state A",[2]);
-						button.addAnimation("up state B",[3]);
-						button.addAnimation("up state C",[4]);
-						button.addAnimation("up activate",[5]);
-						button.addAnimation("up open door",[6]);*/
 						button.frame = BUTTON_INIT;
-						
-						/*
-						// Decide button angle
-						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
-						if (buttonGaugeNumber == 0) {button.angle = 90; button.x -= 14; button.y += 14;}
-						else if (buttonGaugeNumber == 1) {button.angle = 180;}
-						else if (buttonGaugeNumber == 2) {button.angle = 270; button.x -= 10; button.y += 14;}
-						else if (buttonGaugeNumber == 3) {button.y += 3;}
-						*/
 						
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
@@ -437,45 +397,13 @@ package {
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
 						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
-						//door.play("open");
+						door.play("closed");
 						
 						doorGroup.add(door);
 					}
 				}
 			}
 			add(doorGroup);
-			
-			/*
-			// Flaps
-			for (i = FLAP_MIN; i <= FLAP_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var flapArray:Array = level.getTileInstances(i);
-				if (flapArray) {
-					for (j = 0; j < flapArray.length; j++) {
-						level.setTileByIndex(flapArray[j],0);
-						var flapPoint:FlxPoint = pointForTile(flapArray[j],level);
-						
-						// Decide flap graphic
-						var flapSheet:Class = flapHSheet;
-						var flapNumber:Number = (i-FLAP_MIN)%2;
-						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
-						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
-						
-						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
-						flap.immovable = true;
-						flap.loadGraphic(flapSheet,true,false,w,h,true);
-						flap.addAnimation("close",[11,10,9,8,7,6,5,4,3,2,2,2,2,2,2,2,2,2,2,2,2,1],22,false);
-						flap.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
-						flap.addAnimation("closed",[0]);
-						flap.addAnimation("opened",[11]);
-						flap.play("closed");
-						
-						flapGroup.add(flap);
-					}
-				}
-			}
-			add(flapGroup);
-			*/
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -490,6 +418,11 @@ package {
 				arms.add(arm);
 			}
 			add(arms);
+			
+			// marker line
+			markerLine.makeGraphic(level.width,level.height,0x00000000);
+			add(markerLine);
+			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -545,11 +478,6 @@ package {
 			arrow.visible = false;
 			add(arrow);
 			
-			// marker line
-			markerLine.makeGraphic(level.width,level.height,0x00000000);
-			add(markerLine);
-			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
-			
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			text.scrollFactor = new FlxPoint(0,0);
 			add(text);
@@ -561,7 +489,6 @@ package {
 			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
-				//Registry.music.kill();
 				FlxG.switchState(new LevelSelect);
 			}
 			
@@ -569,32 +496,6 @@ package {
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
 				goToNextLevel();
 			}
-			
-			/*
-			// music -- this should probably be moved to the registry if we want to do layering
-			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
-			if (SOUND_ON) {
-				//FlxG.playMusic(musicBackgroundB,1.0);
-				
-				//musicBackgroundSoundB.play();
-				musicBackgroundSoundA.play();
-				
-				if (FlxG.keys.A) {
-					musicBackgroundSoundB.volume -= 0.22;
-				} else {musicBackgroundSoundB.volume += 0.022;}
-				if (FlxG.keys.B) {
-					musicBackgroundSoundA.volume -= 0.22;
-				} else {musicBackgroundSoundA.volume += 0.22;}
-				
-			}
-			*/
-			/*
-			if (SOUND_ON) {
-				
-				//FlxG.playMusic(Registry.musicBackgroundA);
-				//Registry.music.play();
-			}
-			*/
 			
 			
 			if (FlxG.keys.justPressed("LEFT")) {
@@ -709,6 +610,11 @@ package {
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
 			}
 			if (!cannonMode && !bodyMode) {
+				
+				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
+					hint.play("thinking up");
+				}
+				
 				if (enteringBody) {
 					hand.color = 0xff0000;
 					body.color = 0xff0000;
@@ -719,6 +625,10 @@ package {
 					hand.color = 0xff0000;
 					body.color = 0xff0000;
 					armBase.color = 0xff0000;
+				}
+			} else {
+				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+					hint.play("thinking space");
 				}
 			}
 			
