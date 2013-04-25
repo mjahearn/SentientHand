@@ -17,14 +17,40 @@ package {
 		public static const levelOrder:Array = new Array(level01, level03);
 		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB);
 		public static var music:FlxSound = new FlxSound();
+		public static var stupid:Boolean = true;
+		public static var dumb:Boolean = false;
 		
 		//public static var firstButton:Array = new Array();
 		//public static var secondButton:Array = new Array();
 		
 		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
+		public static var levelNumPrevious:uint = levelNum;
 		
 		public static function update():void {
+			
+			FlxG.log(levelNum);
+			
+			if (stupid && levelNum < soundOrder.length) {
+				stupid = false;
+				Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+			}
+			if (levelNum != levelNumPrevious) {
+				dumb = true;
+			}
+			if (dumb) {
+				Registry.music.volume -= 0.0022;
+			}
+			if (Registry.music.volume == 0 && levelNum < soundOrder.length) {
+				dumb = false;
+				Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+			}
+			if (!dumb && Registry.music.volume != 1) {
+				Registry.music.volume += 0.0022;
+			}
+			
+			levelNumPrevious = levelNum;
+			
 			Registry.music.play();
 		}
 	}

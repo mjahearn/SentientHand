@@ -198,7 +198,7 @@ package {
 			reinvigorated = false; //ditto
 			controlDirs = 0;
 			
-			Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+			//Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 			
 			/* Background */
 			dbg = 0;
