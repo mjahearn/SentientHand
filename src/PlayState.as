@@ -621,24 +621,36 @@ package {
 				}
 			}
 			
-			if (!bodyMode && !cannonMode) {
-				curBody = handOverlapsBody();
-				curCannon = handOverlapsCannon();
-			}
-			
 			//time += FlxG.elapsed;
 			// PRECONDITION: if bodyMode, then curBody < uint.MAX_VALUE
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
 			var bodyHead:FlxSprite;
 			var armBase:FlxSprite;
+
+			var enteringCannon:Boolean = false;
+			var enteringBody:Boolean = false;
 			
-			if (curBody < uint.MAX_VALUE) {
+			if (!bodyMode && !cannonMode) {
+				curBody = handOverlapsBody();
+				curCannon = handOverlapsCannon();
+			
+				if (curBody < uint.MAX_VALUE && curCannon < uint.MAX_VALUE) {
+					var handToBody:Number = Math.pow(hand.x - bodyGroup.members[curBody].x,2) + Math.pow(hand.y - bodyGroup.members[curBody].y,2);
+					var handToCannon:Number = Math.pow(hand.x - cannonGroup.members[curCannon].x,2) + Math.pow(hand.y - cannonGroup.members[curCannon].y,2);
+					if (handToCannon < handToBody) {enteringCannon = true;}
+					else {enteringBody = true;}
+				} else if (curBody < uint.MAX_VALUE) {enteringBody = true;}
+				else if (curCannon < uint.MAX_VALUE) {enteringCannon = true;}
+			
+			}
+			
+			if (enteringBody || bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
 				armBase = bodyArmBaseGroup.members[curBody];
-			} else if (curCannon < uint.MAX_VALUE) {
+			} else if (enteringCannon || cannonMode) {
 				body = cannonGroup.members[curCannon];
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}
@@ -695,13 +707,13 @@ package {
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
 			}
 			if (!cannonMode && !bodyMode) {
-				if (curBody < uint.MAX_VALUE) {
+				if (enteringBody) {
 					hand.color = 0xff0000;
 					body.color = 0xff0000;
 					armBase.color = 0xff0000;
 					bodyGear.color = 0xff0000;
 					bodyHead.color = 0xff0000;
-				} else if (curCannon < uint.MAX_VALUE) {
+				} else if (enteringCannon) {
 					hand.color = 0xff0000;
 					body.color = 0xff0000;
 					armBase.color = 0xff0000;
@@ -1278,7 +1290,7 @@ package {
 					
 					}
 					*/
-					if (curBody < uint.MAX_VALUE) {
+					if (enteringBody) {
 						
 						bodyMode = true;
 						
@@ -1300,7 +1312,7 @@ package {
 							Registry.neverEnteredBodyOrCannon = false;
 						}
 						
-					} else if (curCannon < uint.MAX_VALUE) {
+					} else if (enteringCannon) {
 						
 						cannonMode = true;
 						lastTouchedWood = false;
