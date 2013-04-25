@@ -57,14 +57,16 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
-		public const BUTTON_PRESSED:uint = 1;
-		public const BUTTON_INIT:uint = 0;
+		public const BUTTON_PRESSED:uint = 0;
+		public const BUTTON_INIT:uint = 1;
 		
 		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:uint;
+		
+		public var electricityNum:int = 1;
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
@@ -341,6 +343,15 @@ package {
 						bodyHeadGroup.add(bodyHead);
 						
 						bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+						
+						var theta:Number = (body.angle-90)*Math.PI/180.0;
+						
+						bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+						bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+						bodyHead.angle = body.angle;
+						
+						bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+						bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 					}
 				}
 			//}			
@@ -511,7 +522,7 @@ package {
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
-			electricity.addAnimation("electricute",[1,2,3],22,true);
+			electricity.addAnimation("electricute",[1,2,3,4,5,6,7],22,true);
 			electricity.addAnimation("stop",[0]);
 			add(electricity);
 			
@@ -646,6 +657,7 @@ package {
 			hint.play("idle");
 			
 			// marker glow (for hand overlapping)
+			// this should be cleaner... but it's not, but whatever, maybe later
 			if (!bodyMode && !cannonMode) {
 				var handOverlaps:Boolean = false;
 				
@@ -653,9 +665,15 @@ package {
 				if (bodyOverlapId < uint.MAX_VALUE) {
 					handOverlaps = true;
 					bodyGroup.members[bodyOverlapId].color = 0xff8000;
+					bodyArmBaseGroup.members[bodyOverlapId].color = 0xff8000;
+					bodyGearGroup.members[bodyOverlapId].color = 0xff8000;
+					bodyHeadGroup.members[bodyOverlapId].color = 0xff8000;
 				} else {
 					for (var mmm:String in bodyGroup.members) {
 						bodyGroup.members[mmm].color = 0xffffff;
+						bodyArmBaseGroup.members[mmm].color = 0xffffff;
+						bodyGearGroup.members[mmm].color = 0xffffff;
+						bodyHeadGroup.members[mmm].color = 0xffffff;
 					}
 				}
 				
@@ -663,9 +681,11 @@ package {
 				if (cannonOverlapId < uint.MAX_VALUE) {
 					handOverlaps = true;
 					cannonGroup.members[cannonOverlapId].color = 0xff8000;
+					cannonArmBaseGroup.members[cannonOverlapId].color = 0xff8000;
 				} else {
 					for (mmm in cannonGroup.members) {
 						cannonGroup.members[mmm].color = 0xffffff;
+						cannonArmBaseGroup.members[mmm].color = 0xffffff;
 					}
 				}
 				
@@ -677,9 +697,13 @@ package {
 			} else {
 				for (mmm in cannonGroup.members) {
 					cannonGroup.members[mmm].color = 0xffffff;
+					cannonArmBaseGroup.members[mmm].color = 0xffffff;
 				}
 				for (mmm in bodyGroup.members) {
 					bodyGroup.members[mmm].color = 0xffffff;
+					bodyArmBaseGroup.members[mmm].color = 0xffffff;
+					bodyGearGroup.members[mmm].color = 0xffffff;
+					bodyHeadGroup.members[mmm].color = 0xffffff;
 				}
 				hand.color = 0xffffff;
 			}
@@ -995,8 +1019,13 @@ package {
 				electricity.angle = hand.angle;
 				electricity.x = hand.x;
 				electricity.y = hand.y;
+				electricity.alpha += electricityNum*0.022;
+				if (electricity.alpha <= 0.5 || electricity.alpha >= 1) {
+					electricityNum *= -1;
+				}
 			} else {
 				electricity.play("stop");
+				electricity.alpha = 1;
 			}
 			
 			/* End Animations */
