@@ -632,67 +632,6 @@ package {
 				}
 			}
 			
-			// this should be cleaner... but it's not, but whatever, maybe later
-			/*
-			if (!bodyMode && !cannonMode) {
-				var handOverlaps:Boolean = false;
-				
-				var bodyOverlapId:uint = handOverlapsBody();
-				if (bodyOverlapId < uint.MAX_VALUE) {
-					handOverlaps = true;
-					bodyGroup.members[bodyOverlapId].color = 0xff8000;
-					bodyArmBaseGroup.members[bodyOverlapId].color = 0xff8000;
-					bodyGearGroup.members[bodyOverlapId].color = 0xff8000;
-					bodyHeadGroup.members[bodyOverlapId].color = 0xff8000;
-				} else {
-					for (var mmm:String in bodyGroup.members) {
-						bodyGroup.members[mmm].color = 0xffffff;
-						bodyArmBaseGroup.members[mmm].color = 0xffffff;
-						bodyGearGroup.members[mmm].color = 0xffffff;
-						bodyHeadGroup.members[mmm].color = 0xffffff;
-					}
-				}
-				
-				var cannonOverlapId:uint = handOverlapsCannon();
-				if (cannonOverlapId < uint.MAX_VALUE) {
-					handOverlaps = true;
-					cannonGroup.members[cannonOverlapId].color = 0xff8000;
-					cannonArmBaseGroup.members[cannonOverlapId].color = 0xff8000;
-				} else {
-					for (mmm in cannonGroup.members) {
-						cannonGroup.members[mmm].color = 0xffffff;
-						cannonArmBaseGroup.members[mmm].color = 0xffffff;
-					}
-				}
-				
-				if (handOverlaps) {
-					hand.color = 0xff8000;
-					
-					if (Registry.neverEnteredBodyOrCannon) {hint.play("thinking up");}
-				}
-				else {hand.color = 0xffffff;}
-			} else {
-				for (mmm in cannonGroup.members) {
-					cannonGroup.members[mmm].color = 0xffffff;
-					cannonArmBaseGroup.members[mmm].color = 0xffffff;
-				}
-				for (mmm in bodyGroup.members) {
-					bodyGroup.members[mmm].color = 0xffffff;
-					bodyArmBaseGroup.members[mmm].color = 0xffffff;
-					bodyGearGroup.members[mmm].color = 0xffffff;
-					bodyHeadGroup.members[mmm].color = 0xffffff;
-				}
-				hand.color = 0xffffff;
-			}
-			if (cannonMode || (bodyMode && !handOut && !handIn)){
-				
-				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
-				hint.play("thinking space");
-				}
-			}
-			*/
-			
-			
 			// to time the fall for the different falling rot, really belongs with anim stuff
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
@@ -719,30 +658,14 @@ package {
 			}
 			
 			// Press Buttons!
-			// right now, implemented buttons that go back to original state after pressed,
-			// this can change, this was just easier (I think)
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
-			//for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				//for (var m:String in blockGroup.members) {
-					//var block:FlxSprite = blockGroup.members[m];
-					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-						button.frame = BUTTON_PRESSED;
-						/*if (buttonStateArray.indexOf(true) == -1) {
-							if (Registry.iteration == 0) {
-								Registry.firstButton.push(mm);
-							} else if (Registry.iteration == 1) {
-								Registry.secondButton.push(mm);
-							}
-						}*/
-						buttonStateArray[mm] = true;
-						buttonReactionArray[mm]();
-					}
-				//} else if (!hand.overlaps(button)) {
-					//button.play("up");
-					//buttonStateArray[mm] = false;
-				//}
+				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+					button.frame = BUTTON_PRESSED;
+					buttonStateArray[mm] = true;
+					buttonReactionArray[mm]();
+				}
 			}
 			
 			// Bring midground to life
@@ -750,7 +673,7 @@ package {
 				
 				// Steam
 				
-				// Spin Gears // should eventually make them accel in/out of spinning
+				// Spin Gears // should eventually make them accel into spin
 				var gear:FlxSprite;
 				for (var jjj:String in gearInGroup.members) {
 					gear = gearInGroup.members[jjj];
@@ -801,9 +724,6 @@ package {
 				else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
-					/*if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
-						grappleExtendSound.stop();
-					}*/
 					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
 						grappleExtendSound.play();
 					} else {
@@ -923,12 +843,12 @@ package {
 							hand.angle -= 10;
 						}
 					}
-					else if (timeFallen > 0.44) {//if (timeFallen > 0.66) {
+					else if (timeFallen > 0.44) {
 						
 						var vSquared:Number = Math.pow(hand.velocity.x,2) + Math.pow(hand.velocity.y,2);
 						
-						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}//{hand.angle += 10;}
-						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}//{hand.angle -= 10;}
+						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}
+						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}
 					}
 				}
 			}
@@ -1024,27 +944,9 @@ package {
 			
 			/* End Animations */
 			
-			/*
-			if (bodyMode && !handOut) {
-				setGravity(body,body.facing,true);
-			} else if (bodyMode) {
-				setGravity(body,body.facing,false);
-			}
-			*/
-			
 			if (bodyMode || cannonMode) {
 				
-				// possibly fixes bugs?
-				/*
-				if (body.x == hand.x && body.y == hand.y) {
-					setGravity(body,FlxObject.NONE,true);
-				}
-				if (hand.overlaps(body) && body.velocity.x != 0 && body.velocity.y != 0) {
-					body.x = hand.x;
-					body.y = hand.y;
-					setGravity(body,hand.facing,true);
-				}
-				*/
+				// Fixes some bugs with grappling, maybe also redundant?
 				if (!hand.overlaps(body)) {
 					body.allowCollisions = FlxObject.NONE;
 				} else {
@@ -1130,14 +1032,12 @@ package {
 					if (FlxG.keys.justPressed("DOWN")) {
 						bodyMode = false;
 						cannonMode = false;
-						//arrow.visible = false;
 						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed("SPACE") && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
-						//arrow.visible = false;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						hand.allowCollisions = 0;
@@ -1171,69 +1071,10 @@ package {
 					}
 				}
 			} else {
-				/*
-				var hoc:uint = handOverlapsCannon();
-				var hob:uint = handOverlapsBody();
-				*/
 				if (FlxG.keys.justPressed("DOWN")) {
-					/*
-					if (hoc < uint.MAX_VALUE) {
-						curCannon = hoc;
-						body = cannonGroup.members[curCannon];
-						cannonMode = true;
-						
-						lastTouchedWood = false;
-						handFalling = false;
-						onGround = true;
-						
-						hand.velocity.x = 0;
-						hand.velocity.y = 0;
-						hand.acceleration.x = 0;
-						hand.acceleration.y = 0;
-						hand.x = body.x;
-						hand.y = body.y;
-						
-						bodyTargetAngle = body.angle;
-						hand.facing = body.facing;
-						//setGravity(hand,body.facing,false);
-						
-						showArrow();
-						
-						if (Registry.neverEnteredBodyOrCannon) {
-							Registry.neverEnteredBodyOrCannon = false;
-						}
-						
-					} else if (hob < uint.MAX_VALUE) {
-						curBody = hob;
-						body = bodyGroup.members[curBody];
-						bodyGear = bodyGearGroup.members[curBody];
-						bodyMode = true;
-						
-						//setGravity(hand,body.facing,false);
-						
-						hand.velocity.x = 0;
-						hand.velocity.y = 0;
-						hand.acceleration.x = 0;
-						hand.acceleration.y = 0;
-						hand.x = body.x;
-						hand.y = body.y;
-						
-						bodyTargetAngle = body.angle;
-						hand.facing = body.facing;
-						
-						showArrow();
-						
-						if (Registry.neverEnteredBodyOrCannon) {
-							Registry.neverEnteredBodyOrCannon = false;
-						}
-					
-					}
-					*/
 					if (enteringBody) {
 						
 						bodyMode = true;
-						
-						//setGravity(hand,body.facing,false);
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1267,7 +1108,6 @@ package {
 						
 						bodyTargetAngle = body.angle;
 						hand.facing = body.facing;
-						//setGravity(hand,body.facing,false);
 						
 						showArrow();
 						
@@ -1405,9 +1245,6 @@ package {
 			} else if (spr in bodyGroup) {
 				fixGravity(spr);
 			}
-			/*else if (spr in cannonGroup) {
-				fixGravity(spr);
-			}*/
 		}
 		
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
@@ -1478,22 +1315,8 @@ package {
 			return (hand.facing & dir) > 0;
 		}
 		
+		// I kind of want to nix arrows and bodyTargetAngle etc
 		public function showArrow():void {
-			// PRECONDITION: curBody < uint.MAX_VALUE
-			//arrow.visible = true;
-			//arrow.x = bodyGroup.members[curBody].x;
-			//arrow.y = bodyGroup.members[curBody].y;
-			/*
-			if (handIsFacing(FlxObject.DOWN)) {
-				arrow.angle = -90;
-			} else if (handIsFacing(FlxObject.UP)) {
-				arrow.angle = 90;
-			} else if (handIsFacing(FlxObject.LEFT)) {
-				arrow.angle = 0;
-			} else if (handIsFacing(FlxObject.RIGHT)) {
-				arrow.angle = 180;
-			}
-			*/
 			arrow.angle = bodyTargetAngle - 90;
 			arrowStartAngle = arrow.angle;
 		}
