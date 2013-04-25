@@ -637,7 +637,7 @@ package {
 			
 				if (curBody < uint.MAX_VALUE && curCannon < uint.MAX_VALUE) {
 					var closeBody:FlxSprite = bodyGroup.members[curBody];
-					var closeCannon:FlxSprite = bodyGroup.members[curCannon];
+					var closeCannon:FlxSprite = cannonGroup.members[curCannon];
 					var handToBody:Number = Math.pow(hand.x + hand.width/2.0 - closeBody.x - closeBody.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeBody.y - closeBody.height/2.0,2);
 					var handToCannon:Number = Math.pow(hand.x + hand.width/2.0 - closeCannon.x - closeCannon.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeCannon.y - closeCannon.height/2.0,2);
 					if (handToCannon < handToBody) {enteringCannon = true;}
@@ -1610,8 +1610,10 @@ package {
 				}
 			}
 			if (hasOverlapped) {
+				FlxG.log("overlapped");
 				return(b_max);
 			}
+			FlxG.log("didn't overlap");
 			return(uint.MAX_VALUE);
 		}
 		
