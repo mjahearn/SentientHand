@@ -27,7 +27,7 @@ package {
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
-		public const SOUND_ON:Boolean = true;
+		public const SOUND_ON:Boolean = false;
 		
 		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
@@ -49,7 +49,7 @@ package {
 		
 		public var reinvigorated:Boolean;
 		
-		//public var dbg:int;
+		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:uint;
 		
@@ -179,7 +179,7 @@ package {
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
 			/* Background */
-			//dbg = 0;
+			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			/* Midground */
@@ -386,7 +386,7 @@ package {
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],22,false);
 						door.play("closed");
 						
 						doorGroup.add(door);
@@ -476,7 +476,7 @@ package {
 		
 		override public function update():void {
 			
-			Registry.update();
+			if (SOUND_ON) {Registry.update();}
 			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
@@ -945,8 +945,9 @@ package {
 					if (body.justTouched(FlxObject.ANY)) {
 						body.x = hand.x;
 						body.y = hand.y;
+						setGravity(body,hand.facing,true);
 					}
-					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0) {
+					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0 && !hand.touching) {
 						hand.x = body.x;
 						hand.y = body.y;
 					}
@@ -1155,7 +1156,7 @@ package {
 			super.update();
 			
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
-				if (doorGroup.members[a].frame == 11) {
+				if (doorGroup.members[a].frame == 17) {
 					doorGroup.members[a].kill();
 				}
 			}
