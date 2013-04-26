@@ -1037,7 +1037,7 @@ package {
 					if (FlxG.keys.justPressed(BODY_KEY)) {
 						bodyMode = false;
 						cannonMode = false;
-						setGravity(hand, hand.facing, true);
+						setGravity(hand, body.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
