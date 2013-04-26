@@ -379,15 +379,16 @@ package {
 						// Decide door graphic
 						var doorSheet:Class;
 						var doorNumber:Number = (i-DOOR_MIN)%2;
-						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 96;}
-						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 96; h = 16;}
+						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 64;}
+						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 64; h = 16;}
 						
 						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
-						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],22,false);
-						door.play("closed");
+						//door.addAnimation("closed",[0]);
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12,13],22,false);
+						//door.play("closed");
+						door.frame = 18;
 						
 						doorGroup.add(door);
 					}
@@ -656,6 +657,11 @@ package {
 					button.frame = BUTTON_PRESSED;
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
+					for (var bb:String in doorGroup.members) {
+						var door:FlxSprite = doorGroup.members[bb];
+						if (door.frame == 18) {door.frame = 19;}
+						else if (door.frame == 19) {door.frame = 20;}
+					}
 				}
 			}
 			
@@ -1156,7 +1162,7 @@ package {
 			super.update();
 			
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
-				if (doorGroup.members[a].frame == 17) {
+				if (doorGroup.members[a].frame == 13) {
 					doorGroup.members[a].kill();
 				}
 			}
