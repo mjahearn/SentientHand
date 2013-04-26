@@ -57,6 +57,7 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
+		//button animation frames
 		public const BUTTON_PRESSED:uint = 1;
 		public const BUTTON_INIT:uint = 0;
 		
