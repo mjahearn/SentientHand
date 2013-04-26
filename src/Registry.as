@@ -14,13 +14,8 @@ package {
 		[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
 		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
-<<<<<<< HEAD
 		public static const levelOrder:Array = new Array(level01, level02, level03);
 		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB,musicBackgroundA);
-=======
-		public static const levelOrder:Array = new Array(level01);
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB);
->>>>>>> fc42cf7b2b3fbac0d1586e31da46a79761f8aaf6
 		public static var music:FlxSound = new FlxSound();
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
