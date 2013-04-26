@@ -7,8 +7,6 @@ package {
 	
 	public class PlayState extends FlxState {
 		
-		//public var time:Number = 0;
-		
 		public const CANNON_VEL:Number = 6400; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
 		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
@@ -28,19 +26,10 @@ package {
 		public const UNTOUCHABLE_MAX:uint = 171;
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		
 		public const SOUND_ON:Boolean = true;
 		
-		/*
-		Spawn Point Info:
-		hand: 191
-		body: 190
-		cannon: 189
-		blocks 186, 187, 188 -> (small, medium, large)
-		doors: 184-185, every 2 -> (vertical, horizontal)
-		buttons: 172-186, every 4 -> (L, U, R, D)
-		flaps: 166-171, every 2 -> (vertical, horizotonal)
-		*/
-		
+		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
 		public const CANNON_SPAWN:uint = 189;
@@ -48,24 +37,27 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
-		//public const FLAP_MIN:uint = 166;
-		//public const FLAP_MAX:uint = 171;
 		
-		/* midground spawn points: */
+		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
 		//button animation frames
-		public const BUTTON_PRESSED:uint = 1;
-		public const BUTTON_INIT:uint = 0;
+		public const BUTTON_PRESSED:uint = 0;
+		public const BUTTON_INIT:uint = 1;
+		
+		public const ACTION_KEY:String = "X";
+		public const BODY_KEY:String = "Z";
 		
 		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
 		public var rad:Number;
-		public var controlDirs:uint;
+		public var controlDirs:Array;
+		
+		public var electricityNum:int = 1;
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
@@ -77,6 +69,9 @@ package {
 		public var arrow:FlxSprite;
 		public var bodyGearGroup:FlxGroup;
 		public var bodyHeadGroup:FlxGroup;
+		
+		public var bodyArmBaseGroup:FlxGroup = new FlxGroup();
+		public var cannonArmBaseGroup:FlxGroup = new FlxGroup();
 		
 		public var bodyTargetAngle:Number;
 		
@@ -93,6 +88,7 @@ package {
 		public var handMetalFlag:uint;
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
+		public var handTouching:uint;
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
@@ -101,7 +97,7 @@ package {
 		public var lastTouchedWood:Boolean = false;
 		public var arrowStartAngle:int;
 		public var shootAngle:int;
-		public var handReturnedToBody:Boolean = false;
+		//public var handReturnedToBody:Boolean = false;
 		
 		public var buttonGroup:FlxGroup = new FlxGroup();
 		public var buttonStateArray:Array = new Array();
@@ -109,7 +105,6 @@ package {
 		public var buttonMode:uint;
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
-		//public var flapGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -120,6 +115,8 @@ package {
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
+		
+		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
@@ -149,13 +146,9 @@ package {
 		[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		//[Embed("assets/flap_h.png")] public var flapHSheet:Class;
-		//[Embed("assets/flap_v.png")] public var flapVSheet:Class;
-		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		//[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
@@ -171,13 +164,7 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
-		
-		/*
-		[Embed("assets/SentientHandTrackA.mp3")] public var musicBackgroundA:Class;
-		public var musicBackgroundSoundA:FlxSound = new FlxSound().loadEmbedded(musicBackgroundA,false);
-		[Embed("assets/SentientHandTrackB.mp3")] public var musicBackgroundB:Class;
-		public var musicBackgroundSoundB:FlxSound = new FlxSound().loadEmbedded(musicBackgroundB,false);
-		*/
+
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -190,20 +177,18 @@ package {
 		}
 		
 		override public function create():void {
+			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
-			controlDirs = 0;
-			
-			Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-			
-			/* Background */
-			dbg = 0;
-			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+			controlDirs = new Array();
 			
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
-			/* Midground */
+			/* Background */
+			//dbg = 0;
+			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
+			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
 			midground.loadMap(new midgroundMap,midgroundset,8,8);
 			
@@ -273,15 +258,10 @@ package {
 			/* Level */
 			
 			level = new FlxTilemap();
-			//level.loadMap(FlxTilemap.arrayToCSV(data,20), tileset, 32, 32);
-			//level.loadMap(new testMap,tileset,8,8);
 			level.loadMap(new levelMap,tileset,8,8);
-			//level.loadMap(new tallMap,tileset,8,8);
 			add(level);
-			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);//640, 480);
+			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			FlxG.camera.bounds = FlxG.worldBounds;
-			//FlxG.worldBounds = level.getBounds();
-			//FlxG.camera.setBounds(0,0,level.width,level.height,true);
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -306,38 +286,53 @@ package {
 					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
 					cannon.angle = 0;
 					cannonGroup.add(cannon);
+					
+					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
+					cannon.facing = FlxObject.DOWN;
 				}
 			}
 			add(cannonGroup);
+			add(cannonArmBaseGroup);
 			
 			// Bodies
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
-			//for (i = BODY_MIN; i <= BODY_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
-				if (bodyArray) {
-					for (j= 0; j < bodyArray.length; j++) {
-						level.setTileByIndex(bodyArray[j],0);
-						var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
-
-						var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-						bodyTargetAngle = body.angle;
-						setGravity(body,FlxObject.DOWN,true);
-						bodyGroup.add(body);
-						var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
-						bodyGearGroup.add(bodyGear);
-						// the positioning should be based on angle too
-						var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
-						bodyHead.y -= bodyHead.height;
-						bodyHeadGroup.add(bodyHead);
-					}
+			level.setTileProperties(i,FlxObject.NONE);
+			var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
+			if (bodyArray) {
+				for (j= 0; j < bodyArray.length; j++) {
+					level.setTileByIndex(bodyArray[j],0);
+					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
+					
+					var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
+					bodyTargetAngle = body.angle;
+					//setGravity(body,FlxObject.DOWN,true);
+					bodyGroup.add(body);
+					var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+					bodyGearGroup.add(bodyGear);
+					// the positioning should be based on angle too
+					var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
+					bodyHead.y -= bodyHead.height;
+					bodyHeadGroup.add(bodyHead);
+					
+					bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+					body.facing = FlxObject.DOWN;
+					
+					var theta:Number = (body.angle-90)*Math.PI/180.0;
+					
+					bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+					bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+					bodyHead.angle = body.angle;
+					
+					bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+					bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 				}
-			//}			
+			}
 			add(bodyGroup);
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
+			add(bodyArmBaseGroup);
 			
 			// Buttons
 			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
@@ -361,23 +356,7 @@ package {
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
 						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						/*button.addAnimation("up inactive",[0]);
-						button.addAnimation("down",[1]);
-						button.addAnimation("up state A",[2]);
-						button.addAnimation("up state B",[3]);
-						button.addAnimation("up state C",[4]);
-						button.addAnimation("up activate",[5]);
-						button.addAnimation("up open door",[6]);*/
 						button.frame = BUTTON_INIT;
-						
-						/*
-						// Decide button angle
-						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
-						if (buttonGaugeNumber == 0) {button.angle = 90; button.x -= 14; button.y += 14;}
-						else if (buttonGaugeNumber == 1) {button.angle = 180;}
-						else if (buttonGaugeNumber == 2) {button.angle = 270; button.x -= 10; button.y += 14;}
-						else if (buttonGaugeNumber == 3) {button.y += 3;}
-						*/
 						
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
@@ -414,45 +393,13 @@ package {
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						door.addAnimation("closed",[0]);
 						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
-						//door.play("open");
+						door.play("closed");
 						
 						doorGroup.add(door);
 					}
 				}
 			}
 			add(doorGroup);
-			
-			/*
-			// Flaps
-			for (i = FLAP_MIN; i <= FLAP_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var flapArray:Array = level.getTileInstances(i);
-				if (flapArray) {
-					for (j = 0; j < flapArray.length; j++) {
-						level.setTileByIndex(flapArray[j],0);
-						var flapPoint:FlxPoint = pointForTile(flapArray[j],level);
-						
-						// Decide flap graphic
-						var flapSheet:Class = flapHSheet;
-						var flapNumber:Number = (i-FLAP_MIN)%2;
-						if      (flapNumber == 0) {flapSheet = flapVSheet; w = 16; h = 96;}
-						else if (flapNumber == 1) {flapSheet = flapHSheet; w = 96; h = 16;}
-						
-						var flap:FlxSprite = new FlxSprite(flapPoint.x,flapPoint.y);
-						flap.immovable = true;
-						flap.loadGraphic(flapSheet,true,false,w,h,true);
-						flap.addAnimation("close",[11,10,9,8,7,6,5,4,3,2,2,2,2,2,2,2,2,2,2,2,2,1],22,false);
-						flap.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
-						flap.addAnimation("closed",[0]);
-						flap.addAnimation("opened",[11]);
-						flap.play("closed");
-						
-						flapGroup.add(flap);
-					}
-				}
-			}
-			add(flapGroup);
-			*/
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -468,6 +415,10 @@ package {
 			}
 			add(arms);
 			
+			// marker line
+			markerLine.makeGraphic(level.width,level.height,0x00000000);
+			add(markerLine);
+			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
 			hand.addAnimation("crawl right",[0,1,2,3,4,5,6],22,true);
@@ -476,8 +427,8 @@ package {
 			hand.addAnimation("idle left", [13,13,13,13,13,13,13,12,11,11,11,11,11,11,12],10,true);
 			hand.addAnimation("idle body right", [21,21,21,21,21,21,21,22,23,23,23,23,23,23,22],10,true);
 			hand.addAnimation("idle body left", [25,25,25,25,25,25,25,26,27,27,27,27,27,27,26],10,true);
-			hand.addAnimation("fall right",[28,29],22,false);
-			hand.addAnimation("fall left",[33,34],22,false);
+			hand.addAnimation("fall right",[29]);//[28,29],22,false);
+			hand.addAnimation("fall left",[33]);//[33,34],22,false);
 			hand.addAnimation("extend right",[35,36],22,false);
 			hand.addAnimation("extend left",[40,41],22,false);
 			handDir = FlxObject.RIGHT;
@@ -501,7 +452,7 @@ package {
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
-			electricity.addAnimation("electricute",[1,2,3],22,true);
+			electricity.addAnimation("electricute",[1,2,3,4,5,6,7],22,true);
 			electricity.addAnimation("stop",[0]);
 			add(electricity);
 			
@@ -515,6 +466,7 @@ package {
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			handTouching = hand.touching;
 			rad = 0;
 			
 			arrow = new FlxSprite();
@@ -522,20 +474,19 @@ package {
 			arrow.visible = false;
 			add(arrow);
 			
-			// marker line
-			markerLine.makeGraphic(level.width,level.height,0x00000000);
-			add(markerLine);
-			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
-			
 			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 			text.scrollFactor = new FlxPoint(0,0);
 			add(text);
+			
+			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 		}
 		
 		override public function update():void {
+			
+			Registry.update();
+			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
-				//Registry.music.kill();
 				FlxG.switchState(new LevelSelect);
 			}
 			
@@ -544,53 +495,29 @@ package {
 				goToNextLevel();
 			}
 			
-			/*
-			// music -- this should probably be moved to the registry if we want to do layering
-			// another option would be to assign each level a song and prompt a new one for a new area (no registry necessary), something like this, but with each song specified by the level
-			if (SOUND_ON) {
-				//FlxG.playMusic(musicBackgroundB,1.0);
-				
-				//musicBackgroundSoundB.play();
-				musicBackgroundSoundA.play();
-				
-				if (FlxG.keys.A) {
-					musicBackgroundSoundB.volume -= 0.22;
-				} else {musicBackgroundSoundB.volume += 0.022;}
-				if (FlxG.keys.B) {
-					musicBackgroundSoundA.volume -= 0.22;
-				} else {musicBackgroundSoundA.volume += 0.22;}
-				
+			if (FlxG.keys.justPressed("DOWN") && controlDirs.indexOf(FlxObject.DOWN) == -1) {
+				controlDirs.push(FlxObject.DOWN);
 			}
-			*/
-			if (SOUND_ON) {
-				
-				//FlxG.playMusic(Registry.musicBackgroundA);
-				Registry.music.play();
+			if (FlxG.keys.justPressed("UP") && controlDirs.indexOf(FlxObject.UP) == -1) {
+				controlDirs.push(FlxObject.UP);
 			}
-			
-			
-			if (FlxG.keys.justPressed("LEFT")) {
-				controlDirs |= FlxObject.LEFT;
-				if (playerIsPressing(FlxObject.RIGHT)) {
-					controlDirs ^= FlxObject.RIGHT;
-				}
-			} else if (FlxG.keys.justPressed("RIGHT")) {
-				controlDirs |= FlxObject.RIGHT;
-				if (playerIsPressing(FlxObject.LEFT)) {
-					controlDirs ^= FlxObject.LEFT;
-				}
+			if (FlxG.keys.justPressed("RIGHT") && controlDirs.indexOf(FlxObject.RIGHT) == -1) {
+				controlDirs.push(FlxObject.RIGHT);
 			}
-			if (FlxG.keys.justReleased("LEFT") && playerIsPressing(FlxObject.LEFT)) {
-				controlDirs ^= FlxObject.LEFT;
-				if (FlxG.keys.RIGHT) {
-					controlDirs |= FlxObject.RIGHT;
-				}
+			if (FlxG.keys.justPressed("LEFT") && controlDirs.indexOf(FlxObject.LEFT) == -1) {
+				controlDirs.push(FlxObject.LEFT);
 			}
-			if (FlxG.keys.justReleased("RIGHT") && playerIsPressing(FlxObject.RIGHT)) {
-				controlDirs ^= FlxObject.RIGHT;
-				if (FlxG.keys.LEFT) {
-					controlDirs |= FlxObject.LEFT;
-				}
+			if (FlxG.keys.justReleased("DOWN")) {
+				controlDirsRemove(FlxObject.DOWN);
+			}
+			if (FlxG.keys.justReleased("UP")) {
+				controlDirsRemove(FlxObject.UP);
+			}
+			if (FlxG.keys.justReleased("RIGHT")) {
+				controlDirsRemove(FlxObject.RIGHT);
+			}
+			if (FlxG.keys.justReleased("LEFT")) {
+				controlDirsRemove(FlxObject.LEFT);
 			}
 			
 			//time += FlxG.elapsed;
@@ -598,17 +525,51 @@ package {
 			var body:FlxSprite;
 			var bodyGear:FlxSprite;
 			var bodyHead:FlxSprite;
+			var armBase:FlxSprite;
+
+			var enteringCannon:Boolean = false;
+			var enteringBody:Boolean = false;
+			
+			if (!bodyMode && !cannonMode) {
+				curBody = handOverlapsBody();
+				curCannon = handOverlapsCannon();
+			
+				if (curBody < uint.MAX_VALUE && curCannon < uint.MAX_VALUE) {
+					var closeBody:FlxSprite = bodyGroup.members[curBody];
+					var closeCannon:FlxSprite = cannonGroup.members[curCannon];
+					var handToBody:Number = Math.pow(hand.x + hand.width/2.0 - closeBody.x - closeBody.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeBody.y - closeBody.height/2.0,2);
+					var handToCannon:Number = Math.pow(hand.x + hand.width/2.0 - closeCannon.x - closeCannon.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - closeCannon.y - closeCannon.height/2.0,2);
+					if (handToCannon < handToBody) {enteringCannon = true;}
+					else {enteringBody = true;}
+				} else if (curBody < uint.MAX_VALUE) {enteringBody = true;}
+				else if (curCannon < uint.MAX_VALUE) {enteringCannon = true;}
+			
+			}
+			
+			if (enteringBody || bodyMode) {
+				body = bodyGroup.members[curBody];
+				bodyGear = bodyGearGroup.members[curBody];
+				bodyHead = bodyHeadGroup.members[curBody];
+				armBase = bodyArmBaseGroup.members[curBody];
+			} else if (enteringCannon || cannonMode) {
+				body = cannonGroup.members[curCannon];
+				armBase = cannonArmBaseGroup.members[curCannon];
+			}
+			
+			/*
 			if (bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
+				armBase = bodyArmBaseGroup.members[curBody];
 			} if (cannonMode) {
 				body = cannonGroup.members[curCannon];
-			}
+				armBase = cannonArmBaseGroup.members[curCannon];
+			}*/
 			
 			// marker line
 			markerLine.fill(0x00000000);
-			if ((bodyMode && !handOut && !handIn) || cannonMode) {
+			if (bodyMode && !handOut && !handIn) {
 				rad = arrow.angle*Math.PI/180;
 				var startX:Number = hand.x+hand.width/2.0;
 				var startY:Number = hand.y+hand.height/2.0;
@@ -617,6 +578,13 @@ package {
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 				
 				// make objects glow
+			} else if (cannonMode) {
+				rad = arrow.angle*Math.PI/180;
+				startX = hand.x+hand.width/2.0;
+				startY = hand.y+hand.height/2.0;
+				endX = startX + GRAPPLE_LENGTH * Math.cos(rad) / 4.0;
+				endY = startY + GRAPPLE_LENGTH * Math.sin(rad) / 4.0;
+				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
 			
 			// hint system
@@ -628,47 +596,39 @@ package {
 			hint.play("idle");
 			
 			// marker glow (for hand overlapping)
-			if (!bodyMode && !cannonMode) {
-				var handOverlaps:Boolean = false;
+			hand.color = 0xffffff;
+			for (var mmm:String in bodyGroup.members) {
+				bodyGroup.members[mmm].color = 0xffffff;
+				bodyArmBaseGroup.members[mmm].color = 0xffffff;
+				bodyGearGroup.members[mmm].color = 0xffffff;
+				bodyHeadGroup.members[mmm].color = 0xffffff;
+			}
+			for (mmm in cannonGroup.members) {
+				cannonGroup.members[mmm].color = 0xffffff;
+				cannonArmBaseGroup.members[mmm].color = 0xffffff;
+			}
+			if (!cannonMode && !bodyMode) {
 				
-				var bodyOverlapId:uint = handOverlapsBody();
-				if (bodyOverlapId < uint.MAX_VALUE) {
-					handOverlaps = true;
-					bodyGroup.members[bodyOverlapId].color = 0xff8000;
-				} else {
-					for (var mmm:String in bodyGroup.members) {
-						bodyGroup.members[mmm].color = 0xffffff;
-					}
-				}
-				
-				var cannonOverlapId:uint = handOverlapsCannon();
-				if (cannonOverlapId < uint.MAX_VALUE) {
-					handOverlaps = true;
-					cannonGroup.members[cannonOverlapId].color = 0xff8000;
-				} else {
-					for (mmm in cannonGroup.members) {
-						cannonGroup.members[mmm].color = 0xffffff;
-					}
-				}
-				
-				if (handOverlaps) {
-					hand.color = 0xff8000;
+				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("thinking up");
 				}
-				else {hand.color = 0xffffff;}
+				
+				if (enteringBody) {
+					hand.color = 0xff0000;
+					body.color = 0xff0000;
+					armBase.color = 0xff0000;
+					bodyGear.color = 0xff0000;
+					bodyHead.color = 0xff0000;
+				} else if (enteringCannon) {
+					hand.color = 0xff0000;
+					body.color = 0xff0000;
+					armBase.color = 0xff0000;
+				}
 			} else {
-				for (mmm in cannonGroup.members) {
-					cannonGroup.members[mmm].color = 0xffffff;
+				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+					hint.play("thinking space");
 				}
-				for (mmm in bodyGroup.members) {
-					bodyGroup.members[mmm].color = 0xffffff;
-				}
-				hand.color = 0xffffff;
 			}
-			if (cannonMode || (bodyMode && !handOut && !handIn)){
-				hint.play("thinking space");
-			}
-			
 			
 			// to time the fall for the different falling rot, really belongs with anim stuff
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
@@ -683,36 +643,27 @@ package {
 				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
 				bodyHead.angle = body.angle;
 				
-				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/4.0);
-				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/4.0);
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
+			}
+			if (bodyMode || cannonMode) {
+				if (!handOut) {
+					armBase.angle = hand.angle - 180;
+				}
+				armBase.x = body.x;
+				armBase.y = body.y;
 			}
 			
 			// Press Buttons!
-			// right now, implemented buttons that go back to original state after pressed,
-			// this can change, this was just easier (I think)
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
-			//for (var mm:String in buttonGroup.members) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
-				//for (var m:String in blockGroup.members) {
-					//var block:FlxSprite = blockGroup.members[m];
-					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-						button.frame = BUTTON_PRESSED;
-						/*if (buttonStateArray.indexOf(true) == -1) {
-							if (Registry.iteration == 0) {
-								Registry.firstButton.push(mm);
-							} else if (Registry.iteration == 1) {
-								Registry.secondButton.push(mm);
-							}
-						}*/
-						buttonStateArray[mm] = true;
-						buttonReactionArray[mm]();
-					}
-				//} else if (!hand.overlaps(button)) {
-					//button.play("up");
-					//buttonStateArray[mm] = false;
-				//}
+				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+					button.frame = BUTTON_PRESSED;
+					buttonStateArray[mm] = true;
+					buttonReactionArray[mm]();
+				}
 			}
 			
 			// Bring midground to life
@@ -720,7 +671,7 @@ package {
 				
 				// Steam
 				
-				// Spin Gears // should eventually make them accel in/out of spinning
+				// Spin Gears // should eventually make them accel into spin
 				var gear:FlxSprite;
 				for (var jjj:String in gearInGroup.members) {
 					gear = gearInGroup.members[jjj];
@@ -739,7 +690,7 @@ package {
 				
 				// Something's not quite right here...
 				// The hand jumped
-				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
+				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && hand.touching && hand.facing != FlxObject.DOWN) {
 					jumpSound.play();
 				} else if ((!bodyMode && !cannonMode) && hand.touching) {
 					jumpSound.stop();
@@ -771,9 +722,6 @@ package {
 				else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
-					/*if (FlxG.keys.justReleased("SPACE") || FlxG.keys.justPressed("SPACE")) {
-						grappleExtendSound.stop();
-					}*/
 					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
 						grappleExtendSound.play();
 					} else {
@@ -795,16 +743,16 @@ package {
 			// The hand is not attached to a body
 			if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
-				if (FlxG.keys.justPressed("DOWN")) {
-					bodyTargetAngle = hand.angle;
+				if (FlxG.keys.justPressed(BODY_KEY)) {
+					//bodyTargetAngle = hand.angle;
 				}
 				// The hand is crawling along a flat surface
 				if (hand.touching) {
 					// Set the Angle of the hand
 					if (hand.facing == FlxObject.DOWN) {hand.angle = 0;}
-					else if (hand.facing == FlxObject.LEFT) {hand.angle = 90;}
-					else if (hand.facing == FlxObject.UP) {hand.angle = 180;}
-					else if (hand.facing == FlxObject.RIGHT) {hand.angle = 270;}
+					else if (hand.facing == FlxObject.LEFT && !lastTouchedWood) {hand.angle = 90;}
+					else if (hand.facing == FlxObject.UP && !lastTouchedWood) {hand.angle = 180;}
+					else if (hand.facing == FlxObject.RIGHT && !lastTouchedWood) {hand.angle = 270;}
 					// The hand is changing direction
 					// (because the sprite's not ambidexterous)
 					if (playerIsPressing(FlxObject.LEFT)) {handDir = FlxObject.LEFT;}
@@ -831,13 +779,14 @@ package {
 						}
 					}
 					// The hand is about to jump from a flat surface
-					if (FlxG.keys.justPressed("UP")) {
+					if (FlxG.keys.justPressed(ACTION_KEY)) {
 						if (handDir == FlxObject.LEFT) {hand.play("fall left");} //<- placeholder {hand.play("jump left");}
 						else if (handDir == FlxObject.RIGHT) {hand.play("fall right");} //<- placeholder {hand.play("jump right");}
 					}
 				}
 				// The hand is rounding a convex corner
-				else if (!handFalling) {
+				else if (!handFalling) { // (!lastTouchedWood)
+					
 					if (handDir == FlxObject.LEFT) {
 						/*if ((hand.facing == FlxObject.UP && hand.angle > 90) ||
 						(hand.facing == FlxObject.DOWN && hand.angle > -90) || <- this line's not working
@@ -858,6 +807,19 @@ package {
 						//}
 					}
 				}
+				
+				/*
+				else if (!onGround && lastTouchedWood) {
+					if (handDir == FlxObject.LEFT) {
+						hand.play("fall left"); //<- placeholder {hand.play("jump left");
+						//}
+					} else if (handDir == FlxObject.RIGHT) {
+						hand.play("fall right"); //<- placeholder {hand.play("jump right");
+						//}
+					}
+				}
+				*/
+				
 				/*
 				// The hand ran off a wooden platform
 				else if (lastTouchedWood) {
@@ -870,7 +832,6 @@ package {
 				// The hand is falling (with style!)
 				else {
 					
-					
 					if (hand.angle > 0 && hand.angle < 360) {
 						if (handDir == FlxObject.LEFT) {
 							hand.play("fall left");
@@ -880,12 +841,12 @@ package {
 							hand.angle -= 10;
 						}
 					}
-					else if (timeFallen > 0.44) {//if (timeFallen > 0.66) {
+					else if (timeFallen > 0.44) {
 						
 						var vSquared:Number = Math.pow(hand.velocity.x,2) + Math.pow(hand.velocity.y,2);
 						
-						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}//{hand.angle += 10;}
-						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}//{hand.angle -= 10;}
+						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}
+						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}
 					}
 				}
 			}
@@ -906,7 +867,7 @@ package {
 					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 					else {hand.play("idle body right");}
 					// The hand is about to dismount 
-					if (FlxG.keys.justPressed("DOWN")) {
+					if (FlxG.keys.justPressed(BODY_KEY)) {
 						// play falling animations?
 					}
 					// Keep arms hidden
@@ -959,7 +920,7 @@ package {
 						}
 					}
 					// The hand is retracting without having touched anything
-					if (!FlxG.keys.SPACE && !hand.touching) {
+					if (/*!FlxG.keys.SPACE*/handIn && !hand.touching) {
 						
 					}
 				}
@@ -970,32 +931,45 @@ package {
 				electricity.angle = hand.angle;
 				electricity.x = hand.x;
 				electricity.y = hand.y;
+				electricity.alpha += electricityNum*0.022;
+				if (electricity.alpha <= 0.5 || electricity.alpha >= 1) {
+					electricityNum *= -1;
+				}
 			} else {
 				electricity.play("stop");
+				electricity.alpha = 1;
 			}
 			
 			/* End Animations */
 			
-			/*
-			if (bodyMode && !handOut) {
-				setGravity(body,body.facing,true);
-			} else if (bodyMode) {
-				setGravity(body,body.facing,false);
-			}
-			*/
-			
 			if (bodyMode || cannonMode) {
+				
+				// Fixes some bugs with grappling, maybe also redundant?
+				if (!hand.overlaps(body)) {
+					body.allowCollisions = FlxObject.NONE;
+				} else {
+					body.allowCollisions = FlxObject.ANY;
+					if (body.justTouched(FlxObject.ANY)) {
+						body.x = hand.x;
+						body.y = hand.y;
+					}
+					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0) {
+						hand.x = body.x;
+						hand.y = body.y;
+					}
+				}
+				
 				body.velocity.x = 0;
 				body.velocity.y = 0;
 				hand.velocity.x = 0;
 				hand.velocity.y = 0;
-				var diffX:Number = hand.x-body.x;
-				var diffY:Number = hand.y-body.y;
+				var diffX:Number = hand.x + hand.width/2.0 - body.x - body.width/2.0;
+				var diffY:Number = hand.y + hand.width/2.0 - body.y - body.height/2.0;
 				if (handOut) {
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
 					//rad = arrow.angle*Math.PI/180;
-					if (hand.touching <= 0 && Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) < GRAPPLE_LENGTH) {
+					if (hand.touching <= 0 && Math.pow(diffX, 2) + Math.pow(diffY, 2) < Math.pow(GRAPPLE_LENGTH,2)) {
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 					} else {
@@ -1012,7 +986,8 @@ package {
 						hand.velocity.x = -GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = -GRAPPLE_SPEED * Math.sin(rad);
 						arrow.angle = shootAngle;
-						handReturnedToBody = true;
+						//handReturnedToBody = true;
+						
 					}
 					if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(rad)) &&
 						Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(rad))) {
@@ -1028,10 +1003,10 @@ package {
 						if (hand.touching == 0) {
 							hand.x = body.x;
 							hand.y = body.y;
-						} else {
+						}/* else {
 							body.x = hand.x;
 							body.y = hand.y;
-						}
+						}*/
 						hand.allowCollisions = FlxObject.ANY;
 						//showArrow();
 					}
@@ -1039,21 +1014,28 @@ package {
 					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
+						
+						if (Registry.neverAimedBodyOrCannon) {
+							Registry.neverAimedBodyOrCannon = false;
+						}
+						
 					} if (playerIsPressing(FlxObject.RIGHT)) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
+						
+						if (Registry.neverAimedBodyOrCannon) {
+							Registry.neverAimedBodyOrCannon = false;
+						}
 					}
-					if (FlxG.keys.justPressed("DOWN")) {
+					if (FlxG.keys.justPressed(BODY_KEY)) {
 						bodyMode = false;
 						cannonMode = false;
-						//arrow.visible = false;
 						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed("SPACE") && bodyMode) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
-						//arrow.visible = false;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						hand.allowCollisions = 0;
@@ -1067,41 +1049,70 @@ package {
 						} else if (hand.velocity.y < 0) {
 							hand.allowCollisions |= FlxObject.UP;
 						}
-					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
+						
+						if (Registry.neverFiredBodyOrCannon) {
+							Registry.neverFiredBodyOrCannon = false;
+						}
+						
+					} else if (FlxG.keys.justPressed(ACTION_KEY) && cannonMode) {
 						cannonMode = false;
-						rad = Math.PI*arrow.angle/180;
-						hand.velocity.x = CANNON_VEL * Math.cos(rad);
-						hand.velocity.y = CANNON_VEL * Math.sin(rad);
+						//rad = Math.PI*arrow.angle/180;
+						
 						setGravity(hand,FlxObject.DOWN,true);
+						hand.velocity.x = CANNON_VEL * Math.cos(rad);
+						hand.velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
+						
+						if (Registry.neverFiredBodyOrCannon) {
+							Registry.neverFiredBodyOrCannon = false;
+						}
+						
 					}
 				}
 			} else {
-				var hoc:uint = handOverlapsCannon();
-				var hob:uint = handOverlapsBody();
-				if (FlxG.keys.justPressed("DOWN")) {
-					if (hoc < uint.MAX_VALUE) {
-						curCannon = hoc;
-						body = cannonGroup.members[curCannon];
-						cannonMode = true;
+				if (FlxG.keys.justPressed(BODY_KEY)) {
+					if (enteringBody) {
+						
+						bodyMode = true;
+						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
 						hand.acceleration.x = 0;
 						hand.acceleration.y = 0;
 						hand.x = body.x;
 						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						
 						showArrow();
-					} else if (hob < uint.MAX_VALUE) {
-					curBody = hob;
-					body = bodyGroup.members[curBody];
-					bodyGear = bodyGearGroup.members[curBody];
-					bodyMode = true;
-					hand.velocity.x = 0;
-					hand.velocity.y = 0;
-					hand.acceleration.x = 0;
-					hand.acceleration.y = 0;
-					hand.x = body.x;
-					hand.y = body.y;
-					showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
+						
+					} else if (enteringCannon) {
+						
+						cannonMode = true;
+						lastTouchedWood = false;
+						handFalling = false;
+						onGround = true;
+						
+						hand.velocity.x = 0;
+						hand.velocity.y = 0;
+						hand.acceleration.x = 0;
+						hand.acceleration.y = 0;
+						hand.x = body.x;
+						hand.y = body.y;
+						
+						bodyTargetAngle = body.angle;
+						hand.facing = body.facing;
+						
+						showArrow();
+						
+						if (Registry.neverEnteredBodyOrCannon) {
+							Registry.neverEnteredBodyOrCannon = false;
+						}
+						
 					}
 				} else {
 					if (onGround) {
@@ -1130,7 +1141,7 @@ package {
 							} else if (handIsFacing(FlxObject.LEFT)) {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.justPressed("UP")) {
+						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
 							if (hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
@@ -1162,6 +1173,7 @@ package {
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
+			handTouching = hand.touching;
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate
@@ -1218,6 +1230,7 @@ package {
 					hand.maxVelocity.y = MAX_MOVE_VEL;
 				}
 			}
+			FlxG.log("tB " + hand.touching);
 		}
 		
 		public function levelHandCallback(a:FlxObject, b:FlxObject):void {
@@ -1225,12 +1238,18 @@ package {
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			if (spr == hand) {
+			FlxG.log("tC " + spr.touching);
+			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
-				fixGravity(spr);
+				if (getHandTouching() != spr.facing) {
+					FlxG.log(getHandTouching() + " " + spr.facing);
+					fixGravity(spr);
+				}
 			} else if (spr in bodyGroup) {
-				fixGravity(spr);
+				if (spr.touching != spr.facing) {
+					fixGravity(spr);
+				}
 			}
 		}
 		
@@ -1238,40 +1257,50 @@ package {
 			if (spr == hand) {
 				handWoodFlag = tile.mapIndex;
 				lastTouchedWood = true;
+				
+				if (getHandTouching() != spr.facing && onGround && !bodyMode) {fixGravity(spr);}
 			}
 		}
 		
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
-				fixGravity(spr2);
+				if (getHandTouching() != spr2.facing) {
+					fixGravity(spr2);
+				}
 				lastTouchedWood = false;
 			} else {
 				handMetalFlag = 1;
-				fixGravity(spr1);
+				if (getHandTouching() != spr1.facing) {
+					fixGravity(spr1);
+				}
 				lastTouchedWood = false;
 			}
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
-			if ((spr.touching & spr.facing) >= spr.facing) {
-				if (spr.justTouched(FlxObject.DOWN)) {
+			if ((getHandTouching() & spr.facing) >= spr.facing) {
+				if ((getHandTouching() & FlxObject.DOWN) > 0) {
+					FlxG.log("eee1");
 					setGravity(spr, FlxObject.DOWN, false);
-				} else if (spr.justTouched(FlxObject.UP)) {
+				} if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, false);
-				} else if (spr.justTouched(FlxObject.LEFT)) {
+				} if ((getHandTouching() & FlxObject.LEFT) > 0) {
+					FlxG.log("eee2");
 					setGravity(spr, FlxObject.LEFT, false);
-				} else if (spr.justTouched(FlxObject.RIGHT)) {
+				} if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {
-				if (spr.isTouching(FlxObject.DOWN)) {
+				if ((getHandTouching() & FlxObject.DOWN) > 0) {
+					FlxG.log("eee3");
 					setGravity(spr, FlxObject.DOWN, true);
-				} else if (spr.isTouching(FlxObject.UP)) {
+				} else if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, true);
-				} else if (spr.isTouching(FlxObject.LEFT)) {
+				} else if ((getHandTouching() & FlxObject.LEFT) > 0) {
+					FlxG.log("eee4");
 					setGravity(spr, FlxObject.LEFT, true);
-				} else if (spr.isTouching(FlxObject.RIGHT)) {
+				} else if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, true);
 				}
 			}
@@ -1300,22 +1329,8 @@ package {
 			return (hand.facing & dir) > 0;
 		}
 		
+		// I kind of want to nix arrows and bodyTargetAngle etc
 		public function showArrow():void {
-			// PRECONDITION: curBody < uint.MAX_VALUE
-			//arrow.visible = true;
-			//arrow.x = bodyGroup.members[curBody].x;
-			//arrow.y = bodyGroup.members[curBody].y;
-			/*
-			if (handIsFacing(FlxObject.DOWN)) {
-				arrow.angle = -90;
-			} else if (handIsFacing(FlxObject.UP)) {
-				arrow.angle = 90;
-			} else if (handIsFacing(FlxObject.LEFT)) {
-				arrow.angle = 0;
-			} else if (handIsFacing(FlxObject.RIGHT)) {
-				arrow.angle = 180;
-			}
-			*/
 			arrow.angle = bodyTargetAngle - 90;
 			arrowStartAngle = arrow.angle;
 		}
@@ -1325,19 +1340,51 @@ package {
 		}
 		
 		public function handOverlapsBody():uint {
+			var hasOverlapped:Boolean = false;
+			var b_max:int;
+			var b_distSq_Min:Number;
 			for (var b:int = 0; b < bodyGroup.length; b++) {
-				if (hand.overlaps(bodyGroup.members[b])) {
-					return(b);
+				var b_body:FlxSprite = bodyGroup.members[b];
+				if (hand.overlaps(b_body)) {
+					//return(b);
+					var b_distSq:Number = Math.pow(hand.x + hand.width/2.0 - b_body.x - b_body.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - b_body.y - b_body.height/2.0,2);
+					if (!hasOverlapped) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+						hasOverlapped = true;
+					} else if (b_distSq < b_distSq_Min) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+					}
 				}
+			}
+			if (hasOverlapped) {
+				return(b_max);
 			}
 			return(uint.MAX_VALUE);
 		}
 		
 		public function handOverlapsCannon():uint {
+			var hasOverlapped:Boolean = false;
+			var b_max:int;
+			var b_distSq_Min:Number;
 			for (var b:int = 0; b < cannonGroup.length; b++) {
-				if (hand.overlaps(cannonGroup.members[b])) {
-					return(b);
+				var b_cannon:FlxSprite = cannonGroup.members[b];
+				if (hand.overlaps(b_cannon)) {
+					//return(b);
+					var b_distSq:Number = Math.pow(hand.x + hand.width/2.0 - b_cannon.x - b_cannon.width/2.0,2) + Math.pow(hand.y + hand.height/2.0 - b_cannon.y - b_cannon.height/2.0,2);
+					if (!hasOverlapped) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+						hasOverlapped = true;
+					} else if (b_distSq < b_distSq_Min) {
+						b_max = b;
+						b_distSq_Min = b_distSq;
+					}
 				}
+			}
+			if (hasOverlapped) {
+				return(b_max);
 			}
 			return(uint.MAX_VALUE);
 		}
@@ -1351,13 +1398,9 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				if (Registry.levelNum < Registry.levelOrder.length-1) {
-					for (var a:int = 0; a < doorGroup.length; a++) {
-						doorGroup.members[a].play("open");
-					}
-				}/* else {
-					goToNextIteration();
-				}*/
+				for (var a:int = 0; a < doorGroup.length; a++) {
+					doorGroup.members[a].play("open");
+				}
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
@@ -1390,16 +1433,37 @@ package {
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
-			return (controlDirs & dir) == dir;
+			if (dir == FlxObject.LEFT) {
+				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT))) {
+					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
+				} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
+					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
+					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+				} else if (handIsFacing(FlxObject.RIGHT)) {
+					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+				}
+			} else if (dir == FlxObject.RIGHT) {
+				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT))) {
+					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+				} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
+					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
+					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);	
+				} else if (handIsFacing(FlxObject.LEFT)) {
+					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+				}
+			}
+			return false;
 		}
 		
 		public function goToNextLevel():void {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
-			}/* else {
-				goToNextIteration();
-			}*/
+			} else {
+				FlxG.switchState(new EndState());
+			}
 		}
 		
 		/*public function goToNextIteration():void {
@@ -1407,5 +1471,22 @@ package {
 			Registry.levelNum = 0;
 			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
 		}*/
+		
+		public function controlDirsRemove(dir:uint):void {
+			var cD:int = controlDirs.indexOf(dir);
+			if (cD != -1) {
+				controlDirs.splice(cD, 1);
+			}
+		}
+		
+		public function getHandTouching():uint {
+			if (hand.touching == handTouching) {
+				return handTouching;
+			}
+			if (handTouching != 0 && (hand.touching & handTouching) >= handTouching) {
+				return handTouching;
+			}
+			return hand.touching;
+		}
 	}
 }
