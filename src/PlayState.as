@@ -27,7 +27,7 @@ package {
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
-		public const SOUND_ON:Boolean = true;
+		public const SOUND_ON:Boolean = false;
 		
 		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
@@ -185,7 +185,7 @@ package {
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
 			/* Background */
-			//dbg = 0;
+			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			/* Midground */
@@ -385,15 +385,16 @@ package {
 						// Decide door graphic
 						var doorSheet:Class;
 						var doorNumber:Number = (i-DOOR_MIN)%2;
-						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 96;}
-						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 96; h = 16;}
+						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 64;}
+						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 64; h = 16;}
 						
 						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
-						door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11],22,false);
-						door.play("closed");
+						//door.addAnimation("closed",[0]);
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12,13],22,false);
+						//door.play("closed");
+						door.frame = 18;
 						
 						doorGroup.add(door);
 					}
@@ -483,7 +484,7 @@ package {
 		
 		override public function update():void {
 			
-			Registry.update();
+			if (SOUND_ON) {Registry.update();}
 			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE")) {
@@ -663,6 +664,11 @@ package {
 					button.frame = BUTTON_PRESSED;
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
+					for (var bb:String in doorGroup.members) {
+						var door:FlxSprite = doorGroup.members[bb];
+						if (door.frame == 18) {door.frame = 19;}
+						else if (door.frame == 19) {door.frame = 20;}
+					}
 				}
 			}
 			
@@ -952,8 +958,9 @@ package {
 					if (body.justTouched(FlxObject.ANY)) {
 						body.x = hand.x;
 						body.y = hand.y;
+						setGravity(body,hand.facing,true);
 					}
-					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0) {
+					if (hand.velocity.x == 0 && hand.velocity.y == 0 && body.velocity.x == 0 && body.velocity.y == 0 && !hand.touching) {
 						hand.x = body.x;
 						hand.y = body.y;
 					}
@@ -1162,7 +1169,7 @@ package {
 			super.update();
 			
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
-				if (doorGroup.members[a].frame == 11) {
+				if (doorGroup.members[a].frame == 13) {
 					doorGroup.members[a].kill();
 				}
 			}
