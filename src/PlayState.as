@@ -44,14 +44,18 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		
+		//button animation frames
 		public const BUTTON_PRESSED:uint = 0;
 		public const BUTTON_INIT:uint = 1;
+		
+		public const ACTION_KEY:String = "X";
+		public const BODY_KEY:String = "Z";
 		
 		public var reinvigorated:Boolean;
 		
 		public var dbg:int;
 		public var rad:Number;
-		public var controlDirs:uint;
+		public var controlDirs:Array;
 		
 		public var electricityNum:int = 1;
 		
@@ -84,6 +88,7 @@ package {
 		public var handMetalFlag:uint;
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
+		public var handTouching:uint;
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
@@ -172,9 +177,10 @@ package {
 		}
 		
 		override public function create():void {
+			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
-			controlDirs = 0;
+			controlDirs = new Array();
 			
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
@@ -461,6 +467,7 @@ package {
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			handTouching = hand.touching;
 			rad = 0;
 			
 			arrow = new FlxSprite();
@@ -489,29 +496,29 @@ package {
 				goToNextLevel();
 			}
 			
-			
-			if (FlxG.keys.justPressed("LEFT")) {
-				controlDirs |= FlxObject.LEFT;
-				if (playerIsPressing(FlxObject.RIGHT)) {
-					controlDirs ^= FlxObject.RIGHT;
-				}
-			} else if (FlxG.keys.justPressed("RIGHT")) {
-				controlDirs |= FlxObject.RIGHT;
-				if (playerIsPressing(FlxObject.LEFT)) {
-					controlDirs ^= FlxObject.LEFT;
-				}
+			if (FlxG.keys.justPressed("DOWN") && controlDirs.indexOf(FlxObject.DOWN) == -1) {
+				controlDirs.push(FlxObject.DOWN);
 			}
-			if (FlxG.keys.justReleased("LEFT") && playerIsPressing(FlxObject.LEFT)) {
-				controlDirs ^= FlxObject.LEFT;
-				if (FlxG.keys.RIGHT) {
-					controlDirs |= FlxObject.RIGHT;
-				}
+			if (FlxG.keys.justPressed("UP") && controlDirs.indexOf(FlxObject.UP) == -1) {
+				controlDirs.push(FlxObject.UP);
 			}
-			if (FlxG.keys.justReleased("RIGHT") && playerIsPressing(FlxObject.RIGHT)) {
-				controlDirs ^= FlxObject.RIGHT;
-				if (FlxG.keys.LEFT) {
-					controlDirs |= FlxObject.LEFT;
-				}
+			if (FlxG.keys.justPressed("RIGHT") && controlDirs.indexOf(FlxObject.RIGHT) == -1) {
+				controlDirs.push(FlxObject.RIGHT);
+			}
+			if (FlxG.keys.justPressed("LEFT") && controlDirs.indexOf(FlxObject.LEFT) == -1) {
+				controlDirs.push(FlxObject.LEFT);
+			}
+			if (FlxG.keys.justReleased("DOWN")) {
+				controlDirsRemove(FlxObject.DOWN);
+			}
+			if (FlxG.keys.justReleased("UP")) {
+				controlDirsRemove(FlxObject.UP);
+			}
+			if (FlxG.keys.justReleased("RIGHT")) {
+				controlDirsRemove(FlxObject.RIGHT);
+			}
+			if (FlxG.keys.justReleased("LEFT")) {
+				controlDirsRemove(FlxObject.LEFT);
 			}
 			
 			//time += FlxG.elapsed;
@@ -689,7 +696,7 @@ package {
 				
 				// Something's not quite right here...
 				// The hand jumped
-				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed("UP") && hand.touching && hand.facing != FlxObject.DOWN) {
+				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && hand.touching && hand.facing != FlxObject.DOWN) {
 					jumpSound.play();
 				} else if ((!bodyMode && !cannonMode) && hand.touching) {
 					jumpSound.stop();
@@ -742,7 +749,7 @@ package {
 			// The hand is not attached to a body
 			if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
-				if (FlxG.keys.justPressed("DOWN")) {
+				if (FlxG.keys.justPressed(BODY_KEY)) {
 					//bodyTargetAngle = hand.angle;
 				}
 				// The hand is crawling along a flat surface
@@ -778,7 +785,7 @@ package {
 						}
 					}
 					// The hand is about to jump from a flat surface
-					if (FlxG.keys.justPressed("UP")) {
+					if (FlxG.keys.justPressed(ACTION_KEY)) {
 						if (handDir == FlxObject.LEFT) {hand.play("fall left");} //<- placeholder {hand.play("jump left");}
 						else if (handDir == FlxObject.RIGHT) {hand.play("fall right");} //<- placeholder {hand.play("jump right");}
 					}
@@ -866,7 +873,7 @@ package {
 					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 					else {hand.play("idle body right");}
 					// The hand is about to dismount 
-					if (FlxG.keys.justPressed("DOWN")) {
+					if (FlxG.keys.justPressed(BODY_KEY)) {
 						// play falling animations?
 					}
 					// Keep arms hidden
@@ -919,7 +926,7 @@ package {
 						}
 					}
 					// The hand is retracting without having touched anything
-					if (!FlxG.keys.SPACE && !hand.touching) {
+					if (/*!FlxG.keys.SPACE*/handIn && !hand.touching) {
 						
 					}
 				}
@@ -1027,13 +1034,13 @@ package {
 							Registry.neverAimedBodyOrCannon = false;
 						}
 					}
-					if (FlxG.keys.justPressed("DOWN")) {
+					if (FlxG.keys.justPressed(BODY_KEY)) {
 						bodyMode = false;
 						cannonMode = false;
 						setGravity(hand, hand.facing, true);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed("SPACE") && bodyMode) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
@@ -1054,7 +1061,7 @@ package {
 							Registry.neverFiredBodyOrCannon = false;
 						}
 						
-					} else if (FlxG.keys.justPressed("SPACE") && cannonMode) {
+					} else if (FlxG.keys.justPressed(ACTION_KEY) && cannonMode) {
 						cannonMode = false;
 						//rad = Math.PI*arrow.angle/180;
 						
@@ -1069,7 +1076,7 @@ package {
 					}
 				}
 			} else {
-				if (FlxG.keys.justPressed("DOWN")) {
+				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
 						
 						bodyMode = true;
@@ -1141,7 +1148,7 @@ package {
 							} else if (handIsFacing(FlxObject.LEFT)) {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.justPressed("UP")) {
+						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
 							if (hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
@@ -1173,6 +1180,7 @@ package {
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
+			handTouching = hand.touching;
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate
@@ -1229,6 +1237,7 @@ package {
 					hand.maxVelocity.y = MAX_MOVE_VEL;
 				}
 			}
+			FlxG.log("tB " + hand.touching);
 		}
 		
 		public function levelHandCallback(a:FlxObject, b:FlxObject):void {
@@ -1236,12 +1245,18 @@ package {
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
+			FlxG.log("tC " + spr.touching);
 			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
-				fixGravity(spr);
+				if (getHandTouching() != spr.facing) {
+					FlxG.log(getHandTouching() + " " + spr.facing);
+					fixGravity(spr);
+				}
 			} else if (spr in bodyGroup) {
-				fixGravity(spr);
+				if (spr.touching != spr.facing) {
+					fixGravity(spr);
+				}
 			}
 		}
 		
@@ -1250,41 +1265,49 @@ package {
 				handWoodFlag = tile.mapIndex;
 				lastTouchedWood = true;
 				
-				if (onGround && !bodyMode) {fixGravity(spr);}
+				if (getHandTouching() != spr.facing && onGround && !bodyMode) {fixGravity(spr);}
 			}
 		}
 		
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
-				fixGravity(spr2);
+				if (getHandTouching() != spr2.facing) {
+					fixGravity(spr2);
+				}
 				lastTouchedWood = false;
 			} else {
 				handMetalFlag = 1;
-				fixGravity(spr1);
+				if (getHandTouching() != spr1.facing) {
+					fixGravity(spr1);
+				}
 				lastTouchedWood = false;
 			}
 		}
 		
 		public function fixGravity(spr:FlxSprite):void {
-			if ((spr.touching & spr.facing) >= spr.facing) {
-				if (spr.justTouched(FlxObject.DOWN)) {
+			if ((getHandTouching() & spr.facing) >= spr.facing) {
+				if ((getHandTouching() & FlxObject.DOWN) > 0) {
+					FlxG.log("eee1");
 					setGravity(spr, FlxObject.DOWN, false);
-				} else if (spr.justTouched(FlxObject.UP)) {
+				} if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, false);
-				} else if (spr.justTouched(FlxObject.LEFT)) {
+				} if ((getHandTouching() & FlxObject.LEFT) > 0) {
+					FlxG.log("eee2");
 					setGravity(spr, FlxObject.LEFT, false);
-				} else if (spr.justTouched(FlxObject.RIGHT)) {
+				} if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {
-				if (spr.isTouching(FlxObject.DOWN)) {
+				if ((getHandTouching() & FlxObject.DOWN) > 0) {
+					FlxG.log("eee3");
 					setGravity(spr, FlxObject.DOWN, true);
-				} else if (spr.isTouching(FlxObject.UP)) {
+				} else if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, true);
-				} else if (spr.isTouching(FlxObject.LEFT)) {
+				} else if ((getHandTouching() & FlxObject.LEFT) > 0) {
+					FlxG.log("eee4");
 					setGravity(spr, FlxObject.LEFT, true);
-				} else if (spr.isTouching(FlxObject.RIGHT)) {
+				} else if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, true);
 				}
 			}
@@ -1382,13 +1405,9 @@ package {
 		
 		public function buttonReaction():void {
 			if (buttonStateArray.indexOf(false) == -1) {
-				if (Registry.levelNum < Registry.levelOrder.length-1) {
-					for (var a:int = 0; a < doorGroup.length; a++) {
-						doorGroup.members[a].play("open");
-					}
-				}/* else {
-					goToNextIteration();
-				}*/
+				for (var a:int = 0; a < doorGroup.length; a++) {
+					doorGroup.members[a].play("open");
+				}
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
@@ -1421,16 +1440,37 @@ package {
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
-			return (controlDirs & dir) == dir;
+			if (dir == FlxObject.LEFT) {
+				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT))) {
+					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
+				} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
+					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
+					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+				} else if (handIsFacing(FlxObject.RIGHT)) {
+					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+				}
+			} else if (dir == FlxObject.RIGHT) {
+				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT))) {
+					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+				} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
+					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
+					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);	
+				} else if (handIsFacing(FlxObject.LEFT)) {
+					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+				}
+			}
+			return false;
 		}
 		
 		public function goToNextLevel():void {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
-			}/* else {
-				goToNextIteration();
-			}*/
+			} else {
+				FlxG.switchState(new EndState());
+			}
 		}
 		
 		/*public function goToNextIteration():void {
@@ -1438,5 +1478,22 @@ package {
 			Registry.levelNum = 0;
 			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
 		}*/
+		
+		public function controlDirsRemove(dir:uint):void {
+			var cD:int = controlDirs.indexOf(dir);
+			if (cD != -1) {
+				controlDirs.splice(cD, 1);
+			}
+		}
+		
+		public function getHandTouching():uint {
+			if (hand.touching == handTouching) {
+				return handTouching;
+			}
+			if (handTouching != 0 && (hand.touching & handTouching) >= handTouching) {
+				return handTouching;
+			}
+			return hand.touching;
+		}
 	}
 }
