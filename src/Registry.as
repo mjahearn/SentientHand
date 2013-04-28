@@ -24,6 +24,9 @@ package {
 		//public static var firstButton:Array = new Array();
 		//public static var secondButton:Array = new Array();
 		
+		public static const SOUND_ON:Boolean = true;
+		public static const DEBUG_ON:Boolean = false;
+		
 		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
 		public static var levelNumPrevious:uint = levelNum;
@@ -34,30 +37,32 @@ package {
 		public static var neverAimedBodyOrCannon:Boolean = true;
 		
 		public static function update():void {
-			
-			//FlxG.log(levelNum);
-			
-			if (stupid && levelNum < soundOrder.length) {
-				stupid = false;
-				Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+			if (SOUND_ON) {
+				
+				//FlxG.log(levelNum);
+				
+				if (stupid && levelNum < soundOrder.length) {
+					stupid = false;
+					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+				}
+				if (levelNum != levelNumPrevious) {
+					dumb = true;
+				}
+				if (dumb) {
+					Registry.music.volume -= 0.0022;
+				}
+				if (Registry.music.volume == 0 && levelNum < soundOrder.length) {
+					dumb = false;
+					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+				}
+				if (!dumb && Registry.music.volume != 1) {
+					Registry.music.volume += 0.0022;
+				}
+				
+				levelNumPrevious = levelNum;
+				
+				Registry.music.play();
 			}
-			if (levelNum != levelNumPrevious) {
-				dumb = true;
-			}
-			if (dumb) {
-				Registry.music.volume -= 0.0022;
-			}
-			if (Registry.music.volume == 0 && levelNum < soundOrder.length) {
-				dumb = false;
-				Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-			}
-			if (!dumb && Registry.music.volume != 1) {
-				Registry.music.volume += 0.0022;
-			}
-			
-			levelNumPrevious = levelNum;
-			
-			Registry.music.play();
 		}
 	}
 }

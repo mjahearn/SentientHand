@@ -27,7 +27,7 @@ package {
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
-		public const SOUND_ON:Boolean = false;
+		//public const SOUND_ON:Boolean = false;
 		
 		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
@@ -171,12 +171,22 @@ package {
 		[Embed("assets/head.png")] public var headSheet:Class;
 		
 		public function PlayState(level:Class,midground:Class,background:Class) {
-			levelMap = level;
-			midgroundMap = midground;
-			backgroundMap = background;
+			
+			//if (Registry.DEBUG_ON) {
+				levelMap = level;
+				midgroundMap = midground;
+				backgroundMap = background;
+			//}
 		}
 		
 		override public function create():void {
+			
+			/*if (!Registry.DEBUG_ON) {
+				levelMap = Registry.levelOrder[Registry.levelNum];
+				midgroundMap = Registry.midgroundMap
+				backgroundMap = Registry.backgroundMap
+			}*/
+			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
@@ -475,19 +485,22 @@ package {
 			arrow.visible = false;
 			add(arrow);
 			
-			var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
-			text.scrollFactor = new FlxPoint(0,0);
-			add(text);
+			if (Registry.DEBUG_ON) {
+				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
+				text.scrollFactor = new FlxPoint(0,0);
+				add(text);
+			}
 			
 			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
 		}
 		
 		override public function update():void {
 			
-			if (SOUND_ON) {Registry.update();}
+			//if (SOUND_ON) {Registry.update();}
+			Registry.update();
 			
 			// escape for debugging (should remove later)
-			if (FlxG.keys.justPressed("ESCAPE")) {
+			if (FlxG.keys.justPressed("ESCAPE") && Registry.DEBUG_ON) {
 				FlxG.switchState(new LevelSelect);
 			}
 			
@@ -692,7 +705,7 @@ package {
 			}
 			
 			/* Begin Audio */
-			if (SOUND_ON) {
+			if (Registry.SOUND_ON) {
 				
 				// Something's not quite right here...
 				// The hand jumped
