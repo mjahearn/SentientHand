@@ -21,6 +21,10 @@ package {
 		public static var dumb:Boolean = false;
 		public static var handRelative:Boolean = false;
 		
+		public static var level:Class;
+		public static var midground:Class;
+		public static var background:Class;
+		
 		//public static var firstButton:Array = new Array();
 		//public static var secondButton:Array = new Array();
 		

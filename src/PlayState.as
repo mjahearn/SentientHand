@@ -170,22 +170,26 @@ package {
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
 		
-		public function PlayState(level:Class,midground:Class,background:Class) {
+		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
 			//if (Registry.DEBUG_ON) {
 				levelMap = level;
 				midgroundMap = midground;
 				backgroundMap = background;
 			//}
-		}
+		}*/
 		
 		override public function create():void {
 			
-			/*if (!Registry.DEBUG_ON) {
-				levelMap = Registry.levelOrder[Registry.levelNum];
-				midgroundMap = Registry.midgroundMap
-				backgroundMap = Registry.backgroundMap
-			}*/
+			if (!Registry.DEBUG_ON) {
+				Registry.level = Registry.levelOrder[Registry.levelNum];
+				Registry.midground = Registry.midgroundMap;
+				Registry.background = Registry.backgroundMap;
+			}
+			
+			levelMap = Registry.level;
+			midgroundMap = Registry.midground;
+			backgroundMap = Registry.background;
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
@@ -1480,7 +1484,7 @@ package {
 		public function goToNextLevel():void {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
-				FlxG.switchState(new PlayState(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
+				FlxG.switchState(new PlayState);//(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
 			} else {
 				FlxG.switchState(new EndState());
 			}
