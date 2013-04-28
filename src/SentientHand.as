@@ -13,13 +13,15 @@ package
 			var startClass:Class;
 			if (Registry.DEBUG_ON) {
 				startClass = LevelSelect;
-				forceDebugger = true;
 			} else {
 				startClass = PlayState;
-				forceDebugger = false;
 			}
+			
 			super(640,480,startClass,1,60,60,true);
-			//if (Registry.DEBUG_ON) {forceDebugger = true;}
+			
+			if (Registry.DEBUG_ON) {
+				forceDebugger = true;
+			}
 		}
 	}
 }

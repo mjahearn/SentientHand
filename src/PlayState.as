@@ -53,6 +53,8 @@ package {
 		
 		public var reinvigorated:Boolean;
 		
+		public var pause:FlxGroup = new FlxGroup();
+		
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
@@ -499,6 +501,15 @@ package {
 		}
 		
 		override public function update():void {
+			
+			//FlxG.log("update");
+			
+			// for pausing
+			if (FlxG.paused) {
+				pause.update();
+				update();
+				//super.update();
+			}
 			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
@@ -1254,7 +1265,15 @@ package {
 					hand.maxVelocity.y = MAX_MOVE_VEL;
 				}
 			}
-			FlxG.log("tB " + hand.touching);
+			//FlxG.log("tB " + hand.touching);
+			
+			
+			// Pause
+			if (FlxG.keys.justPressed("P")) {
+				// should also pause sfx
+				pause = new PauseState(this);
+				FlxG.paused = !FlxG.paused;
+			}
 		}
 		
 		public function levelHandCallback(a:FlxObject, b:FlxObject):void {
@@ -1262,7 +1281,7 @@ package {
 		}
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			FlxG.log("tC " + spr.touching);
+			//FlxG.log("tC " + spr.touching);
 			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
