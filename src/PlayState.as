@@ -1271,6 +1271,7 @@ package {
 			// Pause
 			if (FlxG.keys.justPressed("P")) {
 				// should also pause sfx
+				
 				pause = new PauseState(this);
 				FlxG.paused = !FlxG.paused;
 			}
@@ -1503,6 +1504,7 @@ package {
 		public function goToNextLevel():void {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
+				Registry.level = Registry.levelOrder[Registry.levelNum];
 				FlxG.switchState(new PlayState);//(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
 			} else {
 				FlxG.switchState(new EndState());

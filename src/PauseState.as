@@ -37,7 +37,8 @@ package
 			if (FlxG.keys.justPressed("P")) {
 				
 				FlxG.log("P pressed");
-				text.alive = false;
+				text.visible = false;
+				text.kill();
 				
 				/*
 				playState.remove(text);
@@ -45,6 +46,8 @@ package
 				playState.remove(controls);*/
 				FlxG.paused = !FlxG.paused;
 			}
+			
+			super.update();
 		}
 		
 		public function changeControls():void {
