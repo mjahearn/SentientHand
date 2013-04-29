@@ -10,8 +10,9 @@ package
 		
 		public function PauseState(MaxSize:uint=0)
 		{			
-			Registry.music.pause();
+			//Registry.music.pause();
 			super(MaxSize);
+			refresh();
 		}
 		
 		public function refresh():void {
@@ -24,6 +25,7 @@ package
 			}
 			add(ctlText);
 			add(controls);
+			setAll("scrollFactor",new FlxPoint(0,0));
 		}
 		
 		public function scrap():void {
@@ -32,23 +34,23 @@ package
 			controls.kill();
 		}
 		
-		override public function update():void {
+		/*override public function update():void {
 			
 			if (FlxG.keys.justPressed("P")) {
 				
 				FlxG.log("P pressed");
 				
-				/*
-				playState.remove(text);
-				playState.remove(ctlText);
-				playState.remove(controls);*/
+				
+				//playState.remove(text);
+				//playState.remove(ctlText);
+				//playState.remove(controls);
 				FlxG.paused = !FlxG.paused;
 				
 				scrap();
 			}
 			
 			super.update();
-		}
+		}*/
 		
 		public function changeControls():void {
 			Registry.handRelative = !Registry.handRelative;
