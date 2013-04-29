@@ -7,44 +7,44 @@ package
 		public var controls:FlxButton;
 		public var ctlText:FlxText;
 		public var text:FlxText;
-		public var playState:PlayState;
 		
-		public function PauseState(state:PlayState,MaxSize:uint=0)
+		public function PauseState(MaxSize:uint=0)
 		{			
-			
-			playState = state;
 			Registry.music.pause();
-			
+			super(MaxSize);
+		}
 		
+		public function refresh():void {
 			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0");
-			playState.add(text);
-			/*ctlText = new FlxText(100, 150, 400, "Controls (click to change):");
+			add(text);
+			ctlText = new FlxText(100, 150, 400, "Controls (click to change):");
 			controls = new FlxButton(100, 200, "Cam-Relative", changeControls);
 			if (Registry.handRelative) {
-				controls.label.text = "Hand-Relative";
+			controls.label.text = "Hand-Relative";
 			}
-			playState.add(ctlText);
-			playState.add(controls);
-			*/
-			super(MaxSize);
-			
+			add(ctlText);
+			add(controls);
+		}
+		
+		public function scrap():void {
+			text.kill();
+			ctlText.kill();
+			controls.kill();
 		}
 		
 		override public function update():void {
 			
-			//FlxG.log("paused");
-			
 			if (FlxG.keys.justPressed("P")) {
 				
 				FlxG.log("P pressed");
-				text.visible = false;
-				text.kill();
 				
 				/*
 				playState.remove(text);
 				playState.remove(ctlText);
 				playState.remove(controls);*/
 				FlxG.paused = !FlxG.paused;
+				
+				scrap();
 			}
 			
 			super.update();

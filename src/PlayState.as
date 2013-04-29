@@ -53,7 +53,7 @@ package {
 		
 		public var reinvigorated:Boolean;
 		
-		public var pause:FlxGroup = new FlxGroup();
+		public var pause:PauseState = new PauseState();
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -490,6 +490,9 @@ package {
 			arrow.loadGraphic(arrowSheet);
 			arrow.visible = false;
 			add(arrow);
+			
+			//add(pause);
+			
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -1271,8 +1274,8 @@ package {
 			// Pause
 			if (FlxG.keys.justPressed("P")) {
 				// should also pause sfx
-				
-				pause = new PauseState(this);
+				pause.refresh();
+				add(pause);
 				FlxG.paused = !FlxG.paused;
 			}
 		}
@@ -1287,7 +1290,7 @@ package {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
 				if (getHandTouching() != spr.facing) {
-					FlxG.log(getHandTouching() + " " + spr.facing);
+					//FlxG.log(getHandTouching() + " " + spr.facing);
 					fixGravity(spr);
 				}
 			} else if (spr in bodyGroup) {
@@ -1325,24 +1328,24 @@ package {
 		public function fixGravity(spr:FlxSprite):void {
 			if ((getHandTouching() & spr.facing) >= spr.facing) {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
-					FlxG.log("eee1");
+					//FlxG.log("eee1");
 					setGravity(spr, FlxObject.DOWN, false);
 				} if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, false);
 				} if ((getHandTouching() & FlxObject.LEFT) > 0) {
-					FlxG.log("eee2");
+					//FlxG.log("eee2");
 					setGravity(spr, FlxObject.LEFT, false);
 				} if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
-					FlxG.log("eee3");
+					//FlxG.log("eee3");
 					setGravity(spr, FlxObject.DOWN, true);
 				} else if ((getHandTouching() & FlxObject.UP) > 0) {
 					setGravity(spr, FlxObject.UP, true);
 				} else if ((getHandTouching() & FlxObject.LEFT) > 0) {
-					FlxG.log("eee4");
+					//FlxG.log("eee4");
 					setGravity(spr, FlxObject.LEFT, true);
 				} else if ((getHandTouching() & FlxObject.RIGHT) > 0) {
 					setGravity(spr, FlxObject.RIGHT, true);
