@@ -364,10 +364,10 @@ package {
 						var w:Number;
 						var h:Number;
 						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
-						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 5; h = 32;}
-						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 5;}
-						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x += 3; w = 5; h = 32;}
-						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y += 3; w = 32; h = 5;}
+						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 8; h = 32;}
+						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 8;}
+						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32;}
+						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8;}
 						
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
@@ -657,7 +657,7 @@ package {
 					armBase.color = 0xff0000;
 				}
 			} else {
-				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+				if (Registry.neverFiredBodyOrCannon) {// || Registry.neverAimedBodyOrCannon) {
 					hint.play("thinking space");
 				}
 			}
