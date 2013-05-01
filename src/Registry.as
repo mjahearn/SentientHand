@@ -21,7 +21,7 @@ package {
 		public static var music:FlxSound = new FlxSound();
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
-		public static var handRelative:Boolean = false;
+		public static var handRelative:Boolean = true;
 		
 		public static var level:Class;
 		public static var midground:Class;
