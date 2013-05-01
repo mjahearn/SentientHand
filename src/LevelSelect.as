@@ -5,6 +5,7 @@ package
 	public class LevelSelect extends FlxState
 	{	
 		public var controls:FlxButton;
+		public var continuity:FlxButton;
 		override public function create():void {
 			
 			Registry.midground = Registry.midgroundMap;
@@ -13,12 +14,19 @@ package
 			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv");
 			add(text);
 			var ctlText:FlxText = new FlxText(100, 150, 400, "Controls (click to change):");
-			controls = new FlxButton(100, 200, "Cam-Relative", changeControls);
+			controls = new FlxButton(100, 180, "Cam-Relative", changeControls);
 			if (Registry.handRelative) {
 				controls.label.text = "Hand-Relative";
 			}
+			var conText:FlxText = new FlxText(100, 250, 400, "Continuity (click to change):");
+			continuity = new FlxButton(100, 280, "On", changeContinuity);
+			if (!Registry.continuityUntilRelease) {
+				continuity.label.text = "Off";
+			}
 			add(ctlText);
 			add(controls);
+			add(conText);
+			add(continuity);
 		}
 		
 		override public function update():void {
@@ -58,6 +66,15 @@ package
 				controls.label.text = "Hand-Relative";
 			} else {
 				controls.label.text = "Cam-Relative";
+			}
+		}
+		
+		public function changeContinuity():void {
+			Registry.continuityUntilRelease = !Registry.continuityUntilRelease;
+			if (Registry.continuityUntilRelease) {
+				continuity.label.text = "On";
+			} else {
+				continuity.label.text = "Off";
 			}
 		}
 	}
