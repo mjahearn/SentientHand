@@ -58,6 +58,8 @@ package {
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
+		public var lastGround:uint;
+		public var tempGround:uint;
 		
 		public var electricityNum:int = 1;
 		
@@ -197,6 +199,8 @@ package {
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
 			controlDirs = new Array();
+			lastGround = FlxObject.DOWN;
+			tempGround = FlxObject.DOWN;
 			
 			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
 			
@@ -541,6 +545,9 @@ package {
 			}
 			if (FlxG.keys.justReleased("LEFT")) {
 				controlDirsRemove(FlxObject.LEFT);
+			}
+			if (controlDirs.length == 0) {
+				resetTempGround();
 			}
 			
 			//time += FlxG.elapsed;
@@ -1060,6 +1067,13 @@ package {
 						bodyMode = false;
 						cannonMode = false;
 						setGravity(hand, body.facing, true);
+						if (Registry.handRelative) {
+							lastGround = FlxObject.DOWN;
+							tempGround = FlxObject.DOWN;
+						} else {
+							lastGround = body.facing;
+							tempGround = body.facing;
+						}
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
@@ -1102,6 +1116,9 @@ package {
 					if (enteringBody) {
 						
 						bodyMode = true;
+						lastTouchedWood = false;
+						handFalling = false;
+						onGround = true;
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1125,6 +1142,13 @@ package {
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
+						if (Registry.handRelative) {
+							lastGround = FlxObject.DOWN;
+							tempGround = FlxObject.DOWN;
+						} else {
+							lastGround = body.facing;
+							tempGround = body.facing;
+						}
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1172,6 +1196,7 @@ package {
 							}
 						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
+							lastGround = hand.facing;
 							if (hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
@@ -1198,7 +1223,7 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			FlxG.collide(level, hand, levelHandCallback);
+			FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
@@ -1221,6 +1246,7 @@ package {
 			} else {
 				if (onGround && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))) {
 					onGround = false;
+					lastGround = hand.facing;
 					
 					if (handFalling || lastTouchedWood) {
 						setGravity(hand,FlxObject.DOWN,true);
@@ -1250,13 +1276,29 @@ package {
 					else if (hand.isTouching(FlxObject.RIGHT)) {hand.facing = FlxObject.RIGHT;}
 					else                                       {hand.facing = FlxObject.DOWN;}
 					
-					
 					onGround = true;
 					setGravity(hand, hand.facing, true);
 					hand.drag.x = MOVE_DECEL;
 					hand.drag.y = MOVE_DECEL;
 					hand.maxVelocity.x = MAX_MOVE_VEL;
 					hand.maxVelocity.y = MAX_MOVE_VEL;
+					
+					/*if (Registry.continuityUntilRelease) {
+						if (Registry.handRelative) {
+							if ((handIsFacing(FlxObject.DOWN) && (lastGround & FlxObject.UP) == FlxObject.UP)
+							|| (handIsFacing(FlxObject.UP) && (lastGround & FlxObject.DOWN) == FlxObject.DOWN)
+							|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
+							|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
+								if (tempGround == FlxObject.DOWN) {
+									tempGround = FlxObject.UP;
+								} else {
+									tempGround = FlxObject.DOWN;
+								}
+							}
+						} else {
+							tempGround = lastGround;
+						}
+					}*/
 				}
 			}
 			
@@ -1268,9 +1310,9 @@ package {
 			}
 		}
 		
-		public function levelHandCallback(a:FlxObject, b:FlxObject):void {
-			//FlxG.log("okay");
-		}
+		/*public function levelHandCallback(a:FlxObject, b:FlxObject):void {
+			FlxG.log("okay");
+		}*/
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
 			//FlxG.log("tC " + spr.touching);
@@ -1354,6 +1396,31 @@ package {
 			} else if (dir == FlxObject.RIGHT) {
 				spr.acceleration.x = GRAV_RATE;
 			}
+			if (onGround) {
+				if (Registry.continuityUntilRelease) {
+					//if (Registry.handRelative) {
+						if ((handIsFacing(FlxObject.DOWN) && (lastGround & FlxObject.UP) == FlxObject.UP)
+							|| (handIsFacing(FlxObject.UP) && (lastGround & FlxObject.DOWN) == FlxObject.DOWN)
+							|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
+							|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
+							if (tempGround == FlxObject.DOWN) {
+								tempGround = FlxObject.UP;
+							} else if (tempGround == FlxObject.UP) {
+								tempGround = FlxObject.DOWN;
+							} else if (tempGround == FlxObject.LEFT) {
+								tempGround = FlxObject.RIGHT;
+							} else if (tempGround == FlxObject.RIGHT) {
+								tempGround = FlxObject.LEFT;
+							}
+						}
+					/*} else {
+						tempGround = lastGround;
+					}*/
+				} else if (!Registry.handRelative) {
+					tempGround = dir;
+				}
+				lastGround = spr.facing;
+			} 
 		}
 		
 		public function handIsFacing(dir:uint):Boolean {
@@ -1464,27 +1531,51 @@ package {
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
-			if (dir == FlxObject.LEFT) {
-				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT))) {
-					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
-				} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
-					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
-				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
-					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
-				} else if (handIsFacing(FlxObject.RIGHT)) {
-					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+			//if (Registry.continuityUntilRelease) {
+				if (dir == FlxObject.LEFT) {
+					if (tempGround == FlxObject.DOWN) {
+						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
+					} else if (tempGround == FlxObject.LEFT) {
+						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+					} else if (tempGround == FlxObject.UP) {
+						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+					} else if (tempGround == FlxObject.RIGHT) {
+						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+					}
+				} else if (dir == FlxObject.RIGHT) {
+					if (tempGround == FlxObject.DOWN) {
+						return controlDirs.indexOf(FlxObject.LEFT) < controlDirs.indexOf(FlxObject.RIGHT);
+					} else if (tempGround == FlxObject.LEFT) {
+						return controlDirs.indexOf(FlxObject.UP) < controlDirs.indexOf(FlxObject.DOWN);
+					} else if (tempGround == FlxObject.UP) {
+						return controlDirs.indexOf(FlxObject.RIGHT) < controlDirs.indexOf(FlxObject.LEFT);
+					} else if (tempGround == FlxObject.RIGHT) {
+						return controlDirs.indexOf(FlxObject.DOWN) < controlDirs.indexOf(FlxObject.UP);
+					}
 				}
-			} else if (dir == FlxObject.RIGHT) {
-				if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT))) {
-					return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
-				} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
-					return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
-				} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
-					return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);	
-				} else if (handIsFacing(FlxObject.LEFT)) {
-					return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+			/*} else {
+				if (dir == FlxObject.LEFT) {
+					if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT))) {
+						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
+					} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
+						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+					} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
+						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+					} else if (handIsFacing(FlxObject.RIGHT)) {
+						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+					}
+				} else if (dir == FlxObject.RIGHT) {
+					if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT))) {
+						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
+					} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
+						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
+					} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
+						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);	
+					} else if (handIsFacing(FlxObject.LEFT)) {
+						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
+					}
 				}
-			}
+			}*/
 			return false;
 		}
 		
@@ -1519,6 +1610,16 @@ package {
 				return handTouching;
 			}
 			return hand.touching;
+		}
+		
+		public function resetTempGround():void {
+			if (Registry.handRelative) {
+				lastGround = FlxObject.DOWN;
+				tempGround = FlxObject.DOWN;
+			} else {
+				lastGround = hand.facing;
+				tempGround = hand.facing;
+			}
 		}
 	}
 }
