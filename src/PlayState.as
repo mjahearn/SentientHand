@@ -202,7 +202,9 @@ package {
 			lastGround = FlxObject.DOWN;
 			tempGround = FlxObject.DOWN;
 			
-			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
+			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
+			background.scrollFactor = new FlxPoint(0.5, 0.5);
+			add(background);
 			
 			/* Background */
 			dbg = 0;
