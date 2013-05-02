@@ -189,7 +189,6 @@ package {
 		
 		override public function create():void {
 			
-			FlxG.mute = true; // DELETE THIS
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
 				Registry.midground = Registry.midgroundMap;
@@ -1329,12 +1328,10 @@ package {
 		}*/
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			//FlxG.log("tC " + spr.touching);
 			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
 				if (getHandTouching() != spr.facing) {
-					//FlxG.log(getHandTouching() + " " + spr.facing);
 					fixGravity(spr);
 				}
 			} else if (spr in bodyGroup) {
@@ -1418,7 +1415,6 @@ package {
 							|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
 							|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
 							if (tempGround == FlxObject.DOWN) {
-								FlxG.log(hand.facing + " " + lastGround);
 								tempGround = FlxObject.UP;
 							} else if (tempGround == FlxObject.UP) {
 								tempGround = FlxObject.DOWN;
@@ -1434,9 +1430,7 @@ package {
 				} else if (!Registry.handRelative) {
 					tempGround = dir;
 				}
-				FlxG.log("A " + lastGround);
 				lastGround = spr.facing;
-				FlxG.log("B " + lastGround);
 			} 
 		}
 		
