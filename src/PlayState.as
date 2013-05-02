@@ -24,6 +24,10 @@ package {
 		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
 		public const UNTOUCHABLE_MAX:uint = 171;
+		
+		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
+		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 207;
+		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
@@ -297,6 +301,10 @@ package {
 				level.setTileProperties(i, FlxObject.NONE);
 			}
 			
+			for (i = UNTOUCHABLE_OVERFLOW_MIN; i <= UNTOUCHABLE_OVERFLOW_MAX; i++) {
+				level.setTileProperties(i, FlxObject.NONE);
+			}
+			
 			// Cannons
 			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
 			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
@@ -467,9 +475,11 @@ package {
 			hint = new FlxSprite(0,0);
 			hint.loadGraphic(hintSheet,true,false,64,64,true);
 			hint.addAnimation("idle",[0]);
-			hint.addAnimation("think",[1,2,3,4],10,false);
-			hint.addAnimation("thinking up",[4]);
-			hint.addAnimation("thinking space",[5]);
+			//hint.addAnimation("think",[1,2,3,4],10,false);
+			//hint.addAnimation("thinking up",[4]);
+			//hint.addAnimation("thinking space",[5]);
+			hint.addAnimation("X",[1,2,3],10,true);
+			hint.addAnimation("Z",[4,5,6],10,true);
 			hint.play("idle");
 			add(hint);
 			
@@ -625,7 +635,6 @@ package {
 			hint.x = hand.x + hand.width - hint.width/2.0;// + (hint.width/2.0)*Math.sin(theta);
 			hint.y = hand.y + hand.height - hint.height;// - (hint.height/2.0)*Math.cos(theta);
 			//hint.angle = hand.angle;
-			hint.play("idle");
 			
 			// marker glow (for hand overlapping)
 			hand.color = 0xffffff;
@@ -642,7 +651,9 @@ package {
 			if (!cannonMode && !bodyMode) {
 				
 				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
-					hint.play("thinking up");
+					hint.play("Z");
+				} else {
+					hint.play("idle");
 				}
 				
 				if (enteringBody) {
@@ -656,9 +667,11 @@ package {
 					body.color = 0xff0000;
 					armBase.color = 0xff0000;
 				}
-			} else {
+			} else if (cannonMode || bodyMode) {
 				if (Registry.neverFiredBodyOrCannon) {// || Registry.neverAimedBodyOrCannon) {
-					hint.play("thinking space");
+					hint.play("X");
+				} else {
+					hint.play("idle");
 				}
 			}
 			
@@ -1199,7 +1212,7 @@ package {
 						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
 							lastGround = hand.facing;
-							if (hand.isTouching(FlxObject.DOWN)) {
+							if (Registry.jumping && hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
 								hand.velocity.y = CEIL_JUMP_VEL;

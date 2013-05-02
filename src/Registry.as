@@ -23,6 +23,7 @@ package {
 		public static var dumb:Boolean = false;
 		public static var handRelative:Boolean = true;
 		public static var continuityUntilRelease:Boolean = true;
+		public static var jumping:Boolean = true;
 		
 		public static var level:Class;
 		public static var midground:Class;
