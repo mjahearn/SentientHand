@@ -189,6 +189,7 @@ package {
 		
 		override public function create():void {
 			
+			FlxG.mute = true; // DELETE THIS
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
 				Registry.midground = Registry.midgroundMap;
@@ -1082,11 +1083,10 @@ package {
 						bodyMode = false;
 						cannonMode = false;
 						setGravity(hand, body.facing, true);
+						lastGround = body.facing;
 						if (Registry.handRelative) {
-							lastGround = FlxObject.DOWN;
 							tempGround = FlxObject.DOWN;
 						} else {
-							lastGround = body.facing;
 							tempGround = body.facing;
 						}
 					}
@@ -1157,11 +1157,10 @@ package {
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
+						lastGround = body.facing;
 						if (Registry.handRelative) {
-							lastGround = FlxObject.DOWN;
 							tempGround = FlxObject.DOWN;
 						} else {
-							lastGround = body.facing;
 							tempGround = body.facing;
 						}
 						
@@ -1419,6 +1418,7 @@ package {
 							|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
 							|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
 							if (tempGround == FlxObject.DOWN) {
+								FlxG.log(hand.facing + " " + lastGround);
 								tempGround = FlxObject.UP;
 							} else if (tempGround == FlxObject.UP) {
 								tempGround = FlxObject.DOWN;
@@ -1434,7 +1434,9 @@ package {
 				} else if (!Registry.handRelative) {
 					tempGround = dir;
 				}
+				FlxG.log("A " + lastGround);
 				lastGround = spr.facing;
+				FlxG.log("B " + lastGround);
 			} 
 		}
 		
@@ -1628,11 +1630,10 @@ package {
 		}
 		
 		public function resetTempGround():void {
+			lastGround = hand.facing;
 			if (Registry.handRelative) {
-				lastGround = FlxObject.DOWN;
 				tempGround = FlxObject.DOWN;
 			} else {
-				lastGround = hand.facing;
 				tempGround = hand.facing;
 			}
 		}
