@@ -9,6 +9,8 @@ package
 		public var text:FlxText;
 		public var conText:FlxText;
 		public var continuity:FlxButton;
+		public var jump:FlxButton;
+		public var jumpText:FlxText;
 		
 		public function PauseState(MaxSize:uint=0)
 		{			
@@ -20,20 +22,31 @@ package
 		public function refresh():void {
 			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0");
 			add(text);
+			
 			ctlText = new FlxText(100, 150, 400, "Controls (click to change):");
 			controls = new FlxButton(100, 180, "Cam-Relative", changeControls);
 			if (Registry.handRelative) {
 			controls.label.text = "Hand-Relative";
 			}
+			add(ctlText);
+			add(controls);
+			
 			conText = new FlxText(100, 250, 400, "Continuity (click to change):");
 			continuity = new FlxButton(100, 280, "On", changeContinuity);
 			if (!Registry.continuityUntilRelease) {
 				continuity.label.text = "Off";
 			}
-			add(ctlText);
-			add(controls);
 			add(conText);
 			add(continuity);
+			
+			jumpText = new FlxText(100, 350, 400, "Jumping:");
+			jump = new FlxButton(100, 380, "On", changeJumping);
+			if (!Registry.jumping) {
+				jump.label.text = "Off";
+			}
+			add(jumpText);
+			add(jump);
+			
 			setAll("scrollFactor",new FlxPoint(0,0));
 		}
 		
@@ -76,6 +89,15 @@ package
 				continuity.label.text = "On";
 			} else {
 				continuity.label.text = "Off";
+			}
+		}
+		
+		public function changeJumping():void {
+			Registry.jumping = !Registry.jumping;
+			if (Registry.jumping) {
+				jump.label.text = "On";
+			} else {
+				jump.label.text = "Off";
 			}
 		}
 	}

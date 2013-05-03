@@ -209,7 +209,9 @@ package {
 			lastGround = FlxObject.DOWN;
 			tempGround = FlxObject.DOWN;
 			
-			add(new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8));
+			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
+			background.scrollFactor = new FlxPoint(0.5, 0.5);
+			add(background);
 			
 			/* Background */
 			dbg = 0;
@@ -1103,11 +1105,10 @@ package {
 						bodyMode = false;
 						cannonMode = false;
 						setGravity(hand, body.facing, true);
+						lastGround = body.facing;
 						if (Registry.handRelative) {
-							lastGround = FlxObject.DOWN;
 							tempGround = FlxObject.DOWN;
 						} else {
-							lastGround = body.facing;
 							tempGround = body.facing;
 						}
 					}
@@ -1178,11 +1179,10 @@ package {
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
+						lastGround = body.facing;
 						if (Registry.handRelative) {
-							lastGround = FlxObject.DOWN;
 							tempGround = FlxObject.DOWN;
 						} else {
-							lastGround = body.facing;
 							tempGround = body.facing;
 						}
 						
@@ -1233,7 +1233,7 @@ package {
 						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
 							lastGround = hand.facing;
-							if (hand.isTouching(FlxObject.DOWN)) {
+							if (Registry.jumping && hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
 							} else if (hand.isTouching(FlxObject.UP)) {
 								hand.velocity.y = CEIL_JUMP_VEL;
@@ -1351,12 +1351,10 @@ package {
 		}*/
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			//FlxG.log("tC " + spr.touching);
 			if (spr == hand && !cannonMode) {
 				handMetalFlag = tile.mapIndex;
 				lastTouchedWood = false;
 				if (getHandTouching() != spr.facing) {
-					//FlxG.log(getHandTouching() + " " + spr.facing);
 					fixGravity(spr);
 				}
 			} else if (spr in bodyGroup) {
@@ -1649,11 +1647,10 @@ package {
 		}
 		
 		public function resetTempGround():void {
+			lastGround = hand.facing;
 			if (Registry.handRelative) {
-				lastGround = FlxObject.DOWN;
 				tempGround = FlxObject.DOWN;
 			} else {
-				lastGround = hand.facing;
 				tempGround = hand.facing;
 			}
 		}
