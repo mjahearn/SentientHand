@@ -17,7 +17,7 @@ package {
 		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
 		public static const levelOrder:Array = new Array(level01, level02, level03, level04, level05);
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB,musicBackgroundA,musicBackgroundB,musicBackgroundA);
+		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundA);
 		public static var music:FlxSound = new FlxSound();
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
@@ -53,18 +53,18 @@ package {
 					stupid = false;
 					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 				}
-				if (levelNum != levelNumPrevious) {
+				if (levelNum != levelNumPrevious && soundOrder[levelNum] != soundOrder[levelNumPrevious]) {
 					dumb = true;
 				}
 				if (dumb) {
-					Registry.music.volume -= 0.0022;
+					Registry.music.volume -= 0.022;
 				}
 				if (Registry.music.volume == 0 && levelNum < soundOrder.length) {
 					dumb = false;
 					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 				}
 				if (!dumb && Registry.music.volume != 1) {
-					Registry.music.volume += 0.0022;
+					Registry.music.volume += 0.022;
 				}
 				
 				levelNumPrevious = levelNum;
