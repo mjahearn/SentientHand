@@ -26,7 +26,7 @@ package {
 		public const UNTOUCHABLE_MAX:uint = 171;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
-		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 207;
+		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 219;
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
@@ -111,6 +111,7 @@ package {
 		public var buttonStateArray:Array = new Array();
 		public var buttonReactionArray:Array = new Array();
 		public var buttonMode:uint;
+		public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
 		public var doorGroup:FlxGroup = new FlxGroup();
 		
@@ -155,6 +156,8 @@ package {
 		[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
+		
+		[Embed("assets/!.png")] public var bangSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
@@ -375,11 +378,14 @@ package {
 						var buttonSheet:Class;
 						var w:Number;
 						var h:Number;
-						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4
-						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 8; h = 32;}
-						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 8;}
-						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32;}
-						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8;}
+						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4;
+						var bangAngle:Number;
+						var bangDX:Number = 0;
+						var bangDY:Number = 0;
+						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 8; h = 32; bangAngle = 90; bangDX = 8;}
+						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 8; bangAngle = 180; bangDY = 8;}
+						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32; bangAngle = -90; bangDX = -32;}
+						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8; bangAngle = 0; bangDY = -32;}
 						
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
@@ -388,6 +394,16 @@ package {
 						
 						buttonGroup.add(button);
 						buttonStateArray.push(false);
+						
+						var bang:FlxSprite = new FlxSprite(button.x+bangDX,button.y+bangDY);
+						bang.loadGraphic(bangSheet,true,false,32,32,true);
+						bang.angle = bangAngle;
+						//bang.addAnimation("idle",[0]);
+						bang.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
+						bang.play("excite");
+						//bang.alpha = 0.88;
+						buttonBangGroup.add(bang);
+						
 						
 						//how to handle different buttons doing different things:
 						/*if ( BUTTON IS A SPECIFIC BUTTON ) {
@@ -399,6 +415,7 @@ package {
 				}
 			}
 			add(buttonGroup);
+			add(buttonBangGroup);
 			buttonMode = 0;
 			
 			// Doors
@@ -420,9 +437,12 @@ package {
 						door.immovable = true;
 						door.loadGraphic(doorSheet,true,false,w,h,true);
 						//door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12,13],22,false);
+						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12],22,false);
 						//door.play("closed");
-						door.frame = 18;
+						door.addAnimation("pulse 1",[17,17,17,16,15,14,14,14,15,16,17,17,17],10,true);
+						door.addAnimation("pulse 2",[21,21,20,19,18,18,19,20,21,21],10,true);
+						door.frame = 13;
+						
 						
 						doorGroup.add(door);
 					}
@@ -702,14 +722,17 @@ package {
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
 				var button:FlxSprite = buttonGroup.members[mm];
 				var buttonState:Boolean = buttonStateArray[mm];
+				var bangFrame:Number = buttonBangGroup.members[mm].frame;
+				buttonBangGroup.members[mm].alpha = (6.0 - bangFrame)/6.0 + 0.22;
 				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
 					button.frame = BUTTON_PRESSED;
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
+					buttonBangGroup.members[mm].kill();
 					for (var bb:String in doorGroup.members) {
 						var door:FlxSprite = doorGroup.members[bb];
-						if (door.frame == 18) {door.frame = 19;}
-						else if (door.frame == 19) {door.frame = 20;}
+						if (door.frame == 13) {door.play("pulse 1");}
+						else if (14 <= door.frame && door.frame <= 17) {door.play("pulse 2");}
 					}
 				}
 			}
@@ -1229,7 +1252,7 @@ package {
 			super.update();
 			
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
-				if (doorGroup.members[a].frame == 13) {
+				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
 				}
 			}
