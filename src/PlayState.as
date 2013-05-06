@@ -23,7 +23,7 @@ package {
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
-		public const UNTOUCHABLE_MAX:uint = 171;
+		public const UNTOUCHABLE_MAX:uint = 170;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
 		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 219;
@@ -41,6 +41,8 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
+		
+		public const EXIT_SPAWN:uint = 171;
 		
 		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
@@ -66,6 +68,8 @@ package {
 		public var tempGround:uint;
 		
 		public var electricityNum:int = 1;
+		
+		public var doorsDead:Boolean = false;
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
@@ -120,8 +124,11 @@ package {
 		public var timeFallen:Number;
 		
 		public var markerLine:FlxSprite = new FlxSprite();
+		//public var hintArrow:FlxSprite = new FlxSprite();
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
+		
+		public var exitPoint:FlxPoint = new FlxPoint();
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
@@ -289,6 +296,15 @@ package {
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			FlxG.camera.bounds = FlxG.worldBounds;
+			
+			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
+			var exitArray:Array = level.getTileInstances(EXIT_SPAWN);
+			if (exitArray) {
+			exitPoint = pointForTile(exitArray[0],level);
+			level.setTileByIndex(exitArray[0],0);
+			} else {
+				exitPoint = new FlxPoint(0,0);
+			}
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
@@ -498,6 +514,7 @@ package {
 			//hint.addAnimation("thinking space",[5]);
 			hint.addAnimation("X",[1,2,3],10,true);
 			hint.addAnimation("Z",[4,5,6],10,true);
+			hint.addAnimation("arrows",[7,8,9],10,true);
 			hint.play("idle");
 			add(hint);
 			
@@ -528,6 +545,14 @@ package {
 			pause = new PauseState();
 			pause.setAll("exists", false);
 			add(pause);
+			
+			/*
+			// hint arrows
+			hintArrow.makeGraphic(FlxG.width,FlxG.height,0x00000000);
+			hintArrow.scrollFactor = new FlxPoint(0,0);
+			add(hintArrow);
+			*/
+
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -647,6 +672,19 @@ package {
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
 			
+			/*
+			// hint arrow
+			hintArrow.fill(0x00000000);
+			
+			if (doorsDead) {
+				startX = hand.x+hand.width/2.0;
+				startY = hand.y+hand.height/2.0;
+				endX = exitPoint.x;
+				endY = exitPoint.y;
+				hintArrow.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+			}
+			*/
+			
 			// hint system
 			//theta = (hand.angle)*Math.PI/180.0;
 			
@@ -670,7 +708,19 @@ package {
 				
 				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("Z");
-				} else {
+				}
+				// arrow hint (uncomment if you want it, I think it's kind of ugly though...)
+				/*
+				else if (Registry.neverCrawled) {
+					if (hand.velocity.x != 0 || hand.velocity.y != 0 && onGround) {
+						Registry.neverCrawled = false;
+					} else {
+						hint.play("arrows");
+					}
+				}
+				*/
+				//
+				else {
 					hint.play("idle");
 				}
 				
@@ -1252,6 +1302,7 @@ package {
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
 				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
+					doorsDead = true;
 				}
 			}
 			
