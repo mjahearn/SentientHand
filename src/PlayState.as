@@ -209,12 +209,10 @@ package {
 			lastGround = FlxObject.DOWN;
 			tempGround = FlxObject.DOWN;
 			
+			/* Background */
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
-			
-			/* Background */
-			dbg = 0;
 			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			/* Midground */
@@ -1414,6 +1412,7 @@ package {
 		}
 		
 		public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
+			FlxG.log(dir);
 			if (reset) {
 				spr.facing = dir;
 				spr.acceleration.x = 0;
@@ -1640,7 +1639,7 @@ package {
 			if (hand.touching == handTouching) {
 				return handTouching;
 			}
-			if (handTouching != 0 && (hand.touching & handTouching) >= handTouching) {
+			if (handTouching != 0 && isMultiDirection(handTouching)/*(hand.touching & handTouching) >= hand.touching*/) { //originally handTouching if this causes problems
 				return handTouching;
 			}
 			return hand.touching;
@@ -1653,6 +1652,10 @@ package {
 			} else {
 				tempGround = hand.facing;
 			}
+		}
+		
+		public function isMultiDirection(n:uint):Boolean {
+			return ((n & FlxObject.DOWN) > 0 && (n ^ FlxObject.DOWN) > 0) || ((n & FlxObject.UP) > 0 && (n ^ FlxObject.UP) > 0) || ((n & FlxObject.LEFT) > 0 && (n ^ FlxObject.LEFT) > 0);
 		}
 	}
 }
