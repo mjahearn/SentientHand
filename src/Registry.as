@@ -17,8 +17,11 @@ package {
 		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
 		public static const levelOrder:Array = new Array(level01, level02, level03, level04, level05);
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundB,musicBackgroundA,musicBackgroundB,musicBackgroundA);
-		public static var music:FlxSound = new FlxSound();
+		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundA);
+		//public static var music:FlxSound = new FlxSound();
+		public static var music1:FlxSound = new FlxSound();
+		public static var music2:FlxSound = new FlxSound();
+		public static var musicSwitch:Boolean = true;
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
 		public static var handRelative:Boolean = true;
@@ -44,6 +47,13 @@ package {
 		public static var neverFiredBodyOrCannon:Boolean = true;
 		public static var neverAimedBodyOrCannon:Boolean = true;
 		
+		public static function music():FlxSound {
+			if (musicSwitch) {
+				return music1;
+			}
+			return music2;
+		}
+		
 		public static function update():void {
 			if (SOUND_ON) {
 				
@@ -51,25 +61,35 @@ package {
 				
 				if (stupid && levelNum < soundOrder.length) {
 					stupid = false;
-					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+					Registry.music().loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 				}
-				if (levelNum != levelNumPrevious) {
+				if (levelNum != levelNumPrevious && soundOrder[levelNum] != soundOrder[levelNumPrevious]) {
 					dumb = true;
+					musicSwitch = !musicSwitch;
+					Registry.music().loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
 				}
 				if (dumb) {
-					Registry.music.volume -= 0.0022;
+					if (musicSwitch) {
+						Registry.music2.volume -= 0.0022;
+					} else {
+						Registry.music1.volume -= 0.0022;
+					}
 				}
-				if (Registry.music.volume == 0 && levelNum < soundOrder.length) {
+				/*if (Registry.music().volume == 0 && levelNum < soundOrder.length) {
 					dumb = false;
-					Registry.music.loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-				}
-				if (!dumb && Registry.music.volume != 1) {
-					Registry.music.volume += 0.0022;
+					Registry.music().loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
+				}*/
+				if (!dumb && Registry.music().volume != 1) {
+					if (musicSwitch) {
+						Registry.music2.volume += 0.0022;
+					} else {
+						Registry.music1.volume += 0.0022;
+					}
 				}
 				
 				levelNumPrevious = levelNum;
 				
-				Registry.music.play();
+				Registry.music().play();
 			}
 		}
 	}
