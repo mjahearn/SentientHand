@@ -167,13 +167,21 @@ package {
 		[Embed("assets/!.png")] public var bangSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
 		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
 		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
+		
+		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var ambientElectricalHumSFX:Class;
+		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
+		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
+		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
+		[Embed("assets/ButtonPress.mp3")] public var buttonPressSFX:Class;
+		
+		
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
@@ -182,6 +190,12 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
+		
+		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX);
+		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
+		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
+		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
+		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
 
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
@@ -743,6 +757,96 @@ package {
 				}
 			}
 			
+			/* Begin Audio */
+			if (Registry.SOUND_ON) {
+				
+				// Something's not quite right here...
+				// The hand jumped
+				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && hand.touching && hand.facing != FlxObject.DOWN) {
+					jumpSound.play();
+				} else if ((!bodyMode && !cannonMode) && hand.touching) {
+					jumpSound.stop();
+				}
+				
+				// The hand is crawling on wood or metal
+				if ((!bodyMode &&!cannonMode) && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+					if (lastTouchedWood) {
+						metalCrawlSound.stop();
+						woodCrawlSound.play();
+					} else {
+						woodCrawlSound.stop();
+						metalCrawlSound.play();
+					}
+				} else {
+					woodCrawlSound.stop();
+					metalCrawlSound.stop();
+				}
+				// The hand is in the body, aiming
+				if ((bodyMode || cannonMode) && !handOut && !handIn) {
+					grappleExtendSound.stop();
+					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
+						robodyAimSound.play();
+					} else {
+						robodyAimSound.stop();
+					}
+				}
+					// The hand is launching out of the body
+				else if (bodyMode && (handOut || handIn)) {
+					robodyLandOnWallSound.stop();
+					robodyAimSound.stop();
+					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
+						grappleExtendSound.play();
+					} else {
+						grappleExtendSound.stop();
+					}
+				} else {
+					grappleExtendSound.stop();
+					robodyAimSound.stop();
+				}
+				
+				// The body just hit a wall
+				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+					robodyLandOnWallSound.play();
+				}
+				
+				// hand electricity
+				if (hand.touching && !lastTouchedWood) {
+					ambientElectricalHumSound.play();
+				} else {
+					ambientElectricalHumSound.stop();
+				}
+				
+				// cannon fire
+				if (cannonMode && FlxG.keys.justPressed("X")) {
+					cannonShotSound.stop();
+					cannonShotSound.play();
+				}
+				
+				// hand landed
+				if (hand.justTouched(FlxObject.ANY)) {
+					if (!lastTouchedWood) {
+						handLandingOnMetalSound.stop();
+						handLandingOnMetalSound.play();
+					} else {
+						handLandingOnNonstickMetalSound.stop();
+						handLandingOnNonstickMetalSound.play();
+					}
+				}
+				
+				// button press
+				// Press Buttons!
+				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
+					var button:FlxSprite = buttonGroup.members[qq];
+					var buttonState:Boolean = buttonStateArray[qq];
+					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) {
+						buttonPressSound.stop();
+						buttonPressSound.play();
+					}
+				}
+				
+			}
+			/* End Audio */
+			
 			// to time the fall for the different falling rot, really belongs with anim stuff
 			if (hand.touching) {handFalling = false; timeFallen = 0;}
 			timeFallen += FlxG.elapsed;
@@ -805,60 +909,6 @@ package {
 					if (gear.angle < 0) {gear.angle = 360;}
 				}
 			}
-			
-			/* Begin Audio */
-			if (Registry.SOUND_ON) {
-				
-				// Something's not quite right here...
-				// The hand jumped
-				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && hand.touching && hand.facing != FlxObject.DOWN) {
-					jumpSound.play();
-				} else if ((!bodyMode && !cannonMode) && hand.touching) {
-					jumpSound.stop();
-				}
-				
-				// The hand is crawling on wood or metal
-				if ((!bodyMode &&!cannonMode) && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-					if (lastTouchedWood) {
-						metalCrawlSound.stop();
-						woodCrawlSound.play();
-					} else {
-						woodCrawlSound.stop();
-						metalCrawlSound.play();
-					}
-				} else {
-					woodCrawlSound.stop();
-					metalCrawlSound.stop();
-				}
-				// The hand is in the body, aiming
-				if ((bodyMode || cannonMode) && !handOut && !handIn) {
-					grappleExtendSound.stop();
-					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
-						robodyAimSound.play();
-					} else {
-						robodyAimSound.stop();
-					}
-				}
-				// The hand is launching out of the body
-				else if (bodyMode && (handOut || handIn)) {
-					robodyLandOnWallSound.stop();
-					robodyAimSound.stop();
-					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
-						grappleExtendSound.play();
-					} else {
-						grappleExtendSound.stop();
-					}
-				} else {
-					grappleExtendSound.stop();
-					robodyAimSound.stop();
-				}
-				
-				// The body just hit a wall
-				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
-					robodyLandOnWallSound.play();
-				}
-			}
-			/* End Audio */
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
