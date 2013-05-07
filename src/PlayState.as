@@ -27,6 +27,8 @@ package {
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
 		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 219;
+		public const WOOD_OVERFLOW_MIN:uint = 232;
+		public const WOOD_OVERFLOW_MAX:uint = 251;
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
@@ -321,6 +323,10 @@ package {
 			}
 			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
+				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+			}
+			
+			for (i = WOOD_OVERFLOW_MIN; i < WOOD_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
