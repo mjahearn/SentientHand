@@ -874,8 +874,8 @@ package {
 			
 			// Press Buttons!
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
-				var button:FlxSprite = buttonGroup.members[mm];
-				var buttonState:Boolean = buttonStateArray[mm];
+				button = buttonGroup.members[mm];
+				buttonState = buttonStateArray[mm];
 				var bangFrame:Number = buttonBangGroup.members[mm].frame;
 				buttonBangGroup.members[mm].alpha = (6.0 - bangFrame)/6.0 + 0.22;
 				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
