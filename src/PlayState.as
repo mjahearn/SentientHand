@@ -176,12 +176,14 @@ package {
 		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
 		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
 		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
-		
 		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var ambientElectricalHumSFX:Class;
 		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/ButtonPress.mp3")] public var buttonPressSFX:Class;
+		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
+		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
+		[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
 		
 		
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
@@ -192,13 +194,14 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
-		
-		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX);
+		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX,true);
 		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
-
+		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
+		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(ambientSteamSFX,true);
+		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -839,8 +842,7 @@ package {
 					}
 				}
 				
-				// button press
-				// Press Buttons!
+				// button press, gears, steam
 				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
 					var button:FlxSprite = buttonGroup.members[qq];
 					var buttonState:Boolean = buttonStateArray[qq];
@@ -848,8 +850,22 @@ package {
 						buttonPressSound.stop();
 						buttonPressSound.play();
 					}
+					if (button.frame == 2) {
+						ambientGearsSound.play();
+					}
+					if (button.frame == 3) {
+						ambientSteamSound.play();
+					}
 				}
 				
+				
+				// door open
+				for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
+					if (doorGroup.members[ab].frame == 1) {
+						doorOpenSound.stop();
+						doorOpenSound.play();
+					}
+				}
 			}
 			/* End Audio */
 			
@@ -1645,15 +1661,25 @@ package {
 				for (var b:uint = 0; b < buttonGroup.length; b++) {
 					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
 						buttonGroup.members[b].frame = 2;
+						
+						//
+						reinvigorated = true;
 					}
 				}
 			} else {
 				for (var c:uint = 0; c < buttonGroup.length; c++) {
 					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
 						buttonGroup.members[c].frame = 3;
+						
+						//
+						for (var m:String in steams.members) {
+							steams.members[m].play("puff");
+						}
+						
 					}
 				}
 			}
+			/*
 			if (reinvigorated) {
 				reinvigorated = false;
 				for (var m:String in steams.members) {
@@ -1668,6 +1694,7 @@ package {
 					steam.play("puff");
 				}
 			}
+			*/
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
@@ -1720,6 +1747,12 @@ package {
 		}
 		
 		public function goToNextLevel():void {
+			
+			// sound stuff
+			ambientGearsSound.stop();
+			ambientSteamSound.stop();
+			ambientElectricalHumSound.stop();
+			
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
