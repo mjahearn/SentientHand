@@ -26,7 +26,7 @@ package {
 		public const UNTOUCHABLE_MAX:uint = 170;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
-		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 219;
+		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 231;
 		public const WOOD_OVERFLOW_MIN:uint = 232;
 		public const WOOD_OVERFLOW_MAX:uint = 251;
 		
