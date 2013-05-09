@@ -1371,12 +1371,55 @@ package {
 			
 			super.update();
 			
+			var doorsJustDied:Boolean = false;
+			//if (!doorsDead) {
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
 				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
-					doorsDead = true;
+					//doorsDead = true;
+					doorsJustDied = true;
 				}
 			}
+			//}
+			
+			/*
+			// catch all drop doors
+			//if (doorsDead) {
+			if (doorsJustDied) {// && !doorsDead) {
+				//doorsDead = true;
+				for (a = bodyGroup.length-1; a >= 0; a--) {
+					var bbody:FlxSprite = bodyGroup.members[a];
+					var bbodyGear:FlxSprite = bodyGearGroup.members[a];
+					var bbodyHead:FlxSprite = bodyHeadGroup.members[a];
+					var barmBase:FlxSprite = bodyArmBaseGroup.members[a];
+					if (!bbody.touching) {
+						
+						bbody.acceleration.y = MAX_GRAV_VEL;
+						if (0 > bbody.angle || bbody.angle < 360) {
+							if (0 > bbody.angle) {
+								bbody.angle += 5;
+							} else {
+								bbody.angle -= 5;
+							}
+						}
+						
+						var btheta:Number = (bbody.angle-90)*Math.PI/180.0;
+						bbodyHead.x = bbody.x + bbody.width/2.0 - bbodyHead.width/2.0 + (bbodyHead.height*1.5)*Math.cos(btheta);
+						bbodyHead.y = bbody.y + bbody.height/2.0 - bbodyHead.height/2.0 + (bbodyHead.height*1.5)*Math.sin(btheta);
+						bbodyHead.angle = bbody.angle;
+						bbodyGear.x = bbody.x + bbody.width/2.0 - bbodyGear.width/2.0 + (bbodyGear.width/2.0)*Math.cos(btheta-Math.PI/2.0);
+						bbodyGear.y = bbody.y + bbody.height/2.0 - bbodyGear.height/2.0 + (bbodyGear.width/2.0)*Math.sin(btheta-Math.PI/2.0);
+						barmBase.x = bbody.x;
+						barmBase.y = bbody.y;
+					}
+					
+					if (bbody.justTouched(FlxObject.DOWN)) {
+						bbody.facing = FlxObject.DOWN;
+						bbody.angle = 0;
+					}
+				}
+			}
+			*/
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
