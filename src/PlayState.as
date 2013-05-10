@@ -127,6 +127,9 @@ package {
 		
 		public var markerLine:FlxSprite = new FlxSprite();
 		//public var hintArrow:FlxSprite = new FlxSprite();
+		public var exitArrow:FlxSprite = new FlxSprite();
+		public var exitRad:Number;
+		public var exitOn:Boolean;
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
@@ -503,6 +506,13 @@ package {
 			}
 			add(arms);
 			
+			exitArrow.loadGraphic(arrowSheet);
+			exitArrow.scrollFactor = new FlxPoint();
+			exitArrow.visible = false;
+			add(exitArrow);
+			exitRad = FlxG.height/2 - exitArrow.width;
+			exitOn = false;
+			
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
@@ -675,6 +685,23 @@ package {
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}*/
 			
+			if (exitOn) {
+				if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
+					exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
+					if (!exitArrow.visible) {
+						exitArrow.visible = true;
+					}
+						var exitX:Number = exitPoint.x - FlxG.camera.scroll.x - FlxG.width/2;
+					var exitY:Number = exitPoint.y - FlxG.camera.scroll.y - FlxG.height/2;
+					var exitA:Number = Math.atan2(exitY, exitX);
+					exitArrow.angle = exitA*180/Math.PI;
+					exitArrow.x = FlxG.width/2 + Math.cos(exitA) * exitRad - exitArrow.width/2;
+					exitArrow.y = FlxG.height/2 + Math.sin(exitA) * exitRad - exitArrow.height/2;
+				} else if (exitArrow.visible) {
+					exitArrow.visible = false;
+				}
+			}
+			
 			// marker line
 			markerLine.fill(0x00000000);
 			if (bodyMode && !handOut && !handIn) {
@@ -684,7 +711,6 @@ package {
 				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
 				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
-				
 				// make objects glow
 			} else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
@@ -1578,7 +1604,6 @@ package {
 		}
 		
 		public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
-			FlxG.log(dir);
 			if (reset) {
 				spr.facing = dir;
 				spr.acceleration.x = 0;
@@ -1698,6 +1723,8 @@ package {
 				for (var a:int = 0; a < doorGroup.length; a++) {
 					doorGroup.members[a].play("open");
 				}
+				exitOn = true;
+				exitArrow.visible = true;
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
