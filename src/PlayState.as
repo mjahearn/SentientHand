@@ -23,10 +23,12 @@ package {
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
 		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
-		public const UNTOUCHABLE_MAX:uint = 171;
+		public const UNTOUCHABLE_MAX:uint = 170;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
-		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 219;
+		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 231;
+		public const WOOD_OVERFLOW_MIN:uint = 232;
+		public const WOOD_OVERFLOW_MAX:uint = 251;
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
@@ -41,6 +43,8 @@ package {
 		public const DOOR_MAX:uint = 185;
 		public const BUTTON_MIN:uint = 172;
 		public const BUTTON_MAX:uint = 183;
+		
+		public const EXIT_SPAWN:uint = 171;
 		
 		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
@@ -66,6 +70,8 @@ package {
 		public var tempGround:uint;
 		
 		public var electricityNum:int = 1;
+		
+		public var doorsDead:Boolean = false;
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
@@ -120,8 +126,13 @@ package {
 		public var timeFallen:Number;
 		
 		public var markerLine:FlxSprite = new FlxSprite();
+		//public var hintArrow:FlxSprite = new FlxSprite();
+		public var exitArrow:FlxSprite = new FlxSprite();
+		public var exitCenter:FlxSprite = new FlxSprite();
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
+		
+		public var exitPoint:FlxPoint = new FlxPoint();
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
@@ -160,13 +171,23 @@ package {
 		[Embed("assets/!.png")] public var bangSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Pipe_Walk.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		[Embed("assets/Jump.mp3")] public var jumpSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
 		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
 		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
+		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var ambientElectricalHumSFX:Class;
+		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
+		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
+		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
+		[Embed("assets/ButtonPress.mp3")] public var buttonPressSFX:Class;
+		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
+		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
+		[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
+		
+		
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
@@ -175,7 +196,14 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
-
+		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX,true);
+		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
+		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
+		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
+		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
+		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
+		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(ambientSteamSFX,true);
+		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -290,7 +318,20 @@ package {
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			FlxG.camera.bounds = FlxG.worldBounds;
 			
+			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
+			var exitArray:Array = level.getTileInstances(EXIT_SPAWN);
+			if (exitArray) {
+			exitPoint = pointForTile(exitArray[0],level);
+			level.setTileByIndex(exitArray[0],0);
+			} else {
+				exitPoint = new FlxPoint(0,0);
+			}
+			
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
+				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+			}
+			
+			for (i = WOOD_OVERFLOW_MIN; i < WOOD_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
@@ -464,6 +505,16 @@ package {
 			}
 			add(arms);
 			
+			exitArrow.makeGraphic(10, 10, 0xffff0000);
+			exitArrow.scrollFactor = new FlxPoint();
+			add(exitArrow);
+			
+			exitCenter.makeGraphic(10, 10, 0xff00ffff);
+			exitCenter.scrollFactor = new FlxPoint();
+			exitCenter.x = FlxG.width/2;
+			exitCenter.y = FlxG.height/2;
+			add(exitCenter);
+			
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
 			add(markerLine);
@@ -498,6 +549,7 @@ package {
 			//hint.addAnimation("thinking space",[5]);
 			hint.addAnimation("X",[1,2,3],10,true);
 			hint.addAnimation("Z",[4,5,6],10,true);
+			hint.addAnimation("arrows",[7,8,9],10,true);
 			hint.play("idle");
 			add(hint);
 			
@@ -528,6 +580,14 @@ package {
 			pause = new PauseState();
 			pause.setAll("exists", false);
 			add(pause);
+			
+			/*
+			// hint arrows
+			hintArrow.makeGraphic(FlxG.width,FlxG.height,0x00000000);
+			hintArrow.scrollFactor = new FlxPoint(0,0);
+			add(hintArrow);
+			*/
+
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -627,6 +687,15 @@ package {
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}*/
 			
+			if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
+				exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
+				var exitX:Number = exitPoint.x - FlxG.camera.scroll.x - FlxG.width/2;
+				var exitY:Number = exitPoint.y - FlxG.camera.scroll.y - FlxG.height/2;
+				var exitA:Number = Math.atan2(exitY, exitX);
+				exitArrow.x = FlxG.width/2 + Math.cos(exitA)*100;
+				exitArrow.y = FlxG.height/2 + Math.sin(exitA)*100;
+			}
+			
 			// marker line
 			markerLine.fill(0x00000000);
 			if (bodyMode && !handOut && !handIn) {
@@ -636,7 +705,6 @@ package {
 				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
 				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
-				
 				// make objects glow
 			} else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
@@ -646,6 +714,19 @@ package {
 				endY = startY + GRAPPLE_LENGTH * Math.sin(rad) / 4.0;
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
+			
+			/*
+			// hint arrow
+			hintArrow.fill(0x00000000);
+			
+			if (doorsDead) {
+				startX = hand.x+hand.width/2.0;
+				startY = hand.y+hand.height/2.0;
+				endX = exitPoint.x;
+				endY = exitPoint.y;
+				hintArrow.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+			}
+			*/
 			
 			// hint system
 			//theta = (hand.angle)*Math.PI/180.0;
@@ -670,7 +751,19 @@ package {
 				
 				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("Z");
-				} else {
+				}
+				// arrow hint (uncomment if you want it, I think it's kind of ugly though...)
+				/*
+				else if (Registry.neverCrawled) {
+					if (hand.velocity.x != 0 || hand.velocity.y != 0 && onGround) {
+						Registry.neverCrawled = false;
+					} else {
+						hint.play("arrows");
+					}
+				}
+				*/
+				//
+				else {
 					hint.play("idle");
 				}
 				
@@ -690,69 +783,6 @@ package {
 					hint.play("X");
 				} else {
 					hint.play("idle");
-				}
-			}
-			
-			// to time the fall for the different falling rot, really belongs with anim stuff
-			if (hand.touching) {handFalling = false; timeFallen = 0;}
-			timeFallen += FlxG.elapsed;
-			
-			// less janky way of getting gears/heads to move with body...
-			if (bodyMode) {
-				
-				var theta:Number = (body.angle-90)*Math.PI/180.0;
-				
-				bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
-				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
-				bodyHead.angle = body.angle;
-				
-				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
-				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
-				bodyGear.angle = -hand.angle;
-			}
-			if (bodyMode || cannonMode) {
-				if (!handOut) {
-					armBase.angle = hand.angle - 180;
-				}
-				armBase.x = body.x;
-				armBase.y = body.y;
-			}
-			
-			// Press Buttons!
-			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
-				var button:FlxSprite = buttonGroup.members[mm];
-				var buttonState:Boolean = buttonStateArray[mm];
-				var bangFrame:Number = buttonBangGroup.members[mm].frame;
-				buttonBangGroup.members[mm].alpha = (6.0 - bangFrame)/6.0 + 0.22;
-				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
-					button.frame = BUTTON_PRESSED;
-					buttonStateArray[mm] = true;
-					buttonReactionArray[mm]();
-					buttonBangGroup.members[mm].kill();
-					for (var bb:String in doorGroup.members) {
-						var door:FlxSprite = doorGroup.members[bb];
-						if (door.frame == 13) {door.play("pulse 1");}
-						else if (14 <= door.frame && door.frame <= 17) {door.play("pulse 2");}
-					}
-				}
-			}
-			
-			// Bring midground to life
-			if (reinvigorated) {
-				
-				// Steam
-				
-				// Spin Gears // should eventually make them accel into spin
-				var gear:FlxSprite;
-				for (var jjj:String in gearInGroup.members) {
-					gear = gearInGroup.members[jjj];
-					gear.angle += 0.5;
-					if (gear.angle > 360) {gear.angle = 0;}
-				}
-				for (jjj in gearOutGroup.members) {
-					gear = gearOutGroup.members[jjj];
-					gear.angle -= 0.5;
-					if (gear.angle < 0) {gear.angle = 360;}
 				}
 			}
 			
@@ -789,7 +819,7 @@ package {
 						robodyAimSound.stop();
 					}
 				}
-				// The hand is launching out of the body
+					// The hand is launching out of the body
 				else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
@@ -807,8 +837,120 @@ package {
 				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 					robodyLandOnWallSound.play();
 				}
+				
+				// hand electricity
+				if (hand.touching && !lastTouchedWood) {
+					ambientElectricalHumSound.play();
+				} else {
+					ambientElectricalHumSound.stop();
+				}
+				
+				// cannon fire
+				if (cannonMode && FlxG.keys.justPressed("X")) {
+					cannonShotSound.stop();
+					cannonShotSound.play();
+				}
+				
+				// hand landed
+				if (hand.justTouched(FlxObject.ANY)) {
+					if (!lastTouchedWood) {
+						handLandingOnMetalSound.stop();
+						handLandingOnMetalSound.play();
+					} else {
+						handLandingOnNonstickMetalSound.stop();
+						handLandingOnNonstickMetalSound.play();
+					}
+				}
+				
+				// button press, gears, steam
+				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
+					var button:FlxSprite = buttonGroup.members[qq];
+					var buttonState:Boolean = buttonStateArray[qq];
+					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) {
+						buttonPressSound.stop();
+						buttonPressSound.play();
+					}
+					if (button.frame == 2) {
+						ambientGearsSound.play();
+					}
+					if (button.frame == 3) {
+						ambientSteamSound.play();
+					}
+				}
+				
+				
+				// door open
+				for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
+					if (doorGroup.members[ab].frame == 1) {
+						doorOpenSound.stop();
+						doorOpenSound.play();
+					}
+				}
 			}
 			/* End Audio */
+			
+			// to time the fall for the different falling rot, really belongs with anim stuff
+			if (hand.touching) {handFalling = false; timeFallen = 0;}
+			timeFallen += FlxG.elapsed;
+			
+			// less janky way of getting gears/heads to move with body...
+			if (bodyMode) {
+				
+				var theta:Number = (body.angle-90)*Math.PI/180.0;
+				
+				bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+				bodyHead.angle = body.angle;
+				
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
+				bodyGear.angle = -hand.angle;
+			}
+			if (bodyMode || cannonMode) {
+				if (!handOut) {
+					armBase.angle = hand.angle - 180;
+				}
+				armBase.x = body.x;
+				armBase.y = body.y;
+			}
+			
+			// Press Buttons!
+			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
+				button = buttonGroup.members[mm];
+				buttonState = buttonStateArray[mm];
+				var bangFrame:Number = buttonBangGroup.members[mm].frame;
+				buttonBangGroup.members[mm].alpha = (6.0 - bangFrame)/6.0 + 0.22;
+				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+					button.frame = BUTTON_PRESSED;
+					buttonStateArray[mm] = true;
+					buttonReactionArray[mm]();
+					buttonBangGroup.members[mm].kill();
+					for (var bb:String in doorGroup.members) {
+						var door:FlxSprite = doorGroup.members[bb];
+						if (door.frame == 13) {door.play("pulse 1");}
+						else if (14 <= door.frame && door.frame <= 17) {door.play("pulse 2");}
+					}
+				}
+			}
+			
+			// Bring midground to life
+			if (reinvigorated) {
+				
+				// Steam
+				
+				// Spin Gears // should eventually make them accel into spin
+				var gear:FlxSprite;
+				for (var jjj:String in gearInGroup.members) {
+					gear = gearInGroup.members[jjj];
+					gear.angle += 0.5;
+					if (gear.angle > 360) {gear.angle = 0;}
+				}
+				for (jjj in gearOutGroup.members) {
+					gear = gearOutGroup.members[jjj];
+					gear.angle -= 0.5;
+					if (gear.angle < 0) {gear.angle = 360;}
+				}
+			}
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
@@ -1249,11 +1391,55 @@ package {
 			
 			super.update();
 			
+			var doorsJustDied:Boolean = false;
+			//if (!doorsDead) {
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
 				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
+					//doorsDead = true;
+					doorsJustDied = true;
 				}
 			}
+			//}
+			
+			/*
+			// catch all drop doors
+			//if (doorsDead) {
+			if (doorsJustDied) {// && !doorsDead) {
+				//doorsDead = true;
+				for (a = bodyGroup.length-1; a >= 0; a--) {
+					var bbody:FlxSprite = bodyGroup.members[a];
+					var bbodyGear:FlxSprite = bodyGearGroup.members[a];
+					var bbodyHead:FlxSprite = bodyHeadGroup.members[a];
+					var barmBase:FlxSprite = bodyArmBaseGroup.members[a];
+					if (!bbody.touching) {
+						
+						bbody.acceleration.y = MAX_GRAV_VEL;
+						if (0 > bbody.angle || bbody.angle < 360) {
+							if (0 > bbody.angle) {
+								bbody.angle += 5;
+							} else {
+								bbody.angle -= 5;
+							}
+						}
+						
+						var btheta:Number = (bbody.angle-90)*Math.PI/180.0;
+						bbodyHead.x = bbody.x + bbody.width/2.0 - bbodyHead.width/2.0 + (bbodyHead.height*1.5)*Math.cos(btheta);
+						bbodyHead.y = bbody.y + bbody.height/2.0 - bbodyHead.height/2.0 + (bbodyHead.height*1.5)*Math.sin(btheta);
+						bbodyHead.angle = bbody.angle;
+						bbodyGear.x = bbody.x + bbody.width/2.0 - bbodyGear.width/2.0 + (bbodyGear.width/2.0)*Math.cos(btheta-Math.PI/2.0);
+						bbodyGear.y = bbody.y + bbody.height/2.0 - bbodyGear.height/2.0 + (bbodyGear.width/2.0)*Math.sin(btheta-Math.PI/2.0);
+						barmBase.x = bbody.x;
+						barmBase.y = bbody.y;
+					}
+					
+					if (bbody.justTouched(FlxObject.DOWN)) {
+						bbody.facing = FlxObject.DOWN;
+						bbody.angle = 0;
+					}
+				}
+			}
+			*/
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
@@ -1412,7 +1598,6 @@ package {
 		}
 		
 		public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
-			FlxG.log(dir);
 			if (reset) {
 				spr.facing = dir;
 				spr.acceleration.x = 0;
@@ -1538,15 +1723,25 @@ package {
 				for (var b:uint = 0; b < buttonGroup.length; b++) {
 					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
 						buttonGroup.members[b].frame = 2;
+						
+						//
+						reinvigorated = true;
 					}
 				}
 			} else {
 				for (var c:uint = 0; c < buttonGroup.length; c++) {
 					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
 						buttonGroup.members[c].frame = 3;
+						
+						//
+						for (var m:String in steams.members) {
+							steams.members[m].play("puff");
+						}
+						
 					}
 				}
 			}
+			/*
 			if (reinvigorated) {
 				reinvigorated = false;
 				for (var m:String in steams.members) {
@@ -1561,6 +1756,7 @@ package {
 					steam.play("puff");
 				}
 			}
+			*/
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
@@ -1613,6 +1809,12 @@ package {
 		}
 		
 		public function goToNextLevel():void {
+			
+			// sound stuff
+			ambientGearsSound.stop();
+			ambientSteamSound.stop();
+			ambientElectricalHumSound.stop();
+			
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
