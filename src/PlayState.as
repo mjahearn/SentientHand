@@ -128,7 +128,8 @@ package {
 		public var markerLine:FlxSprite = new FlxSprite();
 		//public var hintArrow:FlxSprite = new FlxSprite();
 		public var exitArrow:FlxSprite = new FlxSprite();
-		public var exitCenter:FlxSprite = new FlxSprite();
+		public var exitRad:Number;
+		public var exitOn:Boolean;
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
@@ -505,15 +506,12 @@ package {
 			}
 			add(arms);
 			
-			exitArrow.makeGraphic(10, 10, 0xffff0000);
+			exitArrow.loadGraphic(arrowSheet);
 			exitArrow.scrollFactor = new FlxPoint();
+			exitArrow.visible = false;
 			add(exitArrow);
-			
-			exitCenter.makeGraphic(10, 10, 0xff00ffff);
-			exitCenter.scrollFactor = new FlxPoint();
-			exitCenter.x = FlxG.width/2;
-			exitCenter.y = FlxG.height/2;
-			add(exitCenter);
+			exitRad = FlxG.height/2 - exitArrow.width;
+			exitOn = false;
 			
 			// marker line
 			markerLine.makeGraphic(level.width,level.height,0x00000000);
@@ -687,13 +685,21 @@ package {
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}*/
 			
-			if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
-				exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
-				var exitX:Number = exitPoint.x - FlxG.camera.scroll.x - FlxG.width/2;
-				var exitY:Number = exitPoint.y - FlxG.camera.scroll.y - FlxG.height/2;
-				var exitA:Number = Math.atan2(exitY, exitX);
-				exitArrow.x = FlxG.width/2 + Math.cos(exitA)*100;
-				exitArrow.y = FlxG.height/2 + Math.sin(exitA)*100;
+			if (exitOn) {
+				if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
+					exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
+					if (!exitArrow.visible) {
+						exitArrow.visible = true;
+					}
+						var exitX:Number = exitPoint.x - FlxG.camera.scroll.x - FlxG.width/2;
+					var exitY:Number = exitPoint.y - FlxG.camera.scroll.y - FlxG.height/2;
+					var exitA:Number = Math.atan2(exitY, exitX);
+					exitArrow.angle = exitA*180/Math.PI;
+					exitArrow.x = FlxG.width/2 + Math.cos(exitA) * exitRad - exitArrow.width/2;
+					exitArrow.y = FlxG.height/2 + Math.sin(exitA) * exitRad - exitArrow.height/2;
+				} else if (exitArrow.visible) {
+					exitArrow.visible = false;
+				}
 			}
 			
 			// marker line
@@ -1717,6 +1723,8 @@ package {
 				for (var a:int = 0; a < doorGroup.length; a++) {
 					doorGroup.members[a].play("open");
 				}
+				exitOn = true;
+				exitArrow.visible = true;
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
