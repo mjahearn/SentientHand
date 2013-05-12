@@ -1604,7 +1604,6 @@ package {
 		}
 		
 		public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
-			FlxG.log(dir);
 			if (reset) {
 				spr.facing = dir;
 				spr.acceleration.x = 0;
