@@ -143,7 +143,7 @@ package {
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
 		
-		[Embed("assets/testArrow.png")] public var arrowSheet:Class;
+		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		[Embed("assets/hand.png")] public var handSheet:Class;
 		[Embed("assets/hint.png")] public var hintSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
@@ -506,7 +506,9 @@ package {
 			}
 			add(arms);
 			
-			exitArrow.loadGraphic(arrowSheet);
+			exitArrow.loadGraphic(arrowSheet,true,false,32,32,true);
+			exitArrow.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
+			exitArrow.play("excite");
 			exitArrow.scrollFactor = new FlxPoint();
 			exitArrow.visible = false;
 			add(exitArrow);
@@ -919,6 +921,9 @@ package {
 				armBase.x = body.x;
 				armBase.y = body.y;
 			}
+			
+			// make arrow pulse
+			exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;
 			
 			// Press Buttons!
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
@@ -1724,7 +1729,7 @@ package {
 					doorGroup.members[a].play("open");
 				}
 				exitOn = true;
-				exitArrow.visible = true;
+				//exitArrow.visible = true;
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
