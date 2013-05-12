@@ -8,7 +8,7 @@ package {
 	public class PlayState extends FlxState {
 		
 		public const CANNON_VEL:Number = 6400; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
-		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the arrow (later the hand) rotates before grappling
+		public const ROTATE_RATE:Number = 1; //the speed (in degrees per frame) with which the hand rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
 		public const MAX_GRAV_VEL:Number = 400; //terminal velocity (in pixels per second) when the hand is falling
@@ -1145,7 +1145,7 @@ package {
 				}
 			}
 			
-			if (hand.touching && !lastTouchedWood) {
+			if (hand.touching && /*!lastTouchedWood*/ handMetalFlag < uint.MAX_VALUE) {
 				electricity.play("electricute");
 				electricity.angle = hand.angle;
 				electricity.x = hand.x;
@@ -1454,19 +1454,7 @@ package {
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			handTouching = hand.touching;
-			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
-				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
-				of the hand against the surface, we must do this check for the other corner to compensate
-				WARNING: since the switch to 8x8 tiles, this only checks one other tile (on the opposite end), while the player is
-				colliding with >=4 */
-				var indX:uint = handWoodFlag % level.widthInTiles;
-				var indY:uint = handWoodFlag / level.widthInTiles;
-				if (hand.isTouching(FlxObject.UP) && indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
-					handMetalFlag = indY*level.widthInTiles + indX+1;
-				} else if ((hand.isTouching(FlxObject.LEFT) || hand.isTouching(FlxObject.RIGHT)) && indY < level.heightInTiles - 1 && isMetal(level.getTile(indX,indY+1))) {
-					handMetalFlag = (indY+1)*level.widthInTiles + indX;
-				}
-			}
+			correctMetal();
 			if (bodyMode) {
 				//was block stuff
 			} else {
@@ -1541,8 +1529,12 @@ package {
 		}*/
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
+			metalStuff(tile.mapIndex, spr);
+		}
+		
+		public function metalStuff(ind:uint, spr:FlxSprite):void {
 			if (spr == hand && !cannonMode) {
-				handMetalFlag = tile.mapIndex;
+				handMetalFlag = ind;
 				lastTouchedWood = false;
 				if (getHandTouching() != spr.facing) {
 					fixGravity(spr);
@@ -1866,6 +1858,36 @@ package {
 		
 		public function isMultiDirection(n:uint):Boolean {
 			return ((n & FlxObject.DOWN) > 0 && (n ^ FlxObject.DOWN) > 0) || ((n & FlxObject.UP) > 0 && (n ^ FlxObject.UP) > 0) || ((n & FlxObject.LEFT) > 0 && (n ^ FlxObject.LEFT) > 0);
+		}
+		
+		public function correctMetal():void {
+			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
+				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
+				of the hand against the surface, we must do this check for the other corner to compensate */
+				var indX:uint = handWoodFlag % level.widthInTiles;
+				var indY:uint = handWoodFlag / level.widthInTiles;
+				if (hand.isTouching(FlxObject.UP) || hand.isTouching(FlxObject.DOWN)) {
+					if (indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
+						metalStuff(indY*level.widthInTiles + indX+1, hand);
+					} else if (indX < level.widthInTiles - 2 && isMetal(level.getTile(indX+2,indY))) {
+						metalStuff(indY*level.widthInTiles + indX+2, hand);
+					} else if (indX < level.widthInTiles - 3 && isMetal(level.getTile(indX+3,indY))) {
+						metalStuff(indY*level.widthInTiles + indX+3, hand);
+					} else if (indX < level.widthInTiles - 4 && isMetal(level.getTile(indX+4,indY))) {
+						metalStuff(indY*level.widthInTiles + indX+4, hand);
+					}
+				} else if (hand.isTouching(FlxObject.LEFT) || hand.isTouching(FlxObject.RIGHT)) {
+					if (indY < level.heightInTiles - 1 && isMetal(level.getTile(indX,indY+1))) {
+						metalStuff((indY+1)*level.widthInTiles + indX, hand);
+					} else if (indY < level.heightInTiles - 2 && isMetal(level.getTile(indX,indY+2))) {
+						metalStuff((indY+2)*level.widthInTiles + indX, hand);
+					} else if (indY < level.heightInTiles - 3 && isMetal(level.getTile(indX,indY+3))) {
+						metalStuff((indY+3)*level.widthInTiles + indX, hand);
+					} else if (indY < level.heightInTiles - 4 && isMetal(level.getTile(indX,indY+4))) {
+						metalStuff((indY+4)*level.widthInTiles + indX, hand);
+					}
+				}
+			}
 		}
 	}
 }
