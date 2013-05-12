@@ -1591,6 +1591,7 @@ package {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, true);
 				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
+					FlxG.log("wheee");
 					setGravity(spr, FlxObject.UP, true);
 				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
 					setGravity(spr, FlxObject.LEFT, true);
@@ -1912,13 +1913,13 @@ package {
 				}
 			} else if (dir == FlxObject.UP) {
 				for (var c:uint = 0; c < 4; c++) {
-					if (indX < level.heightInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
+					if (indX < level.widthInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.DOWN) {
 				for (var d:uint = 0; d < 4; d++) {
-					if (indY < level.heightInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
+					if (indX < level.widthInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
 						return true;
 					}
 				}
