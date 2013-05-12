@@ -1559,37 +1559,37 @@ package {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
 				if (getHandTouching() != spr2.facing) {
-					fixGravity(spr2);
+					fixGravity(spr2, true);
 				}
 				lastTouchedWood = false;
 			} else {
 				handMetalFlag = 1;
 				if (getHandTouching() != spr1.facing) {
-					fixGravity(spr1);
+					fixGravity(spr1, true);
 				}
 				lastTouchedWood = false;
 			}
 		}
 		
-		public function fixGravity(spr:FlxSprite):void {
+		public function fixGravity(spr:FlxSprite, isDoor:Boolean=false):void {
 			if ((getHandTouching() & spr.facing) >= spr.facing) {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, false);
-				} if ((getHandTouching() & FlxObject.UP) > 0) {
+				} if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
 					setGravity(spr, FlxObject.UP, false);
-				} if ((getHandTouching() & FlxObject.LEFT) > 0) {
+				} if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
 					setGravity(spr, FlxObject.LEFT, false);
-				} if ((getHandTouching() & FlxObject.RIGHT) > 0) {
+				} if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT))) {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, true);
-				} else if ((getHandTouching() & FlxObject.UP) > 0) {
+				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
 					setGravity(spr, FlxObject.UP, true);
-				} else if ((getHandTouching() & FlxObject.LEFT) > 0) {
+				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
 					setGravity(spr, FlxObject.LEFT, true);
-				} else if ((getHandTouching() & FlxObject.RIGHT) > 0) {
+				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT))) {
 					setGravity(spr, FlxObject.RIGHT, true);
 				}
 			}
@@ -1841,7 +1841,7 @@ package {
 			if (hand.touching == handTouching) {
 				return handTouching;
 			}
-			if (handTouching != 0 && isMultiDirection(handTouching)/*(hand.touching & handTouching) >= hand.touching*/) { //originally handTouching if this causes problems
+			if (handTouching != 0 && (isMultiDirection(handTouching)/* || !isMultiDirection(hand.touching)*/)/*(hand.touching & handTouching) >= hand.touching*/) { //originally >= handTouching if this causes problems
 				return handTouching;
 			}
 			return hand.touching;
@@ -1888,6 +1888,37 @@ package {
 					}
 				}
 			}
+		}
+		
+		public function isMetalInDir(dir:uint):Boolean {
+			var indX:uint = int(hand.x/8);
+			var indY:uint = int(hand.y/8);
+			if (dir == FlxObject.LEFT) {
+				for (var a:uint = 0; a < 4; a++) {
+					if (indY < level.heightInTiles - a && isMetal(level.getTile(indX-1, indY+a))) {
+						return true;
+					}
+				}
+			} else if (dir == FlxObject.RIGHT) {
+				for (var b:uint = 0; b < 4; b++) {
+					if (indY < level.heightInTiles - b && isMetal(level.getTile(indX+4, indY+b))) {
+						return true;
+					}
+				}
+			} else if (dir == FlxObject.UP) {
+				for (var c:uint = 0; c < 4; c++) {
+					if (indX < level.heightInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
+						return true;
+					}
+				}
+			} else if (dir == FlxObject.DOWN) {
+				for (var d:uint = 0; d < 4; d++) {
+					if (indY < level.heightInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 	}
 }
