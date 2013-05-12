@@ -1253,6 +1253,9 @@ package {
 						}
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
+						if (bodyMode) {
+							lastTouchedWood = false;
+						}
 						bodyMode = false;
 						cannonMode = false;
 						setGravity(hand, body.facing, true);
@@ -1591,7 +1594,6 @@ package {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, true);
 				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
-					FlxG.log("wheee");
 					setGravity(spr, FlxObject.UP, true);
 				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
 					setGravity(spr, FlxObject.LEFT, true);
@@ -1602,6 +1604,7 @@ package {
 		}
 		
 		public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
+			FlxG.log(dir);
 			if (reset) {
 				spr.facing = dir;
 				spr.acceleration.x = 0;
