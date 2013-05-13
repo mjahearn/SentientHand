@@ -63,6 +63,8 @@ package {
 		
 		public var pause:PauseState;
 		
+		public var touchedExitPoint:Boolean = false;
+		
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
@@ -687,11 +689,17 @@ package {
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}*/
 			
+			if (hand.overlapsPoint(exitPoint)) {
+				touchedExitPoint = true;
+			}
+			
 			if (exitOn) {
 				if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
 					exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
 					if (!exitArrow.visible) {
-						exitArrow.visible = true;
+						if (!touchedExitPoint) {
+							exitArrow.visible = true;
+						}
 					}
 						var exitX:Number = exitPoint.x - FlxG.camera.scroll.x - FlxG.width/2;
 					var exitY:Number = exitPoint.y - FlxG.camera.scroll.y - FlxG.height/2;
