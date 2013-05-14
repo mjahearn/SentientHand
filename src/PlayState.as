@@ -1591,21 +1591,21 @@ package {
 			if ((getHandTouching() & spr.facing) >= spr.facing) {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, false);
-				} if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
+				} if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP,3))) {
 					setGravity(spr, FlxObject.UP, false);
-				} if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
+				} if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT,3))) {
 					setGravity(spr, FlxObject.LEFT, false);
-				} if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT))) {
+				} if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT,3))) {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					setGravity(spr, FlxObject.DOWN, true);
-				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP))) {
+				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP,3))) {
 					setGravity(spr, FlxObject.UP, true);
-				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT))) {
+				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT,3))) {
 					setGravity(spr, FlxObject.LEFT, true);
-				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT))) {
+				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT,3))) {
 					setGravity(spr, FlxObject.RIGHT, true);
 				}
 			}
@@ -1880,55 +1880,38 @@ package {
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate */
-				var indX:uint = handWoodFlag % level.widthInTiles;
-				var indY:uint = handWoodFlag / level.widthInTiles;
-				if (hand.isTouching(FlxObject.UP) || hand.isTouching(FlxObject.DOWN)) {
-					if (indX < level.widthInTiles - 1 && isMetal(level.getTile(indX+1,indY))) {
-						metalStuff(indY*level.widthInTiles + indX+1, hand);
-					} else if (indX < level.widthInTiles - 2 && isMetal(level.getTile(indX+2,indY))) {
-						metalStuff(indY*level.widthInTiles + indX+2, hand);
-					} else if (indX < level.widthInTiles - 3 && isMetal(level.getTile(indX+3,indY))) {
-						metalStuff(indY*level.widthInTiles + indX+3, hand);
-					} else if (indX < level.widthInTiles - 4 && isMetal(level.getTile(indX+4,indY))) {
-						metalStuff(indY*level.widthInTiles + indX+4, hand);
-					}
-				} else if (hand.isTouching(FlxObject.LEFT) || hand.isTouching(FlxObject.RIGHT)) {
-					if (indY < level.heightInTiles - 1 && isMetal(level.getTile(indX,indY+1))) {
-						metalStuff((indY+1)*level.widthInTiles + indX, hand);
-					} else if (indY < level.heightInTiles - 2 && isMetal(level.getTile(indX,indY+2))) {
-						metalStuff((indY+2)*level.widthInTiles + indX, hand);
-					} else if (indY < level.heightInTiles - 3 && isMetal(level.getTile(indX,indY+3))) {
-						metalStuff((indY+3)*level.widthInTiles + indX, hand);
-					} else if (indY < level.heightInTiles - 4 && isMetal(level.getTile(indX,indY+4))) {
-						metalStuff((indY+4)*level.widthInTiles + indX, hand);
-					}
+				if ((hand.isTouching(FlxObject.UP) && isMetalInDir(FlxObject.UP, 4)) 
+				 || (hand.isTouching(FlxObject.DOWN) && isMetalInDir(FlxObject.DOWN, 4))
+				 || (hand.isTouching(FlxObject.LEFT) && isMetalInDir(FlxObject.LEFT, 4))
+				 || (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(FlxObject.RIGHT, 4))) {
+					metalStuff(1, hand);
 				}
 			}
 		}
 		
-		public function isMetalInDir(dir:uint):Boolean {
+		public function isMetalInDir(dir:uint, max:uint):Boolean {
 			var indX:uint = int(hand.x/8);
 			var indY:uint = int(hand.y/8);
 			if (dir == FlxObject.LEFT) {
-				for (var a:uint = 0; a < 4; a++) {
+				for (var a:uint = 0; a <= max; a++) {
 					if (indY < level.heightInTiles - a && isMetal(level.getTile(indX-1, indY+a))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.RIGHT) {
-				for (var b:uint = 0; b < 4; b++) {
+				for (var b:uint = 0; b <= max; b++) {
 					if (indY < level.heightInTiles - b && isMetal(level.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.UP) {
-				for (var c:uint = 0; c < 4; c++) {
+				for (var c:uint = 0; c <= max; c++) {
 					if (indX < level.widthInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.DOWN) {
-				for (var d:uint = 0; d < 4; d++) {
+				for (var d:uint = 0; d <= max; d++) {
 					if (indX < level.widthInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
 						return true;
 					}
