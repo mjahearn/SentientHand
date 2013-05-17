@@ -45,12 +45,17 @@ package
 			if (FlxG.keys.justPressed("A")) {
 				Registry.level = Registry.level01;
 				Registry.background = Registry.back01;
+				Registry.midground = Registry.mid01;
 				FlxG.switchState(new PlayState);//(Registry.level01,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("B")) {
+				Registry.background = Registry.back02;
 				Registry.level = Registry.level02;
+				Registry.midground = Registry.mid02;
 				FlxG.switchState(new PlayState);//(Registry.level02,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("C")) {
 				Registry.level = Registry.level03;
+				Registry.background = Registry.back03;
+				Registry.midground = Registry.mid03;
 				FlxG.switchState(new PlayState);//(Registry.level03,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("D")) {
 				Registry.level = Registry.testMap;
@@ -63,12 +68,18 @@ package
 				FlxG.switchState(new PlayState);//(Registry.tallMap,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("G")) {
 				Registry.level = Registry.level04;
+				Registry.midground = Registry.mid04;
+				Registry.background = Registry.back04;
 				FlxG.switchState(new PlayState);
 			} else if (FlxG.keys.justPressed("H")) {
 				Registry.level = Registry.level05;
+				Registry.midground = Registry.mid05;
+				Registry.background = Registry.back05;
 				FlxG.switchState(new PlayState);
 			} else if (FlxG.keys.justPressed("I")) {
 				Registry.level = Registry.level06;
+				Registry.background = Registry.back06;
+				Registry.midground = Registry.mid06;
 				FlxG.switchState(new PlayState);
 			}
 			
