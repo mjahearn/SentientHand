@@ -8,7 +8,7 @@ package {
 	public class PlayState extends FlxState {
 		
 		public const CANNON_VEL:Number = 6400; //the initial velocity (in pixels per second) of the hand upon launch from a cannon
-		public const ROTATE_RATE:Number = 1; //the speed (in degrees per frame) with which the hand rotates before grappling
+		public const ROTATE_RATE:Number = 2; //the speed (in degrees per frame) with which the hand rotates before grappling
 		public const GRAPPLE_SPEED:Number = 300; //the velocity (in pixels per second) of the grappling arm when extending or retracting
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
 		public const MAX_GRAV_VEL:Number = 400; //terminal velocity (in pixels per second) when the hand is falling
@@ -1469,6 +1469,7 @@ package {
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
+			FlxG.collide(doorGroup, bodyGroup);
 			handTouching = hand.touching;
 			correctMetal();
 			if (bodyMode) {
