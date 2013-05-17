@@ -12,7 +12,7 @@ package
 			Registry.midground = Registry.midgroundMap;
 			Registry.background = Registry.backgroundMap;
 		
-			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv");
+			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv \n I -> tsh_level06.csv");
 			add(text);
 			
 			var ctlText:FlxText = new FlxText(100, 150, 400, "Controls (click to change):");
@@ -44,12 +44,18 @@ package
 			
 			if (FlxG.keys.justPressed("A")) {
 				Registry.level = Registry.level01;
+				Registry.background = Registry.back01;
+				Registry.midground = Registry.mid01;
 				FlxG.switchState(new PlayState);//(Registry.level01,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("B")) {
+				Registry.background = Registry.back02;
 				Registry.level = Registry.level02;
+				Registry.midground = Registry.mid02;
 				FlxG.switchState(new PlayState);//(Registry.level02,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("C")) {
 				Registry.level = Registry.level03;
+				Registry.background = Registry.back03;
+				Registry.midground = Registry.mid03;
 				FlxG.switchState(new PlayState);//(Registry.level03,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("D")) {
 				Registry.level = Registry.testMap;
@@ -62,9 +68,18 @@ package
 				FlxG.switchState(new PlayState);//(Registry.tallMap,Registry.midgroundMap,Registry.backgroundMap));
 			} else if (FlxG.keys.justPressed("G")) {
 				Registry.level = Registry.level04;
+				Registry.midground = Registry.mid04;
+				Registry.background = Registry.back04;
 				FlxG.switchState(new PlayState);
 			} else if (FlxG.keys.justPressed("H")) {
 				Registry.level = Registry.level05;
+				Registry.midground = Registry.mid05;
+				Registry.background = Registry.back05;
+				FlxG.switchState(new PlayState);
+			} else if (FlxG.keys.justPressed("I")) {
+				Registry.level = Registry.level06;
+				Registry.background = Registry.back06;
+				Registry.midground = Registry.mid06;
 				FlxG.switchState(new PlayState);
 			}
 			

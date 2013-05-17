@@ -30,6 +30,11 @@ package {
 		public const WOOD_OVERFLOW_MIN:uint = 232;
 		public const WOOD_OVERFLOW_MAX:uint = 251;
 		
+		public const GRASS_MIN:uint = 272;
+		public const GRASS_MAX:uint = 286;
+		public const UNTOUCHABLE_GRASS_MIN:uint = 264;
+		public const UNTOUCHABLE_GRASS_MAX:uint = 271;
+		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
@@ -225,8 +230,8 @@ package {
 			
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
-				Registry.midground = Registry.midgroundMap;
-				Registry.background = Registry.backgroundMap;
+				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
+				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
 			}
 			
 			levelMap = Registry.level;
@@ -334,7 +339,7 @@ package {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
-			for (i = WOOD_OVERFLOW_MIN; i < WOOD_OVERFLOW_MAX; i++) {
+			for (i = WOOD_OVERFLOW_MIN; i <= WOOD_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
@@ -349,6 +354,20 @@ package {
 			for (i = UNTOUCHABLE_OVERFLOW_MIN; i <= UNTOUCHABLE_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.NONE);
 			}
+			
+			
+			for (i = UNTOUCHABLE_GRASS_MIN; i <= UNTOUCHABLE_GRASS_MAX; i++) {
+				level.setTileProperties(i, FlxObject.NONE);
+			}
+			
+			
+			// do we need a grass sound?
+			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
+				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+			}
+			
+			
+			
 			
 			// Cannons
 			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
@@ -1835,6 +1854,8 @@ package {
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
+				Registry.midground = Registry.midOrder[Registry.levelNum];
+				Registry.background = Registry.backOrder[Registry.levelNum];
 				FlxG.switchState(new PlayState);//(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
 			} else {
 				FlxG.switchState(new EndState());
