@@ -1,0 +1,165 @@
+stuff in the class before the first method:
+
+
+		public const BLOCK_MIN:uint = 186;
+		public const BLOCK_MAX:uint = 188;
+		
+		public var blockGroup:FlxGroup;
+		public var handBlockFlag:uint;
+		public var handBlockRel:FlxPoint;
+		
+		[Embed("assets/block_32x32.png")] public var block32x32Sheet:Class;
+		[Embed("assets/block_48x48.png")] public var block48x48Sheet:Class;
+		[Embed("assets/block_64x64.png")] public var block64x64Sheet:Class;
+
+stuff in create():
+
+	between initialization of bodies and buttons:
+			
+			// Blocks
+			blockGroup = new FlxGroup();
+			for (i = BLOCK_MIN; i <= BLOCK_MAX; i++) {
+				level.setTileProperties(i,FlxObject.NONE);
+				var blockArray:Array = level.getTileInstances(i);
+				if (blockArray) {
+					for (j = 0; j < blockArray.length; j++) {
+						level.setTileByIndex(blockArray[j],0);
+						var blockPoint:FlxPoint = pointForTile(blockArray[j],level);
+
+						var blockImgClass:Class;
+						var blockSizeNumber:Number = (i-BLOCK_MIN)%3;
+						if      (blockSizeNumber == 0) {blockImgClass = block32x32Sheet;}
+						else if (blockSizeNumber == 1) {blockImgClass = block48x48Sheet;}
+						else if (blockSizeNumber == 2) {blockImgClass = block64x64Sheet;}
+
+						var testBlock:FlxSprite = new FlxSprite(blockPoint.x,blockPoint.y,blockImgClass);
+						setBlockState(testBlock,0);
+						blockGroup.add(testBlock);
+					}
+				}
+			}
+			add(blockGroup);
+			
+		during initialization of non-FlxSprite data variables:
+		
+			handBlockFlag = uint.MAX_VALUE;
+			handBlockRel = new FlxPoint();
+			
+		||ed with (hand.overlaps(button) && !buttonState) when pressing buttons:
+		
+			(blockOvelapsButton(button) && !buttonState)
+		
+		in main movement check for handOut:
+			
+			if (handBlockFlag < uint.MAX_VALUE && FlxG.keys.UP) {
+				setBlockState(blockGroup.members[handBlockFlag], 2);
+				handBlockFlag = uint.MAX_VALUE;
+			}
+		
+		commented out, in if statement checking if body should be dragged to hand in same:
+			/*|| (handBlockFlag < uint.MAX_VALUE && blockGroup.members[handBlockFlag].mass > body.mass)*/
+		
+		when setting handOut to false in same:
+		
+			if (handBlockFlag < uint.MAX_VALUE) {
+				setBlockState(blockGroup.members[handBlockFlag], 2);
+				handBlockFlag = uint.MAX_VALUE;
+			}
+			
+		during collisions:
+			
+			//handBlockFlag = uint.MAX_VALUE;
+			FlxG.collide(blockGroup, hand, blockCallback);
+			if (bodyMode) {
+				FlxG.collide(blockGroup, body, blockCallback);
+			} else {
+				FlxG.collide(blockGroup, bodyGroup, blockCallback);
+			}
+			FlxG.collide(level, blockGroup, levelBlockCallback);
+			//FlxG.collide(blockGroup); //Need to figure out how to make this work
+			
+		after collisions, in bodyMode check: (now labeled "was block stuff")
+		
+			if (onGround && handBlockFlag < uint.MAX_VALUE) {
+					var curBlock:FlxSprite = blockGroup.members[handBlockFlag];
+					//if (curBlock.mass < body.mass) {
+						if (curBlock.immovable) {
+							setBlockState(curBlock, 1);
+							handBlockRel = new FlxPoint(curBlock.x - hand.x, curBlock.y - hand.y);
+						}
+						if (handOut) {
+							curBlock.x = hand.x + handBlockRel.x;
+							curBlock.y = hand.y + handBlockRel.y;
+							FlxG.collide(level, blockGroup);
+						} else {
+							//prolly won't be reached any more due to handBlockFlag resetting with handOut
+							setBlockState(curBlock, 2);
+							handBlockFlag = uint.MAX_VALUE;
+						}
+					//}
+				}
+				
+other functions:
+
+		public function blockCallback(spr1:FlxSprite, spr2:FlxSprite):void {
+			if (spr2 == hand) {
+				if (bodyMode) {
+					handBlockFlag = blockGroup.members.indexOf(spr1);
+				} else {
+					handMetalFlag = 1;
+					fixGravity(spr2);
+					lastTouchedWood = false;
+				}
+			/*} else if (spr2 in bodyGroup && spr1.mass > spr2.mass) {
+				fixGravity(spr2);*/
+			} else if (spr2 in blockGroup.members) {
+				if (spr1 == hand) {
+					if (bodyMode) {
+						handBlockFlag = blockGroup.members.indexOf(spr2);
+					} else {
+						handMetalFlag = 1;
+						fixGravity(spr1);
+						lastTouchedWood = false;
+					}
+				}/* else if (spr1 in bodyGroup && spr2.mass > spr1.mass) {
+					fixGravity(spr1);
+				}*/
+			}
+		}
+		
+		public function levelBlockCallback(spr1:FlxTilemap, spr2:FlxSprite):void {
+			if (spr2.isTouching(FlxObject.DOWN)) {
+				setBlockState(spr2, 0);
+			}
+		}
+		
+		public function blockOvelapsButton(spr:FlxSprite):Boolean {
+			for (var m:String in blockGroup.members) {
+				if (spr.overlaps(blockGroup.members[m])) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		/* 0 = rest
+		1 = grabbed
+		2 = in air*/
+		public function setBlockState(b:FlxSprite, n:uint):void {
+			if (n == 0) {
+				b.immovable = true;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else if (n == 1) {
+				b.immovable = false;
+				b.drag.x = Number.MAX_VALUE;
+				b.drag.y = Number.MAX_VALUE;
+				b.acceleration.y = 0;
+			} else {
+				b.immovable = false;
+				b.drag.x = 0;
+				b.drag.y = 0;
+				b.acceleration.y = GRAV_RATE;
+			}
+		}
