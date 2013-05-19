@@ -249,7 +249,7 @@ package {
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
-			FlxG.bgColor = 0xff000000;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+			FlxG.bgColor = 0xff090502;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 			
 			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
@@ -291,6 +291,7 @@ package {
 					for (j = 0; j < steamArray.length; j++) {
 						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
 						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
+						steam.alpha = 0.5;
 						steam.loadGraphic(steamSheet,true,false,32,32,true);
 						steam.addAnimation("idle",[0]);
 						steam.play("idle");
@@ -980,12 +981,12 @@ package {
 				var gear:FlxSprite;
 				for (var jjj:String in gearInGroup.members) {
 					gear = gearInGroup.members[jjj];
-					gear.angle += 0.5;
+					gear.angle += 0.5*(64.0/gear.width);
 					if (gear.angle > 360) {gear.angle = 0;}
 				}
 				for (jjj in gearOutGroup.members) {
 					gear = gearOutGroup.members[jjj];
-					gear.angle -= 0.5;
+					gear.angle -= 0.5*(64.0/gear.width);
 					if (gear.angle < 0) {gear.angle = 360;}
 				}
 			}
@@ -1030,7 +1031,7 @@ package {
 						}
 					}
 					// The hand is about to jump from a flat surface
-					if (FlxG.keys.justPressed(ACTION_KEY)) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && (hand.facing != FlxObject.DOWN || Registry.jumping)) {
 						if (handDir == FlxObject.LEFT) {hand.play("fall left");} //<- placeholder {hand.play("jump left");}
 						else if (handDir == FlxObject.RIGHT) {hand.play("fall right");} //<- placeholder {hand.play("jump right");}
 					}
