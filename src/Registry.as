@@ -66,6 +66,7 @@ package {
 		public static var neverFiredBodyOrCannon:Boolean = true;
 		public static var neverAimedBodyOrCannon:Boolean = true;
 		public static var neverCrawled:Boolean = true;
+		public static var neverJumped:Boolean = true;
 		
 		public static function music():FlxSound {
 			if (musicSwitch) {
