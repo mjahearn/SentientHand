@@ -302,7 +302,7 @@ package {
 					var trashPoint:FlxPoint = pointForTile(trashArray[j],midground);
 					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
 					trash.loadGraphic(handSheet,true,false,32,32,true);
-					trash.color = 0xffff2000 & Math.random()*0xffffffff;
+					trash.color = (0xffff0000 & Math.random()*0xffffffff)
 					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
 					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
 					//trash.acceleration.y = MAX_GRAV_VEL;
@@ -1213,10 +1213,11 @@ package {
 				electricity.angle = hand.angle;
 				electricity.x = hand.x;
 				electricity.y = hand.y;
-				electricity.alpha += electricityNum*0.022;
-				if (electricity.alpha <= 0.5 || electricity.alpha >= 1) {
-					electricityNum *= -1;
-				}
+				electricity.alpha = (6.0 - electricity.frame)/6.0 + 0.22;
+				//electricity.alpha += electricityNum*0.022;
+				//if (electricity.alpha <= 0.5 || electricity.alpha >= 1) {
+					//electricityNum *= -1;
+				//}
 			} else {
 				electricity.play("stop");
 				electricity.alpha = 1;
