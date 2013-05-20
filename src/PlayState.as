@@ -56,6 +56,7 @@ package {
 		public const GEAR_MAX:uint = 18;
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
+		public const TRASH_SPAWN:uint = 31;
 		
 		//button animation frames
 		public const BUTTON_PRESSED:uint = 0;
@@ -141,6 +142,8 @@ package {
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
 		public var exitPoint:FlxPoint = new FlxPoint();
+		
+		public var trashGroup:FlxGroup = new FlxGroup();
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
@@ -249,7 +252,12 @@ package {
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
-			FlxG.bgColor = 0xff090502;//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+			if (Registry.levelNum < 5) {
+				FlxG.bgColor = 0xff090502;
+			} else {
+				FlxG.bgColor = 0xff442288;
+				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+			}
 			
 			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
@@ -285,6 +293,28 @@ package {
 			add(gearInGroup);
 			add(gearOutGroup);
 			
+			// Trash
+			var trashArray:Array = midground.getTileInstances(TRASH_SPAWN);
+			if (trashArray) {
+				var trashValidFrames:Array = [0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
+				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
+				for (j = 0; j < trashArray.length; j++) {
+					var trashPoint:FlxPoint = pointForTile(trashArray[j],midground);
+					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
+					trash.loadGraphic(handSheet,true,false,32,32,true);
+					trash.color = 0xffff2000 & Math.random()*0xffffffff;
+					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
+					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
+					//trash.acceleration.y = MAX_GRAV_VEL;
+					//trash.acceleration.x = -MAX_GRAV_VEL;
+					trash.immovable = true;
+					//FlxG.collide(hand,trash,woodCallback);
+					trashGroup.add(trash);
+				}
+			}
+			add(trashGroup);
+			
+			// Steam
 			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 				var steamArray:Array = midground.getTileInstances(i);
 				if (steamArray) {
@@ -1485,6 +1515,9 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			//FlxG.collide(level,trashGroup);
+			FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
+			//FlxG.collide(trashGroup,trashGroup);
 			FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.collide(flapGroup, hand, doorCallback);
@@ -1608,6 +1641,22 @@ package {
 			}
 		}
 		
+		/*
+		public function hitUp(spr1:FlxSprite, spr2:FlxSprite):void {
+			var spr:FlxSprite;
+			if (spr2 == hand) {
+				spr = spr1;
+			} else {
+				spr = spr2;
+			}
+			//spr.acceleration.y = MAX_GRAV_VEL;
+			//spr.acceleration.x = -MAX_GRAV_VEL;
+			spr.angle += 2.2*hand.velocity.x/MAX_MOVE_VEL;
+			spr.velocity.y = -MAX_MOVE_VEL;
+			spr.velocity.x = -MAX_MOVE_VEL;
+		}
+		*/
+				
 		public function fixGravity(spr:FlxSprite, isDoor:Boolean=false):void {
 			if ((getHandTouching() & spr.facing) >= spr.facing) {
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
@@ -1843,6 +1892,10 @@ package {
 				}
 			}*/
 			return false;
+		}
+		
+		public function stupidCallback(spr1:FlxSprite,spr2:FlxSprite):void {
+			lastTouchedWood = true;
 		}
 		
 		public function goToNextLevel():void {

@@ -34,7 +34,7 @@ package {
 		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
 		public static const levelOrder:Array = new Array(level01, level02, level03, level04, level05, level06);
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundA,musicBackgroundA);
+		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
 		public static const backOrder:Array = new Array(back01, back02, back03, back04, back05, back06);
 		public static const midOrder:Array = new Array(mid01, mid02, mid03, mid04, mid05, mid06);
 		//public static var music:FlxSound = new FlxSound();
