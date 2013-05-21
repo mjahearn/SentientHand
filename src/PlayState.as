@@ -58,6 +58,7 @@ package {
 		public const STEAM_MAX:uint = 30;
 		public const TRASH_SPAWN:uint = 31;
 		public const JUMP_HINT_SPAWN:uint = 32;
+		public const SIGN_SPAWN:uint = 33;
 		
 		//button animation frames
 		public const BUTTON_PRESSED:uint = 0;
@@ -71,6 +72,9 @@ package {
 		public var pause:PauseState;
 		
 		public var touchedExitPoint:Boolean = false;
+		
+		public var time:Number = 0;
+		public var IDLE_TIME:Number = 5;
 		
 		public var dbg:int;
 		public var rad:Number;
@@ -167,6 +171,8 @@ package {
 		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
+		
+		[Embed("assets/sign.png")] public var signSheet:Class;
 		
 		public static var levelMap:Class;
 		public static var midgroundMap:Class;
@@ -617,6 +623,7 @@ package {
 			hint.addAnimation("Z",[4,5,6],10,true);
 			hint.addAnimation("arrows",[7,8,9],10,true);
 			hint.addAnimation("left X right",[10,11,12],10,true);
+			hint.addAnimation("enter",[13,14,15],10,true);
 			hint.play("idle");
 			add(hint);
 			
@@ -654,7 +661,17 @@ package {
 			hintArrow.scrollFactor = new FlxPoint(0,0);
 			add(hintArrow);
 			*/
-
+			
+			// sign
+			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
+			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
+			if (signArray) {
+				for (j = 0; j < signArray.length; j++) {
+					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
+					midground.setTileByIndex(array[j],0);
+					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
+				}
+			}
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -666,6 +683,21 @@ package {
 		}
 		
 		override public function update():void {
+			
+			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+				time += FlxG.elapsed;
+			} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+				time += FlxG.elapsed;
+			} else {
+				time = 0;
+			}
+			if (time > IDLE_TIME) {
+				time = IDLE_TIME;
+			}
+			if (FlxG.paused) {
+				time = 0;
+			}
+			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
 			
@@ -838,7 +870,9 @@ package {
 			
 			if (!cannonMode && !bodyMode) {
 				
-				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
+				if (time >= IDLE_TIME) {
+					hint.play("enter");
+				} else if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("Z");
 				}
 				// arrow hint (uncomment if you want it, I think it's kind of ugly though...)
@@ -870,11 +904,16 @@ package {
 					armBase.color = 0xff0000;
 				}
 			} else if (cannonMode || bodyMode) {
-				if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+				if (time >= IDLE_TIME) {
+					hint.play("enter");
+				} else if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
 					hint.play("left X right");
 				} else {
 					hint.play("idle");
 				}
+			}
+			if (FlxG.paused) {
+				hint.play("idle");
 			}
 			
 			/* Begin Audio */
@@ -1615,7 +1654,7 @@ package {
 			
 			
 			// Pause
-			if (FlxG.keys.justPressed("P")) {
+			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
 			}
