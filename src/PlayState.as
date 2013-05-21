@@ -1657,7 +1657,7 @@ package {
 			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
-				IDLE_TIME = 22;
+				//IDLE_TIME = 22;
 			}
 			
 			if (FlxG.paused) {
