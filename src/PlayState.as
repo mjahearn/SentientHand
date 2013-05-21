@@ -613,6 +613,17 @@ package {
 			onGround = true;
 			add(hand);
 			
+			// sign
+			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
+			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
+			if (signArray) {
+				for (j = 0; j < signArray.length; j++) {
+					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
+					midground.setTileByIndex(array[j],0);
+					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
+				}
+			}
+			
 			hint = new FlxSprite(0,0);
 			hint.loadGraphic(hintSheet,true,false,64,64,true);
 			hint.addAnimation("idle",[0]);
@@ -661,17 +672,6 @@ package {
 			hintArrow.scrollFactor = new FlxPoint(0,0);
 			add(hintArrow);
 			*/
-			
-			// sign
-			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
-			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
-			if (signArray) {
-				for (j = 0; j < signArray.length; j++) {
-					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
-					midground.setTileByIndex(array[j],0);
-					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
-				}
-			}
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -1657,6 +1657,15 @@ package {
 			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
+				IDLE_TIME = 22;
+			}
+			
+			if (FlxG.paused) {
+				if (bodyMode || cannonMode) {
+					pause.con.play("attached");
+				} else {
+					pause.con.play("detached");
+				}
 			}
 		}
 		
