@@ -916,7 +916,9 @@ package {
 			} else if (cannonMode || bodyMode) {
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
-				} else if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+				} else if (Registry.neverAimedBodyOrCannon) {
+					hint.play("arrows");
+				} else if (Registry.neverFiredBodyOrCannon) {
 					hint.play("left X right");
 				} else {
 					hint.play("idle");
