@@ -161,6 +161,8 @@ package {
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
+		[Embed("assets/trash.png")] public var trashSheet:Class;
+		
 		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
 		
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
@@ -331,13 +333,14 @@ package {
 			// Trash
 			var trashArray:Array = midground.getTileInstances(TRASH_SPAWN);
 			if (trashArray) {
-				var trashValidFrames:Array = [0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
+				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
 				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
 				for (j = 0; j < trashArray.length; j++) {
 					var trashPoint:FlxPoint = pointForTile(trashArray[j],midground);
 					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
-					trash.loadGraphic(handSheet,true,false,32,32,true);
-					trash.color = (0xffff0000 & Math.random()*0xffffffff)
+					trash.loadGraphic(trashSheet,true,false,32,32,true);
+					//trash.color = (0xffff0000 & Math.random()*0xffffffff)
+					trash.color = 0xff555555;
 					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
 					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
 					//trash.acceleration.y = MAX_GRAV_VEL;
