@@ -151,6 +151,7 @@ package {
 		public var exitPoint:FlxPoint = new FlxPoint();
 		
 		public var trashGroup:FlxGroup = new FlxGroup();
+		public var lastTouchedDirt:Boolean = false;
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
@@ -206,6 +207,7 @@ package {
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
 		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
 		[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
+		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		
 		
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
@@ -224,6 +226,7 @@ package {
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
 		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(ambientSteamSFX,true);
 		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
+		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -420,7 +423,7 @@ package {
 			
 			// do we need a grass sound?
 			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+				level.setTileProperties(i, FlxObject.ANY, dirtCallback);
 			}
 			
 			
@@ -935,16 +938,24 @@ package {
 				
 				// The hand is crawling on wood or metal
 				if ((!bodyMode &&!cannonMode) && hand.touching && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-					if (lastTouchedWood) {
+					if (lastTouchedWood && !lastTouchedDirt) {
 						metalCrawlSound.stop();
+						dirtFootstepsSound.stop();
 						woodCrawlSound.play();
+					} else if (lastTouchedDirt) {
+						metalCrawlSound.stop();
+						woodCrawlSound.stop();
+						dirtFootstepsSound.play();
 					} else {
 						woodCrawlSound.stop();
+						dirtFootstepsSound.stop();
 						metalCrawlSound.play();
+						
 					}
 				} else {
 					woodCrawlSound.stop();
 					metalCrawlSound.stop();
+					dirtFootstepsSound.stop();
 				}
 				// The hand is in the body, aiming
 				if ((bodyMode || cannonMode) && !handOut && !handIn) {
@@ -988,13 +999,15 @@ package {
 				}
 				
 				// hand landed
-				if (hand.justTouched(FlxObject.ANY)) {
-					if (!lastTouchedWood) {
-						handLandingOnMetalSound.stop();
-						handLandingOnMetalSound.play();
-					} else {
-						handLandingOnNonstickMetalSound.stop();
-						handLandingOnNonstickMetalSound.play();
+				if (!lastTouchedDirt) {
+					if (hand.justTouched(FlxObject.ANY)) {
+						if (!lastTouchedWood) {
+							handLandingOnMetalSound.stop();
+							handLandingOnMetalSound.play();
+						} else {
+							handLandingOnNonstickMetalSound.stop();
+							handLandingOnNonstickMetalSound.play();
+						}
 					}
 				}
 				
@@ -1704,6 +1717,11 @@ package {
 				
 				if (getHandTouching() != spr.facing && onGround && !bodyMode) {fixGravity(spr);}
 			}
+		}
+		
+		public function dirtCallback(tile:FlxTile, spr:FlxSprite):void {
+			lastTouchedDirt = true;
+			woodCallback(tile,spr);
 		}
 		
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
