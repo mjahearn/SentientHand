@@ -104,6 +104,8 @@ package {
 		
 		public var bodyTargetAngle:Number;
 		
+		public var overlay:FlxSprite = new FlxSprite();
+		
 		public var arms:FlxGroup = new FlxGroup();
 		public const numArms:int = 22;
 		public var handDir:uint;
@@ -233,6 +235,7 @@ package {
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
+		[Embed("assets/factory.png")] public var factorySheet:Class;
 		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
@@ -263,7 +266,7 @@ package {
 			tempGround = FlxObject.DOWN;
 			
 			
-			FlxG.bgColor = 0xff090502;
+			FlxG.bgColor = 0xff000000;
 			if (Registry.levelNum >= 5) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -271,7 +274,11 @@ package {
 				sky.scrollFactor = new FlxPoint(0,0);
 				add(sky);
 				
-			}
+			} /*else {
+				var fact:FlxSprite = new FlxSprite(0,0,factorySheet);
+				fact.scrollFactor = new FlxPoint(0,0);
+				add(fact);
+			}*/
 			
 			/* Background */
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
@@ -690,9 +697,15 @@ package {
 			}
 			
 			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
+			
+			overlay.makeGraphic(level.width,level.height,0xff000000);
+			overlay.alpha = 0;
+			add(overlay);
 		}
 		
 		override public function update():void {
+			
+			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
 				time += FlxG.elapsed;
@@ -1696,6 +1709,10 @@ package {
 				}
 			}
 			if (FlxG.paused && FlxG.keys.justPressed("R")) {
+				// sound stuff
+				ambientGearsSound.stop();
+				ambientSteamSound.stop();
+				ambientElectricalHumSound.stop();
 				FlxG.resetState();
 			}
 		}
