@@ -77,9 +77,12 @@ package
 				Registry.background = Registry.back05;
 				FlxG.switchState(new PlayState);
 			} else if (FlxG.keys.justPressed("I")) {
+				
 				Registry.level = Registry.level06;
 				Registry.background = Registry.back06;
 				Registry.midground = Registry.mid06;
+				
+				Registry.levelNum = 5;
 				FlxG.switchState(new PlayState);
 			}
 			
