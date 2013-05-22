@@ -208,7 +208,7 @@ package {
 		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
 		[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
-		
+		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
 		
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
@@ -227,6 +227,7 @@ package {
 		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(ambientSteamSFX,true);
 		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
+		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
@@ -1003,12 +1004,18 @@ package {
 					if (hand.justTouched(FlxObject.ANY)) {
 						if (!lastTouchedWood) {
 							handLandingOnMetalSound.stop();
+							handLandingOnDirtSound.stop();
 							handLandingOnMetalSound.play();
 						} else {
 							handLandingOnNonstickMetalSound.stop();
+							handLandingOnDirtSound.stop();
 							handLandingOnNonstickMetalSound.play();
 						}
 					}
+				} else if (hand.justTouched(FlxObject.ANY)) {
+					handLandingOnNonstickMetalSound.stop();
+					handLandingOnMetalSound.stop();
+					handLandingOnDirtSound.play();
 				}
 				
 				// button press, gears, steam
