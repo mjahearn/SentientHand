@@ -76,6 +76,10 @@ package {
 		public var time:Number = 0;
 		public var IDLE_TIME:Number = 5;
 		
+		public var pulseTimer = 0;
+		public var pulseTimeMax = 2.2;
+		public var pulseDir = 1;
+		
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
@@ -705,6 +709,13 @@ package {
 		
 		override public function update():void {
 			
+			pulseTimer += pulseDir*FlxG.elapsed;
+			if (pulseTimer >= pulseTimeMax) {pulseTimer = pulseTimeMax;}
+			if (pulseTimer <= 0) {pulseTimer = 0;}
+			if (pulseTimer <= 0 || pulseTimer >= pulseTimeMax) {
+				pulseDir *= -1;
+			}
+						
 			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
@@ -850,6 +861,7 @@ package {
 				endY = startY + GRAPPLE_LENGTH * Math.sin(rad) / 4.0;
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
+			markerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
 			
 			/*
 			// hint arrow
@@ -915,16 +927,21 @@ package {
 					hint.play("idle");
 				}
 				
+				var pulseNum:Number = int((pulseTimer/pulseTimeMax)*16);
+				if (pulseNum >= 15) {pulseNum = 15;}
+				if (pulseNum <= 10) {pulseNum = 10;}
+				var col:Number = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
+				
 				if (enteringBody) {
-					hand.color = 0xff0000;
-					body.color = 0xff0000;
-					armBase.color = 0xff0000;
-					bodyGear.color = 0xff0000;
-					bodyHead.color = 0xff0000;
+					hand.color = col;
+					body.color = col;
+					armBase.color = col;
+					bodyGear.color = col;
+					bodyHead.color = col;
 				} else if (enteringCannon) {
-					hand.color = 0xff0000;
-					body.color = 0xff0000;
-					armBase.color = 0xff0000;
+					hand.color = col;
+					body.color = col;
+					armBase.color = col;
 				}
 			} else if (cannonMode || bodyMode) {
 				if (time >= IDLE_TIME) {
