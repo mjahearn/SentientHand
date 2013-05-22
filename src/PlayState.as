@@ -241,6 +241,11 @@ package {
 		[Embed("assets/sky.png")] public var skySheet:Class;
 		[Embed("assets/factory.png")] public var factorySheet:Class;
 		
+		[Embed("assets/body_marker_line.png")] public var bodyMarkerLineSheet:Class;
+		[Embed("assets/cannon_marker_line.png")] public var cannonMarkerLineSheet:Class;
+		public var cannonMarkerLine:FlxSprite = new FlxSprite();
+		public var bodyMarkerLine:FlxSprite = new FlxSprite();
+		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
 			//if (Registry.DEBUG_ON) {
@@ -609,8 +614,12 @@ package {
 			exitOn = false;
 			
 			// marker line
-			markerLine.makeGraphic(level.width,level.height,0x00000000);
-			add(markerLine);
+			//markerLine.makeGraphic(level.width,level.height,0x00000000);
+			//add(markerLine);
+			bodyMarkerLine = new FlxSprite(0,0,bodyMarkerLineSheet);
+			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
+			add(bodyMarkerLine);
+			add(cannonMarkerLine);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -843,6 +852,27 @@ package {
 				}
 			}
 			
+			
+			if (bodyMode && !handOut && !handIn) {
+				
+				theta = (arrow.angle)*Math.PI/180.0;
+				bodyMarkerLine.x = hand.x + hand.width/2.0 + (bodyMarkerLine.height/2.0)*Math.cos(theta);
+				bodyMarkerLine.y = hand.y + hand.height/2.0 - bodyMarkerLine.height/2.0 + (bodyMarkerLine.height/2.0)*Math.sin(theta);
+				bodyMarkerLine.angle = arrow.angle-90;
+				bodyMarkerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
+			} else {
+				bodyMarkerLine.alpha = 0;
+			}
+			if (cannonMode) {
+				theta = (arrow.angle)*Math.PI/180.0;
+				cannonMarkerLine.x = hand.x + hand.width/2.0 + (cannonMarkerLine.height/2.0)*Math.cos(theta);
+				cannonMarkerLine.y = hand.y + hand.height/2.0 - cannonMarkerLine.height/2.0 + (cannonMarkerLine.height/2.0)*Math.sin(theta);
+				cannonMarkerLine.angle = arrow.angle-90;
+				cannonMarkerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
+			} else {
+				cannonMarkerLine.alpha = 0;
+			}
+			/*
 			// marker line
 			markerLine.fill(0x00000000);
 			if (bodyMode && !handOut && !handIn) {
@@ -862,7 +892,7 @@ package {
 				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
 			}
 			markerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
-			
+			*/
 			/*
 			// hint arrow
 			hintArrow.fill(0x00000000);
@@ -886,13 +916,13 @@ package {
 			// marker glow (for hand overlapping)
 			hand.color = 0xffffff;
 			for (var mmm:String in bodyGroup.members) {
-				bodyGroup.members[mmm].color = 0xffffff;
+				bodyGroup.members[mmm].color = 0xaaaaaa;
 				bodyArmBaseGroup.members[mmm].color = 0xffffff;
-				bodyGearGroup.members[mmm].color = 0xffffff;
-				bodyHeadGroup.members[mmm].color = 0xffffff;
+				bodyGearGroup.members[mmm].color = 0xaaaaaa;
+				bodyHeadGroup.members[mmm].color = 0xaaaaaa;
 			}
 			for (mmm in cannonGroup.members) {
-				cannonGroup.members[mmm].color = 0xffffff;
+				cannonGroup.members[mmm].color = 0xaaaaaa;
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
 			}
 			
@@ -927,9 +957,9 @@ package {
 					hint.play("idle");
 				}
 				
-				var pulseNum:Number = int((pulseTimer/pulseTimeMax)*16);
+				var pulseNum:Number = int((pulseTimer/pulseTimeMax)*5) + 7;
 				if (pulseNum >= 15) {pulseNum = 15;}
-				if (pulseNum <= 10) {pulseNum = 10;}
+				if (pulseNum <= 7) {pulseNum = 7;}
 				var col:Number = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
 				
 				if (enteringBody) {
@@ -1091,7 +1121,7 @@ package {
 				bodyHead.angle = body.angle;
 				
 				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
-				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.height/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
 			}
 			if (bodyMode || cannonMode) {
