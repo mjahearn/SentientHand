@@ -57,6 +57,8 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		public const TRASH_SPAWN:uint = 31;
+		public const JUMP_HINT_SPAWN:uint = 32;
+		public const SIGN_SPAWN:uint = 33;
 		
 		//button animation frames
 		public const BUTTON_PRESSED:uint = 0;
@@ -71,11 +73,16 @@ package {
 		
 		public var touchedExitPoint:Boolean = false;
 		
+		public var time:Number = 0;
+		public var IDLE_TIME:Number = 5;
+		
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
 		public var lastGround:uint;
 		public var tempGround:uint;
+		
+		public var jumpHintGroup:FlxGroup = new FlxGroup();
 		
 		public var electricityNum:int = 1;
 		
@@ -165,6 +172,8 @@ package {
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
 		
+		[Embed("assets/sign.png")] public var signSheet:Class;
+		
 		public static var levelMap:Class;
 		public static var midgroundMap:Class;
 		public static var backgroundMap:Class;
@@ -219,6 +228,7 @@ package {
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
+		[Embed("assets/sky.png")] public var skySheet:Class;
 		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
@@ -248,16 +258,21 @@ package {
 			lastGround = FlxObject.DOWN;
 			tempGround = FlxObject.DOWN;
 			
+			
+			FlxG.bgColor = 0xff090502;
+			if (Registry.levelNum >= 5) {
+				//FlxG.bgColor = 0xff442288;
+				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
+				sky.scrollFactor = new FlxPoint(0,0);
+				add(sky);
+				
+			}
+			
 			/* Background */
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
-			if (Registry.levelNum < 5) {
-				FlxG.bgColor = 0xff090502;
-			} else {
-				FlxG.bgColor = 0xff442288;
-				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
-			}
 			
 			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
@@ -314,6 +329,16 @@ package {
 			}
 			add(trashGroup);
 			
+			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
+			midground.setTileProperties(JUMP_HINT_SPAWN,FlxObject.NONE);
+			if (jumpHintArray) {
+				for (j = 0; j < jumpHintArray.length; j++) {
+					midground.setTileByIndex(jumpHintArray[j],0);
+					var jumpHintPoint:FlxPoint = pointForTile(jumpHintArray[j],midground);
+					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
+				}
+			}
+			
 			// Steam
 			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 				var steamArray:Array = midground.getTileInstances(i);
@@ -357,6 +382,7 @@ package {
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			FlxG.camera.bounds = FlxG.worldBounds;
 			
+			// Exit arrow
 			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
 			var exitArray:Array = level.getTileInstances(EXIT_SPAWN);
 			if (exitArray) {
@@ -419,46 +445,6 @@ package {
 			add(cannonGroup);
 			add(cannonArmBaseGroup);
 			
-			// Bodies
-			bodyGroup = new FlxGroup();
-			bodyGearGroup = new FlxGroup();
-			bodyHeadGroup = new FlxGroup();
-			level.setTileProperties(i,FlxObject.NONE);
-			var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
-			if (bodyArray) {
-				for (j= 0; j < bodyArray.length; j++) {
-					level.setTileByIndex(bodyArray[j],0);
-					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
-					
-					var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
-					bodyTargetAngle = body.angle;
-					//setGravity(body,FlxObject.DOWN,true);
-					bodyGroup.add(body);
-					var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
-					bodyGearGroup.add(bodyGear);
-					// the positioning should be based on angle too
-					var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
-					bodyHead.y -= bodyHead.height;
-					bodyHeadGroup.add(bodyHead);
-					
-					bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
-					body.facing = FlxObject.DOWN;
-					
-					var theta:Number = (body.angle-90)*Math.PI/180.0;
-					
-					bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
-					bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
-					bodyHead.angle = body.angle;
-					
-					bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
-					bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
-				}
-			}
-			add(bodyGroup);
-			add(bodyGearGroup);
-			add(bodyHeadGroup);
-			add(bodyArmBaseGroup);
-			
 			// Buttons
 			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
 				level.setTileProperties(i,FlxObject.NONE);
@@ -501,9 +487,9 @@ package {
 						
 						//how to handle different buttons doing different things:
 						/*if ( BUTTON IS A SPECIFIC BUTTON ) {
-							specialFunctionDefinedBelowButtonReactionThatCallsButtonReaction();
+						specialFunctionDefinedBelowButtonReactionThatCallsButtonReaction();
 						} else {*/
-							buttonReactionArray.push(buttonReaction);
+						buttonReactionArray.push(buttonReaction);
 						//}
 					}
 				}
@@ -511,6 +497,46 @@ package {
 			add(buttonGroup);
 			add(buttonBangGroup);
 			buttonMode = 0;
+			
+			// Bodies
+			bodyGroup = new FlxGroup();
+			bodyGearGroup = new FlxGroup();
+			bodyHeadGroup = new FlxGroup();
+			level.setTileProperties(i,FlxObject.NONE);
+			var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
+			if (bodyArray) {
+				for (j= 0; j < bodyArray.length; j++) {
+					level.setTileByIndex(bodyArray[j],0);
+					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
+					
+					var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
+					bodyTargetAngle = body.angle;
+					//setGravity(body,FlxObject.DOWN,true);
+					bodyGroup.add(body);
+					var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+					bodyGearGroup.add(bodyGear);
+					// the positioning should be based on angle too
+					var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
+					bodyHead.y -= bodyHead.height;
+					bodyHeadGroup.add(bodyHead);
+					
+					bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+					body.facing = FlxObject.DOWN;
+					
+					var theta:Number = (body.angle-90)*Math.PI/180.0;
+					
+					bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+					bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+					bodyHead.angle = body.angle;
+					
+					bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+					bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
+				}
+			}
+			add(bodyGroup);
+			add(bodyGearGroup);
+			add(bodyHeadGroup);
+			add(bodyArmBaseGroup);
 			
 			// Doors
 			for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
@@ -593,6 +619,17 @@ package {
 			onGround = true;
 			add(hand);
 			
+			// sign
+			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
+			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
+			if (signArray) {
+				for (j = 0; j < signArray.length; j++) {
+					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
+					midground.setTileByIndex(array[j],0);
+					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
+				}
+			}
+			
 			hint = new FlxSprite(0,0);
 			hint.loadGraphic(hintSheet,true,false,64,64,true);
 			hint.addAnimation("idle",[0]);
@@ -602,6 +639,8 @@ package {
 			hint.addAnimation("X",[1,2,3],10,true);
 			hint.addAnimation("Z",[4,5,6],10,true);
 			hint.addAnimation("arrows",[7,8,9],10,true);
+			hint.addAnimation("left X right",[10,11,12],10,true);
+			hint.addAnimation("enter",[13,14,15],10,true);
 			hint.play("idle");
 			add(hint);
 			
@@ -639,7 +678,6 @@ package {
 			hintArrow.scrollFactor = new FlxPoint(0,0);
 			add(hintArrow);
 			*/
-
 			
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
@@ -651,6 +689,21 @@ package {
 		}
 		
 		override public function update():void {
+			
+			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+				time += FlxG.elapsed;
+			} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+				time += FlxG.elapsed;
+			} else {
+				time = 0;
+			}
+			if (time > IDLE_TIME) {
+				time = IDLE_TIME;
+			}
+			if (FlxG.paused) {
+				time = 0;
+			}
+			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
 			
@@ -813,9 +866,19 @@ package {
 				cannonGroup.members[mmm].color = 0xffffff;
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
 			}
+			
+			var handOnJumpGroup:Boolean = false;
+			for (var tt:uint = 0; tt < jumpHintGroup.length; tt++) {
+				if (hand.overlaps(jumpHintGroup.members[tt])) {
+					handOnJumpGroup = true;
+				}
+			}
+			
 			if (!cannonMode && !bodyMode) {
 				
-				if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
+				if (time >= IDLE_TIME) {
+					hint.play("enter");
+				} else if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("Z");
 				}
 				// arrow hint (uncomment if you want it, I think it's kind of ugly though...)
@@ -829,7 +892,9 @@ package {
 				}
 				*/
 				//
-				else {
+				else if (Registry.neverJumped && handOnJumpGroup && hand.isTouching(FlxObject.LEFT)) {
+					hint.play("X");
+				} else {
 					hint.play("idle");
 				}
 				
@@ -845,11 +910,16 @@ package {
 					armBase.color = 0xff0000;
 				}
 			} else if (cannonMode || bodyMode) {
-				if (Registry.neverFiredBodyOrCannon) {// || Registry.neverAimedBodyOrCannon) {
-					hint.play("X");
+				if (time >= IDLE_TIME) {
+					hint.play("enter");
+				} else if (Registry.neverFiredBodyOrCannon || Registry.neverAimedBodyOrCannon) {
+					hint.play("left X right");
 				} else {
 					hint.play("idle");
 				}
+			}
+			if (FlxG.paused) {
+				hint.play("idle");
 			}
 			
 			/* Begin Audio */
@@ -1445,6 +1515,7 @@ package {
 							}
 						} if (FlxG.keys.justPressed(ACTION_KEY)) {
 							handFalling = true;
+							Registry.neverJumped = false;
 							lastGround = hand.facing;
 							if (Registry.jumping && hand.isTouching(FlxObject.DOWN)) {
 								hand.velocity.y = -FLOOR_JUMP_VEL;
@@ -1589,9 +1660,18 @@ package {
 			
 			
 			// Pause
-			if (FlxG.keys.justPressed("P")) {
+			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
+				//IDLE_TIME = 22;
+			}
+			
+			if (FlxG.paused) {
+				if (bodyMode || cannonMode) {
+					pause.con.play("attached");
+				} else {
+					pause.con.play("detached");
+				}
 			}
 			if (FlxG.paused && FlxG.keys.justPressed("R")) {
 				FlxG.resetState();

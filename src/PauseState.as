@@ -11,6 +11,10 @@ package
 		public var continuity:FlxButton;
 		public var jump:FlxButton;
 		public var jumpText:FlxText;
+		public var con:FlxSprite;
+		
+		[Embed("assets/controls.png")] public var controlsSheet:Class;
+
 		
 		public function PauseState(MaxSize:uint=0)
 		{			
@@ -20,7 +24,8 @@ package
 		}
 		
 		public function refresh():void {
-			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0\nIf you wanna reset the level, press the R key RIGHT NOW!");
+			/*
+			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0");
 			add(text);
 			
 			ctlText = new FlxText(100, 150, 400, "Controls (click to change):");
@@ -46,14 +51,29 @@ package
 			}
 			add(jumpText);
 			add(jump);
+			*/
+			
+			con = new  FlxSprite(FlxG.width/2,FlxG.height/2);
+			con.loadGraphic(controlsSheet,true,false,320,240);
+			con.x -= con.width/2;
+			con.y -= con.height/2;
+			con.scrollFactor = new FlxPoint(0,0);
+			con.addAnimation("detached",[0],10,true);
+			con.addAnimation("attached",[1],10,true);
+			add(con);
+			
+			
 			
 			setAll("scrollFactor",new FlxPoint(0,0));
 		}
 		
 		public function scrap():void {
+			/*
 			text.kill();
 			ctlText.kill();
 			controls.kill();
+			*/
+			//con.kill();
 		}
 		
 		/*override public function update():void {
