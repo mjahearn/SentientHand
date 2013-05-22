@@ -228,6 +228,7 @@ package {
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		[Embed("assets/head.png")] public var headSheet:Class;
+		[Embed("assets/sky.png")] public var skySheet:Class;
 		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
@@ -257,16 +258,21 @@ package {
 			lastGround = FlxObject.DOWN;
 			tempGround = FlxObject.DOWN;
 			
+			
+			FlxG.bgColor = 0xff090502;
+			if (Registry.levelNum >= 5) {
+				//FlxG.bgColor = 0xff442288;
+				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
+				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
+				sky.scrollFactor = new FlxPoint(0,0);
+				add(sky);
+				
+			}
+			
 			/* Background */
 			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
-			if (Registry.levelNum < 5) {
-				FlxG.bgColor = 0xff090502;
-			} else {
-				FlxG.bgColor = 0xff442288;
-				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
-			}
 			
 			/* Midground */
 			var midground:FlxTilemap = new FlxTilemap();
