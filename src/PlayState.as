@@ -76,9 +76,9 @@ package {
 		public var time:Number = 0;
 		public var IDLE_TIME:Number = 5;
 		
-		public var pulseTimer = 0;
-		public var pulseTimeMax = 2.2;
-		public var pulseDir = 1;
+		public var pulseTimer:Number = 0;
+		public var pulseTimeMax:Number = 2.2;
+		public var pulseDir:Number = 1;
 		
 		public var dbg:int;
 		public var rad:Number;
