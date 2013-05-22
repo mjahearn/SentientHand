@@ -24,7 +24,6 @@ package
 		}
 		
 		public function refresh():void {
-			
 			/*
 			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0");
 			add(text);
