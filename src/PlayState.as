@@ -1593,6 +1593,9 @@ package {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
 			}
+			if (FlxG.paused && FlxG.keys.justPressed("R")) {
+				FlxG.resetState();
+			}
 		}
 		
 		/*public function levelHandCallback(a:FlxObject, b:FlxObject):void {

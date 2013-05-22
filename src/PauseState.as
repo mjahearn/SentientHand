@@ -20,7 +20,7 @@ package
 		}
 		
 		public function refresh():void {
-			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0");
+			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"This is the PAUSE SCREEN :0\nIf you wanna reset the level, press the R key RIGHT NOW!");
 			add(text);
 			
 			ctlText = new FlxText(100, 150, 400, "Controls (click to change):");
