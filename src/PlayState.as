@@ -920,7 +920,7 @@ package {
 			} else {
 				camTag.x += (-camTag.x + hand.x)/8.0;
 				camTag.y += (-camTag.y + hand.y)/8.0;
-			}
+			} //
 		
 			
 			/* else if (cannonMode) {
