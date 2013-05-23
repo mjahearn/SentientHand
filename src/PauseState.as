@@ -53,13 +53,14 @@ package
 			add(jump);
 			*/
 			
-			con = new  FlxSprite(FlxG.width/2,FlxG.height/2);
-			con.loadGraphic(controlsSheet,true,false,320,240);
-			con.x -= con.width/2;
-			con.y -= con.height/2;
+			con = new  FlxSprite(0,0);//(FlxG.width/2,FlxG.height/2);
+			con.loadGraphic(controlsSheet,true,false,640,480);
+			//con.x -= con.width/2;
+			//con.y -= con.height/2;
 			con.scrollFactor = new FlxPoint(0,0);
-			con.addAnimation("detached",[0],10,true);
-			con.addAnimation("attached",[1],10,true);
+			con.addAnimation("detached",[0,2,4],10,true);
+			con.addAnimation("attached",[1,3,5],10,true);
+			//con.alpha = 0.75;
 			add(con);
 			
 			
