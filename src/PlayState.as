@@ -1370,7 +1370,7 @@ package {
 						else if (hand.isTouching(FlxObject.UP)) {hand.angle = 180;}
 						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
 						// The arm is retracting while holding
-						if (/*!FlxG.keys.SPACE*/handIn) {
+						if (/*!FlxG.keys.SPACE*/handIn && hand.facing != body.facing) {
 							bodyTargetAngle = hand.angle;
 							if (bodyTargetAngle > body.angle) {
 								body.angle += 4;
