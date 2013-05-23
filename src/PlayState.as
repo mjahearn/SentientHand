@@ -251,6 +251,8 @@ package {
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
 		public var bodyMarkerLine:FlxSprite = new FlxSprite();
 		
+		public var camTag:FlxSprite = new FlxSprite();
+		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
 			//if (Registry.DEBUG_ON) {
@@ -650,6 +652,9 @@ package {
 			//onGround = false;
 			add(hand);
 			
+			camTag = new FlxSprite(hand.x,hand.y);//,bodySheet);
+			//add(camTag);
+			
 			// sign
 			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
 			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
@@ -718,7 +723,7 @@ package {
 				add(text);
 			}
 			
-			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
+			FlxG.camera.follow(camTag, FlxCamera.STYLE_TOPDOWN);
 			
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
@@ -889,15 +894,36 @@ package {
 			/*
 			// marker line
 			markerLine.fill(0x00000000);
-			if (bodyMode && !handOut && !handIn) {
-				rad = arrow.angle*Math.PI/180;
-				var startX:Number = hand.x+hand.width/2.0;
-				var startY:Number = hand.y+hand.height/2.0;
-				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
-				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
-				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
-				// make objects glow
-			} else if (cannonMode) {
+			*/
+			if (bodyMode) {
+				if (!handOut && !handIn) {// && !handOut && !handIn) {
+					rad = arrow.angle*Math.PI/180;
+					var startX:Number = hand.x+hand.width/2.0;
+					var startY:Number = hand.y+hand.height/2.0;
+					var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
+					var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
+					//markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+					
+					
+					camTag.x += (-camTag.x + endX)/44.0;
+					camTag.y += (-camTag.y + endY)/44.0;
+					// make objects glow
+					
+					
+				}/* else { // if (bodyMode && (body.velocity.x != 0 || body.velocity.y !=0)) {
+					
+					endX = hand.x + (body.x - hand.x)*0.25;
+					endY = hand.y + (body.y - hand.y)*0.25;
+					camTag.x += (-camTag.x + endX)/8.0;
+					camTag.y += (-camTag.y + endY)/8.0;
+				}*/
+			} else {
+				camTag.x += (-camTag.x + hand.x)/8.0;
+				camTag.y += (-camTag.y + hand.y)/8.0;
+			}
+		
+			
+			/* else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
 				startX = hand.x+hand.width/2.0;
 				startY = hand.y+hand.height/2.0;
@@ -910,6 +936,7 @@ package {
 			/*
 			// hint arrow
 			hintArrow.fill(0x00000000);
+			
 			
 			if (doorsDead) {
 				startX = hand.x+hand.width/2.0;
