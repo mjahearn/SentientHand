@@ -75,7 +75,7 @@ package {
 		public var touchedExitPoint:Boolean = false;
 		
 		public var time:Number = 0;
-		public var IDLE_TIME:Number = 5;
+		public var IDLE_TIME:Number = 15;
 		
 		public var pulseTimer:Number = 0;
 		public var pulseTimeMax:Number = 2.2;
@@ -992,7 +992,7 @@ package {
 				}
 				*/
 				//
-				else if (Registry.neverJumped && handOnJumpGroup && hand.isTouching(FlxObject.LEFT)) {
+				else if (Registry.neverJumped && handOnJumpGroup && hand.angle == 90) {
 					hint.play("X");
 				} else {
 					hint.play("idle");
@@ -1116,6 +1116,7 @@ package {
 				}
 				
 				// hand landed
+				//if ((lastVel.x != 0 && lastVel.y != 0) || handFalling) {
 				if (!lastTouchedDirt) {
 					if (hand.justTouched(FlxObject.ANY)) {
 						if (!lastTouchedWood) {
@@ -1133,6 +1134,7 @@ package {
 					handLandingOnMetalSound.stop();
 					handLandingOnDirtSound.play();
 				}
+				//}
 				
 				// button press, gears, steam
 				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
