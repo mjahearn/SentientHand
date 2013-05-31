@@ -13,7 +13,7 @@ package
 		public var delta:Number = 0.022;
 		
 		override public function create():void {
-			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"END.");//"The factory was producing death machines or was a giant death machine or something.  You just reactivated it.  Awesome.  \nend");
+			text = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"FREEDOM.");//"The factory was producing death machines or was a giant death machine or something.  You just reactivated it.  Awesome.  \nend");
 			text.alpha = 0;
 			add(text);
 		}
