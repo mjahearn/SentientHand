@@ -39,6 +39,11 @@ package {
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
 		
+		public var steamsNumberArray:Array = new Array();
+		public var steamsNumber:Number = 0;
+		public var steamTimer:Number = 0;
+		public var steamTimerMax:Number = 2;
+		
 		//public const SOUND_ON:Boolean = false;
 		
 		/* Level Spawn Points */
@@ -235,7 +240,7 @@ package {
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
-		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(ambientSteamSFX,true);
+		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);//ambientSteamSFX,true);
 		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
@@ -264,6 +269,8 @@ package {
 		
 		override public function create():void {
 			
+			ambientSteamSound.volume = 0.5;
+			
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
 				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
@@ -276,7 +283,7 @@ package {
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
-			reinvigorated = false; //ditto
+			reinvigorated = false;//false; //ditto
 			doorsDead = false;
 			controlDirs = new Array();
 			lastGround = FlxObject.DOWN;
@@ -391,11 +398,20 @@ package {
 						// n.b. Steam is group in 3 patterns
 						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
 						steamGaugeNumber = (i-STEAM_MIN);
-						var steamPuffFrames:Array;
-						if (steamGaugeNumber < 4)      {steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
-						else if (steamGaugeNumber < 8) {steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];}
-						else                           {steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];}
-						steam.addAnimation("puff",steamPuffFrames,11,true);
+						var steamPuffFrames:Array = [0,1,2,3,0];
+						if (steamGaugeNumber < 4)      {
+							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(0);
+						}
+						else if (steamGaugeNumber < 8) {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(1);
+						}
+						else                           {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
+							steamsNumberArray.push(2);
+						}
+						steam.addAnimation("puff",steamPuffFrames,11,false);
 						
 						steams.add(steam);
 					}
@@ -737,6 +753,11 @@ package {
 			if (pulseTimer <= 0) {pulseTimer = 0;}
 			if (pulseTimer <= 0 || pulseTimer >= pulseTimeMax) {
 				pulseDir *= -1;
+			}
+			
+			steamTimer += FlxG.elapsed;
+			if (steamTimer > steamTimerMax) {
+				steamTimer = 0;
 			}
 						
 			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
@@ -1136,6 +1157,7 @@ package {
 				}
 				//}
 				
+				
 				// button press, gears, steam
 				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
 					var button:FlxSprite = buttonGroup.members[qq];
@@ -1144,10 +1166,20 @@ package {
 						buttonPressSound.stop();
 						buttonPressSound.play();
 					}
+					/*
 					if (button.frame == 2) {
 						ambientGearsSound.play();
 					}
 					if (button.frame == 3) {
+						ambientSteamSound.play();
+					}
+					*/
+					
+				}
+				
+				for (qq = 0; qq < steams.length; qq++) {
+					if (steams.members[qq].frame == 1) {
+						ambientSteamSound.stop();
 						ambientSteamSound.play();
 					}
 				}
@@ -1158,6 +1190,7 @@ package {
 					if (doorGroup.members[ab].frame == 1) {
 						doorOpenSound.stop();
 						doorOpenSound.play();
+						ambientGearsSound.play();
 					}
 				}
 			}
@@ -1430,6 +1463,14 @@ package {
 				electricity.alpha = 1;
 			}
 			
+			for (var mn:uint = 0; mn < steams.length; mn++) {
+				if (steamsNumberArray[mn] < steamsNumber && int(10*steamTimer) == 10*(steamsNumberArray[mn])) {
+					steams.members[mn].play("puff");
+				}
+			}
+			
+			FlxG.log(steamTimer);
+			
 			/* End Animations */
 			
 			if (bodyMode || cannonMode) {
@@ -1684,6 +1725,8 @@ package {
 			for (var a:int = doorGroup.length-1; a >= 0; a--) {
 				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
+					ambientGearsSound.stop();
+					reinvigorated = false;
 					doorsDead = true;
 					//doorsJustDied = true;
 				}
@@ -2108,12 +2151,22 @@ package {
 		}
 		
 		public function buttonReaction():void {
+			steamsNumber++;
 			if (buttonStateArray.indexOf(false) == -1) {
 				for (var a:int = 0; a < doorGroup.length; a++) {
 					doorGroup.members[a].play("open");
 				}
 				exitOn = true;
 				//exitArrow.visible = true;
+				
+				for (var mn:int = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
+					//if (steamsNumberArray[mn] < steamsNumber) {
+					steams.members[mn].play("idle");
+					//}
+				}
+				steamsNumber = 0;
+				
+				reinvigorated = true;
 			}
 			buttonMode++;
 			if (buttonMode == 1) {
@@ -2121,8 +2174,15 @@ package {
 					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
 						buttonGroup.members[b].frame = 2;
 						
+						/*
 						//
-						reinvigorated = true;
+						//reinvigorated = true;
+						for (mn = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
+							if (steamsNumberArray[mn] < steamsNumber) {
+								steams.members[mn].play("puff");
+							}
+						}
+						*/
 					}
 				}
 			} else {
@@ -2130,10 +2190,14 @@ package {
 					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
 						buttonGroup.members[c].frame = 3;
 						
+						/*
 						//
-						for (var m:String in steams.members) {
-							steams.members[m].play("puff");
+						for (mn = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
+							if (steamsNumberArray[mn] < steamsNumber) {
+								steams.members[mn].play("puff");
+							}
 						}
+						*/
 						
 					}
 				}
