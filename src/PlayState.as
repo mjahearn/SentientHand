@@ -75,7 +75,7 @@ package {
 		public var touchedExitPoint:Boolean = false;
 		
 		public var time:Number = 0;
-		public var IDLE_TIME:Number = 5;
+		public var IDLE_TIME:Number = 15;
 		
 		public var pulseTimer:Number = 0;
 		public var pulseTimeMax:Number = 2.2;
@@ -251,6 +251,8 @@ package {
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
 		public var bodyMarkerLine:FlxSprite = new FlxSprite();
 		
+		public var camTag:FlxSprite = new FlxSprite();
+		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
 			//if (Registry.DEBUG_ON) {
@@ -381,9 +383,18 @@ package {
 						// Decide steam angle
 						// n.b. Steam is grouped in 3 frequencies, 4 angles
 						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
-						if (steamGaugeNumber == 0) {steam.angle = 90;}
-						else if (steamGaugeNumber == 1) {steam.angle = 180;}
-						else if (steamGaugeNumber == 2) {steam.angle = 270;}
+						if (steamGaugeNumber == 0) {
+							steam.angle = 90;
+							steam.facing = FlxObject.RIGHT;
+						} else if (steamGaugeNumber == 1) {
+							steam.angle = 180;
+							steam.facing = FlxObject.DOWN;
+						} else if (steamGaugeNumber == 2) {
+							steam.angle = 270;
+							steam.facing = FlxObject.LEFT;
+						} else { //sGN == 3
+							steam.facing = FlxObject.UP;
+						}
 						
 						// Decide steam pattern
 						// n.b. Steam is group in 3 patterns
@@ -650,6 +661,9 @@ package {
 			//onGround = false;
 			add(hand);
 			
+			camTag = new FlxSprite(hand.x,hand.y);//,bodySheet);
+			//add(camTag);
+			
 			// sign
 			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
 			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
@@ -718,7 +732,7 @@ package {
 				add(text);
 			}
 			
-			FlxG.camera.follow(hand, FlxCamera.STYLE_TOPDOWN);
+			FlxG.camera.follow(camTag, FlxCamera.STYLE_TOPDOWN);
 			
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
@@ -889,15 +903,36 @@ package {
 			/*
 			// marker line
 			markerLine.fill(0x00000000);
-			if (bodyMode && !handOut && !handIn) {
-				rad = arrow.angle*Math.PI/180;
-				var startX:Number = hand.x+hand.width/2.0;
-				var startY:Number = hand.y+hand.height/2.0;
-				var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
-				var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
-				markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
-				// make objects glow
-			} else if (cannonMode) {
+			*/
+			if (bodyMode) {
+				if (!handOut && !handIn) {// && !handOut && !handIn) {
+					rad = arrow.angle*Math.PI/180;
+					var startX:Number = hand.x+hand.width/2.0;
+					var startY:Number = hand.y+hand.height/2.0;
+					var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
+					var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
+					//markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
+					
+					
+					camTag.x += (-camTag.x + endX)/44.0;
+					camTag.y += (-camTag.y + endY)/44.0;
+					// make objects glow
+					
+					
+				}/* else { // if (bodyMode && (body.velocity.x != 0 || body.velocity.y !=0)) {
+					
+					endX = hand.x + (body.x - hand.x)*0.25;
+					endY = hand.y + (body.y - hand.y)*0.25;
+					camTag.x += (-camTag.x + endX)/8.0;
+					camTag.y += (-camTag.y + endY)/8.0;
+				}*/
+			} else {
+				camTag.x += (-camTag.x + hand.x)/8.0;
+				camTag.y += (-camTag.y + hand.y)/8.0;
+			} //
+		
+			
+			/* else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
 				startX = hand.x+hand.width/2.0;
 				startY = hand.y+hand.height/2.0;
@@ -910,6 +945,7 @@ package {
 			/*
 			// hint arrow
 			hintArrow.fill(0x00000000);
+			
 			
 			if (doorsDead) {
 				startX = hand.x+hand.width/2.0;
@@ -965,7 +1001,7 @@ package {
 				}
 				*/
 				//
-				else if (Registry.neverJumped && handOnJumpGroup && hand.isTouching(FlxObject.LEFT)) {
+				else if (Registry.neverJumped && handOnJumpGroup && hand.angle == 90) {
 					hint.play("X");
 				} else {
 					hint.play("idle");
@@ -1089,6 +1125,7 @@ package {
 				}
 				
 				// hand landed
+				//if ((lastVel.x != 0 && lastVel.y != 0) || handFalling) {
 				if (!lastTouchedDirt) {
 					if (hand.justTouched(FlxObject.ANY)) {
 						if (!lastTouchedWood) {
@@ -1106,6 +1143,7 @@ package {
 					handLandingOnMetalSound.stop();
 					handLandingOnDirtSound.play();
 				}
+				//}
 				
 				// button press, gears, steam
 				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
@@ -1710,6 +1748,7 @@ package {
 			//FlxG.collide(trashGroup,trashGroup);
 			FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
+			FlxG.overlap(hand, steams, handSteamOverlap);
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
@@ -1892,14 +1931,22 @@ package {
 					setGravity(spr, FlxObject.RIGHT, false);
 				}
 			} else {*/
+			var hitOnlyWood:Boolean = true;
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
+					hitOnlyWood = false;
 					setDir(spr, FlxObject.DOWN);
 				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
+					hitOnlyWood = false;
 					setDir(spr, FlxObject.UP);
 				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT,4))) {
+					hitOnlyWood = false;
 					setDir(spr, FlxObject.LEFT);
 				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT,4))) {
+					hitOnlyWood = false;
 					setDir(spr, FlxObject.RIGHT);
+				}
+				if (hitOnlyWood && !onGround && spr.facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by steam
+					setDir(spr, FlxObject.DOWN, true);
 				}
 			//}
 		}
@@ -2360,6 +2407,13 @@ package {
 			Registry.neverJumped = false;
 			lastGround = hand.facing;
 			setDir(hand,FlxObject.DOWN,true);
+		}
+		
+		public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
+			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
+			if (steam.frame > 0) {
+				setDir(hand, steam.facing, true);
+			}
 		}
 	}
 }
