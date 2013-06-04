@@ -19,17 +19,19 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		public const METAL_MIN:uint = 65; //minimum index number of metal in the tilemap
+		public const METAL_MIN:uint = 64; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 147; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
+		public const WOOD_MAX:uint = 63; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
 		public const UNTOUCHABLE_MAX:uint = 170;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
 		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 231;
 		public const WOOD_OVERFLOW_MIN:uint = 232;
-		public const WOOD_OVERFLOW_MAX:uint = 251;
+		public const WOOD_OVERFLOW_MAX:uint = 263;
+		public const WOOD_OVERFLOW_OVERFLOW_MIN:uint = 289;
+		public const WOOD_OVERFLOW_OVERFLOW_MAX:uint = 292;
 		
 		public const GRASS_MIN:uint = 272;
 		public const GRASS_MAX:uint = 286;
@@ -400,6 +402,10 @@ package {
 			}
 			
 			for (i = WOOD_OVERFLOW_MIN; i <= WOOD_OVERFLOW_MAX; i++) {
+				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+			}
+			
+			for (i = WOOD_OVERFLOW_OVERFLOW_MIN; i <= WOOD_OVERFLOW_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
