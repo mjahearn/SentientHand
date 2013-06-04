@@ -2180,6 +2180,9 @@ package {
 		}
 		
 		public function buttonReaction():void {
+			
+			steamTimer = 0;
+			
 			steamsNumber++;
 			if (buttonStateArray.indexOf(false) == -1) {
 				for (var a:int = 0; a < doorGroup.length; a++) {
