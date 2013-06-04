@@ -43,6 +43,8 @@ package {
 		public var steamsNumber:Number = 0;
 		public var steamTimer:Number = 0;
 		public var steamTimerMax:Number = 2;
+		public var steamsStartPoint:Array = new Array();
+		public var steamsDXY:Array = new Array();
 		
 		//public const SOUND_ON:Boolean = false;
 		
@@ -374,59 +376,6 @@ package {
 					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
 				}
 			}
-			
-			// Steam
-			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
-				var steamArray:Array = midground.getTileInstances(i);
-				if (steamArray) {
-					for (j = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
-						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
-						steam.alpha = 0.5;
-						steam.loadGraphic(steamSheet,true,false,32,32,true);
-						steam.addAnimation("idle",[0]);
-						steam.play("idle");
-						
-						// Decide steam angle
-						// n.b. Steam is grouped in 3 frequencies, 4 angles
-						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
-						if (steamGaugeNumber == 0) {
-							steam.angle = 90;
-							steam.facing = FlxObject.RIGHT;
-						} else if (steamGaugeNumber == 1) {
-							steam.angle = 180;
-							steam.facing = FlxObject.DOWN;
-						} else if (steamGaugeNumber == 2) {
-							steam.angle = 270;
-							steam.facing = FlxObject.LEFT;
-						} else { //sGN == 3
-							steam.facing = FlxObject.UP;
-						}
-						
-						// Decide steam pattern
-						// n.b. Steam is group in 3 patterns
-						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
-						steamGaugeNumber = (i-STEAM_MIN);
-						var steamPuffFrames:Array = [0,1,2,3,0];
-						if (steamGaugeNumber < 4)      {
-							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(0);
-						}
-						else if (steamGaugeNumber < 8) {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(1);
-						}
-						else                           {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
-							steamsNumberArray.push(2);
-						}
-						steam.addAnimation("puff",steamPuffFrames,11,false);
-						
-						steams.add(steam);
-					}
-				}
-			}
-			add(steams);
 
 			/* Level */
 			
@@ -623,6 +572,65 @@ package {
 				}
 			}
 			add(doorGroup);
+			
+			// Steam
+			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
+				var steamArray:Array = midground.getTileInstances(i);
+				if (steamArray) {
+					for (j = 0; j < steamArray.length; j++) {
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
+						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
+						//steam.alpha = 0.5;
+						steam.loadGraphic(steamSheet,true,false,32,32,true);
+						steam.addAnimation("idle",[0]);
+						steam.play("idle");
+						
+						// Decide steam angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
+						if (steamGaugeNumber == 0) {
+							steam.angle = 90;
+							steam.facing = FlxObject.RIGHT;
+							steamsDXY.push(new FlxPoint(-1,0));
+						} else if (steamGaugeNumber == 1) {
+							steam.angle = 180;
+							steam.facing = FlxObject.DOWN;
+							steamsDXY.push(new FlxPoint(0,-1));
+						} else if (steamGaugeNumber == 2) {
+							steam.angle = 270;
+							steam.facing = FlxObject.LEFT;
+							steamsDXY.push(new FlxPoint(1,0));
+						} else { //sGN == 3
+							steam.facing = FlxObject.UP;
+							steamsDXY.push(new FlxPoint(0,1));
+						}
+						
+						// Decide steam pattern
+						// n.b. Steam is group in 3 patterns
+						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
+						steamGaugeNumber = (i-STEAM_MIN);
+						var steamPuffFrames:Array = [0,1,2,3,0];
+						if (steamGaugeNumber < 4)      {
+							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(0);
+						}
+						else if (steamGaugeNumber < 8) {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(1);
+						}
+						else                           {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
+							steamsNumberArray.push(2);
+						}
+						steam.addAnimation("puff",steamPuffFrames,11,false);
+						
+						steamsStartPoint.push(new FlxPoint(steam.x,steam.y));
+						
+						steams.add(steam);
+					}
+				}
+			}
+			add(steams);
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
@@ -1475,10 +1483,13 @@ package {
 			for (var mn:uint = 0; mn < steams.length; mn++) {
 				if (steamsNumberArray[mn] < steamsNumber && int(10*steamTimer) == 10*(steamsNumberArray[mn])) {
 					steams.members[mn].play("puff");
+					steams.members[mn].x = steamsStartPoint[mn].x - 4.4*steamsDXY[mn].x*steams.members[mn].frame;
+					steams.members[mn].y = steamsStartPoint[mn].y - 4.4*steamsDXY[mn].y*steams.members[mn].frame;
+					steams.members[mn].alpha = 1 - steams.members[mn].frame/3.0 + 0.5;
 				}
 			}
 			
-			FlxG.log(steamTimer);
+			//FlxG.log(steamTimer);
 			
 			/* End Animations */
 			
