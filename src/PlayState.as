@@ -158,7 +158,7 @@ package {
 		
 		public var timeFallen:Number;
 		
-		public var markerLine:FlxSprite = new FlxSprite();
+		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
 		public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
@@ -259,6 +259,8 @@ package {
 		[Embed("assets/cannon_marker_line.png")] public var cannonMarkerLineSheet:Class;
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
 		public var bodyMarkerLine:FlxSprite = new FlxSprite();
+		public var markerEnd:FlxSprite;
+		public var markerEndGroup:FlxGroup;
 		
 		public var camTag:FlxSprite = new FlxSprite();
 		
@@ -666,8 +668,16 @@ package {
 			//add(markerLine);
 			bodyMarkerLine = new FlxSprite(0,0,bodyMarkerLineSheet);
 			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
+			markerEnd = new FlxSprite(0,0);
+			markerEnd.loadGraphic(handSheet,true,false,32,32);
+			markerEnd.frame = 21;
+			markerEnd.alpha = 0.5;
+			markerEnd.visible = false;
+			markerEndGroup = new FlxGroup();
 			add(bodyMarkerLine);
 			add(cannonMarkerLine);
+			markerEndGroup.add(markerEnd);
+			add(markerEndGroup);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -917,7 +927,6 @@ package {
 			
 			
 			if (bodyMode && !handOut && !handIn) {
-				
 				theta = (arrow.angle)*Math.PI/180.0;
 				bodyMarkerLine.x = hand.x + hand.width/2.0 + (bodyMarkerLine.height/2.0)*Math.cos(theta);
 				bodyMarkerLine.y = hand.y + hand.height/2.0 - bodyMarkerLine.height/2.0 + (bodyMarkerLine.height/2.0)*Math.sin(theta);
@@ -1567,6 +1576,8 @@ package {
 							setDir(body,hand.facing);
 							showArrow();
 						}
+						markerEnd.visible = true;
+						updateRaytrace(arrow.angle);
 						hand.allowCollisions = FlxObject.ANY;
 					}
 				} if (!handOut && !handIn) {
@@ -1577,7 +1588,7 @@ package {
 						if (Registry.neverAimedBodyOrCannon) {
 							Registry.neverAimedBodyOrCannon = false;
 						}
-						
+						updateRaytrace(arrow.angle);
 					} if (playerIsPressing(FlxObject.RIGHT)) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
@@ -1585,6 +1596,7 @@ package {
 						if (Registry.neverAimedBodyOrCannon) {
 							Registry.neverAimedBodyOrCannon = false;
 						}
+						updateRaytrace(arrow.angle);
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
 						if (bodyMode) {
@@ -1592,6 +1604,7 @@ package {
 						}
 						bodyMode = false;
 						cannonMode = false;
+						markerEnd.visible = false;
 						setDir(hand, body.facing);
 						lastGround = body.facing;
 						if (Registry.handRelative) {
@@ -1604,6 +1617,11 @@ package {
 					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
+						markerEnd.visible = false;
+						hand.maxVelocity.x = Number.MAX_VALUE;
+						hand.maxVelocity.y = Number.MAX_VALUE;
+						hand.drag.x = 0;
+						hand.drag.y = 0;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						hand.allowCollisions = 0;
@@ -1644,6 +1662,7 @@ package {
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
+						markerEnd.visible = true;
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1656,6 +1675,7 @@ package {
 						hand.facing = body.facing;
 						
 						showArrow();
+						updateRaytrace(arrow.angle);
 						
 						if (Registry.neverEnteredBodyOrCannon) {
 							Registry.neverEnteredBodyOrCannon = false;
@@ -1812,6 +1832,12 @@ package {
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
+			/*FlxG.collide(markerEnd, level);
+			FlxG.collide(markerEnd, doorGroup);*/
+			if (FlxG.collide(markerEnd, level) || FlxG.collide(markerEnd, doorGroup)) {
+				markerEnd.velocity.x = 0;
+				markerEnd.velocity.y = 0;
+			}
 			handTouching = hand.touching;
 			correctMetal();
 			if (bodyMode) {
@@ -2495,8 +2521,39 @@ package {
 		
 		public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
 			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
-			if (steam.frame > 0) {
+			if (steam.frame > 0 && !bodyMode && !cannonMode) {
 				setDir(hand, steam.facing, true);
+			}
+		}
+		
+		public function updateRaytrace(angle:Number):void {
+			if (bodyMode) {
+				markerEnd.angle = angle-90;
+				var theta:Number = angle*Math.PI/180.0;
+				markerEnd.x = hand.x;
+				markerEnd.y = hand.y;
+				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
+				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
+				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
+					markerEndGroup.update();
+					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceCallback)) {
+						break;
+					}
+				}
+				markerEnd.velocity.x = 0;
+				markerEnd.velocity.y = 0;
+			}
+		}
+		
+		public function raytraceCallback(spr1:FlxSprite, spr2:FlxObject):void {
+			if (markerEnd.isTouching(FlxObject.LEFT)) {
+				markerEnd.angle = 90;
+			} else if (markerEnd.isTouching(FlxObject.RIGHT)) {
+				markerEnd.angle = 270;
+			} else if (markerEnd.isTouching(FlxObject.UP)) {
+				markerEnd.angle = 180;
+			} else if (markerEnd.isTouching(FlxObject.DOWN)) {
+				markerEnd.angle = 0;
 			}
 		}
 	}
