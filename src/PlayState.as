@@ -154,7 +154,7 @@ package {
 		
 		public var timeFallen:Number;
 		
-		public var markerLine:FlxSprite = new FlxSprite();
+		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
 		public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
@@ -255,6 +255,7 @@ package {
 		[Embed("assets/cannon_marker_line.png")] public var cannonMarkerLineSheet:Class;
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
 		public var bodyMarkerLine:FlxSprite = new FlxSprite();
+		public var markerEnd:FlxSprite;
 		
 		public var camTag:FlxSprite = new FlxSprite();
 		
@@ -652,8 +653,11 @@ package {
 			//add(markerLine);
 			bodyMarkerLine = new FlxSprite(0,0,bodyMarkerLineSheet);
 			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
+			markerEnd = new FlxSprite(0,0);
+			markerEnd.makeGraphic(32, 32, 0xffff0000);
 			add(bodyMarkerLine);
 			add(cannonMarkerLine);
+			add(markerEnd);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -2475,7 +2479,7 @@ package {
 		
 		public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
 			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
-			if (steam.frame > 0) {
+			if (steam.frame > 0 && !bodyMode) {
 				setDir(hand, steam.facing, true);
 			}
 		}
