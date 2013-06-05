@@ -19,17 +19,19 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
-		public const METAL_MIN:uint = 65; //minimum index number of metal in the tilemap
+		public const METAL_MIN:uint = 64; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 147; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
-		public const WOOD_MAX:uint = 64; // maximum index number of wood in the tilemap
+		public const WOOD_MAX:uint = 63; // maximum index number of wood in the tilemap
 		public const UNTOUCHABLE_MIN:uint = 148;
 		public const UNTOUCHABLE_MAX:uint = 170;
 		
 		public const UNTOUCHABLE_OVERFLOW_MIN:uint = 192;
 		public const UNTOUCHABLE_OVERFLOW_MAX:uint = 231;
 		public const WOOD_OVERFLOW_MIN:uint = 232;
-		public const WOOD_OVERFLOW_MAX:uint = 251;
+		public const WOOD_OVERFLOW_MAX:uint = 263;
+		public const WOOD_OVERFLOW_OVERFLOW_MIN:uint = 289;
+		public const WOOD_OVERFLOW_OVERFLOW_MAX:uint = 292;
 		
 		public const GRASS_MIN:uint = 272;
 		public const GRASS_MAX:uint = 286;
@@ -43,6 +45,8 @@ package {
 		public var steamsNumber:Number = 0;
 		public var steamTimer:Number = 0;
 		public var steamTimerMax:Number = 2;
+		public var steamsStartPoint:Array = new Array();
+		public var steamsDXY:Array = new Array();
 		
 		//public const SOUND_ON:Boolean = false;
 		
@@ -256,6 +260,7 @@ package {
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
 		public var bodyMarkerLine:FlxSprite = new FlxSprite();
 		public var markerEnd:FlxSprite;
+		public var markerEndGroup:FlxGroup;
 		
 		public var camTag:FlxSprite = new FlxSprite();
 		
@@ -375,59 +380,6 @@ package {
 					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
 				}
 			}
-			
-			// Steam
-			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
-				var steamArray:Array = midground.getTileInstances(i);
-				if (steamArray) {
-					for (j = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
-						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
-						steam.alpha = 0.5;
-						steam.loadGraphic(steamSheet,true,false,32,32,true);
-						steam.addAnimation("idle",[0]);
-						steam.play("idle");
-						
-						// Decide steam angle
-						// n.b. Steam is grouped in 3 frequencies, 4 angles
-						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
-						if (steamGaugeNumber == 0) {
-							steam.angle = 90;
-							steam.facing = FlxObject.RIGHT;
-						} else if (steamGaugeNumber == 1) {
-							steam.angle = 180;
-							steam.facing = FlxObject.DOWN;
-						} else if (steamGaugeNumber == 2) {
-							steam.angle = 270;
-							steam.facing = FlxObject.LEFT;
-						} else { //sGN == 3
-							steam.facing = FlxObject.UP;
-						}
-						
-						// Decide steam pattern
-						// n.b. Steam is group in 3 patterns
-						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
-						steamGaugeNumber = (i-STEAM_MIN);
-						var steamPuffFrames:Array = [0,1,2,3,0];
-						if (steamGaugeNumber < 4)      {
-							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(0);
-						}
-						else if (steamGaugeNumber < 8) {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(1);
-						}
-						else                           {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
-							steamsNumberArray.push(2);
-						}
-						steam.addAnimation("puff",steamPuffFrames,11,false);
-						
-						steams.add(steam);
-					}
-				}
-			}
-			add(steams);
 
 			/* Level */
 			
@@ -452,6 +404,10 @@ package {
 			}
 			
 			for (i = WOOD_OVERFLOW_MIN; i <= WOOD_OVERFLOW_MAX; i++) {
+				level.setTileProperties(i, FlxObject.ANY, woodCallback);
+			}
+			
+			for (i = WOOD_OVERFLOW_OVERFLOW_MIN; i <= WOOD_OVERFLOW_OVERFLOW_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
 			
@@ -625,6 +581,65 @@ package {
 			}
 			add(doorGroup);
 			
+			// Steam
+			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
+				var steamArray:Array = midground.getTileInstances(i);
+				if (steamArray) {
+					for (j = 0; j < steamArray.length; j++) {
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
+						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
+						//steam.alpha = 0.5;
+						steam.loadGraphic(steamSheet,true,false,32,32,true);
+						steam.addAnimation("idle",[0]);
+						steam.play("idle");
+						
+						// Decide steam angle
+						// n.b. Steam is grouped in 3 frequencies, 4 angles
+						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
+						if (steamGaugeNumber == 0) {
+							steam.angle = 90;
+							steam.facing = FlxObject.RIGHT;
+							steamsDXY.push(new FlxPoint(-1,0));
+						} else if (steamGaugeNumber == 1) {
+							steam.angle = 180;
+							steam.facing = FlxObject.DOWN;
+							steamsDXY.push(new FlxPoint(0,-1));
+						} else if (steamGaugeNumber == 2) {
+							steam.angle = 270;
+							steam.facing = FlxObject.LEFT;
+							steamsDXY.push(new FlxPoint(1,0));
+						} else { //sGN == 3
+							steam.facing = FlxObject.UP;
+							steamsDXY.push(new FlxPoint(0,1));
+						}
+						
+						// Decide steam pattern
+						// n.b. Steam is group in 3 patterns
+						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
+						steamGaugeNumber = (i-STEAM_MIN);
+						var steamPuffFrames:Array = [0,1,2,3,0];
+						if (steamGaugeNumber < 4)      {
+							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(0);
+						}
+						else if (steamGaugeNumber < 8) {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							steamsNumberArray.push(1);
+						}
+						else                           {
+							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
+							steamsNumberArray.push(2);
+						}
+						steam.addAnimation("puff",steamPuffFrames,11,false);
+						
+						steamsStartPoint.push(new FlxPoint(steam.x,steam.y));
+						
+						steams.add(steam);
+					}
+				}
+			}
+			add(steams);
+			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
 			var array:Array = level.getTileInstances(HAND_SPAWN);
@@ -654,10 +669,15 @@ package {
 			bodyMarkerLine = new FlxSprite(0,0,bodyMarkerLineSheet);
 			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
 			markerEnd = new FlxSprite(0,0);
-			markerEnd.makeGraphic(32, 32, 0xffff0000);
+			markerEnd.loadGraphic(handSheet,true,false,32,32);
+			markerEnd.frame = 21;
+			markerEnd.alpha = 0.5;
+			markerEnd.visible = false;
+			markerEndGroup = new FlxGroup();
 			add(bodyMarkerLine);
 			add(cannonMarkerLine);
-			add(markerEnd);
+			markerEndGroup.add(markerEnd);
+			add(markerEndGroup);
 			
 			hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
@@ -907,7 +927,6 @@ package {
 			
 			
 			if (bodyMode && !handOut && !handIn) {
-				
 				theta = (arrow.angle)*Math.PI/180.0;
 				bodyMarkerLine.x = hand.x + hand.width/2.0 + (bodyMarkerLine.height/2.0)*Math.cos(theta);
 				bodyMarkerLine.y = hand.y + hand.height/2.0 - bodyMarkerLine.height/2.0 + (bodyMarkerLine.height/2.0)*Math.sin(theta);
@@ -1479,10 +1498,13 @@ package {
 			for (var mn:uint = 0; mn < steams.length; mn++) {
 				if (steamsNumberArray[mn] < steamsNumber && int(10*steamTimer) == 10*(steamsNumberArray[mn])) {
 					steams.members[mn].play("puff");
+					steams.members[mn].x = steamsStartPoint[mn].x - 4.4*steamsDXY[mn].x*steams.members[mn].frame;
+					steams.members[mn].y = steamsStartPoint[mn].y - 4.4*steamsDXY[mn].y*steams.members[mn].frame;
+					steams.members[mn].alpha = 1 - steams.members[mn].frame/3.0 + 0.5;
 				}
 			}
 			
-			FlxG.log(steamTimer);
+			//FlxG.log(steamTimer);
 			
 			/* End Animations */
 			
@@ -1554,6 +1576,8 @@ package {
 							setDir(body,hand.facing);
 							showArrow();
 						}
+						markerEnd.visible = true;
+						updateRaytrace(arrow.angle);
 						hand.allowCollisions = FlxObject.ANY;
 					}
 				} if (!handOut && !handIn) {
@@ -1564,7 +1588,7 @@ package {
 						if (Registry.neverAimedBodyOrCannon) {
 							Registry.neverAimedBodyOrCannon = false;
 						}
-						
+						updateRaytrace(arrow.angle);
 					} if (playerIsPressing(FlxObject.RIGHT)) {
 						arrow.angle += ROTATE_RATE;
 						if (arrow.angle > arrowStartAngle + 90) {arrow.angle = arrowStartAngle + 90;}
@@ -1572,6 +1596,7 @@ package {
 						if (Registry.neverAimedBodyOrCannon) {
 							Registry.neverAimedBodyOrCannon = false;
 						}
+						updateRaytrace(arrow.angle);
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
 						if (bodyMode) {
@@ -1579,6 +1604,7 @@ package {
 						}
 						bodyMode = false;
 						cannonMode = false;
+						markerEnd.visible = false;
 						setDir(hand, body.facing);
 						lastGround = body.facing;
 						if (Registry.handRelative) {
@@ -1591,6 +1617,11 @@ package {
 					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
+						markerEnd.visible = false;
+						hand.maxVelocity.x = Number.MAX_VALUE;
+						hand.maxVelocity.y = Number.MAX_VALUE;
+						hand.drag.x = 0;
+						hand.drag.y = 0;
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
 						hand.allowCollisions = 0;
@@ -1631,6 +1662,7 @@ package {
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
+						markerEnd.visible = true;
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1643,6 +1675,7 @@ package {
 						hand.facing = body.facing;
 						
 						showArrow();
+						updateRaytrace(arrow.angle);
 						
 						if (Registry.neverEnteredBodyOrCannon) {
 							Registry.neverEnteredBodyOrCannon = false;
@@ -1799,6 +1832,12 @@ package {
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
+			/*FlxG.collide(markerEnd, level);
+			FlxG.collide(markerEnd, doorGroup);*/
+			if (FlxG.collide(markerEnd, level) || FlxG.collide(markerEnd, doorGroup)) {
+				markerEnd.velocity.x = 0;
+				markerEnd.velocity.y = 0;
+			}
 			handTouching = hand.touching;
 			correctMetal();
 			if (bodyMode) {
@@ -2173,6 +2212,9 @@ package {
 		}
 		
 		public function buttonReaction():void {
+			
+			steamTimer = 0;
+			
 			steamsNumber++;
 			if (buttonStateArray.indexOf(false) == -1) {
 				for (var a:int = 0; a < doorGroup.length; a++) {
@@ -2479,8 +2521,39 @@ package {
 		
 		public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
 			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
-			if (steam.frame > 0 && !bodyMode) {
+			if (steam.frame > 0 && !bodyMode && !cannonMode) {
 				setDir(hand, steam.facing, true);
+			}
+		}
+		
+		public function updateRaytrace(angle:Number):void {
+			if (bodyMode) {
+				markerEnd.angle = angle-90;
+				var theta:Number = angle*Math.PI/180.0;
+				markerEnd.x = hand.x;
+				markerEnd.y = hand.y;
+				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
+				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
+				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
+					markerEndGroup.update();
+					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceCallback)) {
+						break;
+					}
+				}
+				markerEnd.velocity.x = 0;
+				markerEnd.velocity.y = 0;
+			}
+		}
+		
+		public function raytraceCallback(spr1:FlxSprite, spr2:FlxObject):void {
+			if (markerEnd.isTouching(FlxObject.LEFT)) {
+				markerEnd.angle = 90;
+			} else if (markerEnd.isTouching(FlxObject.RIGHT)) {
+				markerEnd.angle = 270;
+			} else if (markerEnd.isTouching(FlxObject.UP)) {
+				markerEnd.angle = 180;
+			} else if (markerEnd.isTouching(FlxObject.DOWN)) {
+				markerEnd.angle = 0;
 			}
 		}
 	}
