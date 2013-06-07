@@ -61,6 +61,13 @@ package {
 		
 		public const EXIT_SPAWN:uint = 171;
 		
+		public const STEAM:Array = [64,69,71,72,77,78,79,86,88,91,93,95,117,125,126,127,252,253,254,255,256,257,258,259,260,261,262,263,289,290,291,292];
+		public const STEAM_U:Array = [254,255,289,290,86,91,93,125];
+		public const STEAM_D:Array = [69,71,76,117,252,253,260,261];
+		public const STEAM_L:Array = [263,262,259,257,79,77,95,127];
+		public const STEAM_R:Array = [64,72,88,126,256,258,291,292];
+		public const STEAM_1:Array = [291,289,262,260,257,256,254,252,93,88,86,79,78,77,69,64];
+		
 		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
@@ -581,12 +588,15 @@ package {
 			}
 			add(doorGroup);
 			
+			
 			// Steam
-			for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
-				var steamArray:Array = midground.getTileInstances(i);
+			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
+			for (var b:uint = 0; b < STEAM.length; b++) {
+				i = STEAM[b];
+				var steamArray:Array = level.getTileInstances(i);
 				if (steamArray) {
 					for (j = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],midground);
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],level);
 						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
 						//steam.alpha = 0.5;
 						steam.loadGraphic(steamSheet,true,false,32,32,true);
@@ -595,20 +605,29 @@ package {
 						
 						// Decide steam angle
 						// n.b. Steam is grouped in 3 frequencies, 4 angles
-						var steamGaugeNumber:Number = (i-STEAM_MIN)%4
-						if (steamGaugeNumber == 0) {
+						//var steamGaugeNumber:Number = (i-STEAM_MIN)%4
+						//if (steamGaugeNumber == 0) {
+						
+						steam.x -= steam.width/2 - 4; // the 4 is for the tile width and height
+						steam.y -= steam.height/2 - 4;
+						
+						if (STEAM_L.indexOf(i) != -1) {
+							steam.x += steam.width/2;
 							steam.angle = 90;
 							steam.facing = FlxObject.RIGHT;
 							steamsDXY.push(new FlxPoint(-1,0));
-						} else if (steamGaugeNumber == 1) {
+						} else if (STEAM_U.indexOf(i) != -1) {//else if (steamGaugeNumber == 1) {
+							steam.y += steam.height/2;
 							steam.angle = 180;
 							steam.facing = FlxObject.DOWN;
 							steamsDXY.push(new FlxPoint(0,-1));
-						} else if (steamGaugeNumber == 2) {
+						} else if (STEAM_R.indexOf(i) != -1) {//else if (steamGaugeNumber == 2) {
+							steam.x -= steam.width/2;
 							steam.angle = 270;
 							steam.facing = FlxObject.LEFT;
 							steamsDXY.push(new FlxPoint(1,0));
 						} else { //sGN == 3
+							steam.y -= steam.height/2;
 							steam.facing = FlxObject.UP;
 							steamsDXY.push(new FlxPoint(0,1));
 						}
@@ -616,20 +635,21 @@ package {
 						// Decide steam pattern
 						// n.b. Steam is group in 3 patterns
 						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
-						steamGaugeNumber = (i-STEAM_MIN);
+						//steamGaugeNumber = (i-STEAM_MIN);
 						var steamPuffFrames:Array = [0,1,2,3,0];
-						if (steamGaugeNumber < 4)      {
+						//if (steamGaugeNumber < 4)      {
+						if (STEAM_1.indexOf(i) != -1) {
 							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 							steamsNumberArray.push(0);
-						}
-						else if (steamGaugeNumber < 8) {
+						} else {
+						//else if (steamGaugeNumber < 8) {
 							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 							steamsNumberArray.push(1);
-						}
+						}/*
 						else                           {
 							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
 							steamsNumberArray.push(2);
-						}
+						}*/
 						steam.addAnimation("puff",steamPuffFrames,11,false);
 						
 						steamsStartPoint.push(new FlxPoint(steam.x,steam.y));
@@ -639,6 +659,7 @@ package {
 				}
 			}
 			add(steams);
+			
 			
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
