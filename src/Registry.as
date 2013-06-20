@@ -55,7 +55,7 @@ package {
 		//public static var secondButton:Array = new Array();
 		
 		public static const SOUND_ON:Boolean = true;
-		public static const DEBUG_ON:Boolean = true;
+		public static const DEBUG_ON:Boolean = false;
 		
 		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
