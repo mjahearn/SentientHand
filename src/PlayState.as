@@ -40,6 +40,8 @@ package {
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
+		public const DOT_SPACING:uint = 10;
+		public const DOT_SPEED:uint = 3;
 		
 		public var steamsNumberArray:Array = new Array();
 		public var steamsNumber:Number = 0;
@@ -265,7 +267,9 @@ package {
 		[Embed("assets/body_marker_line.png")] public var bodyMarkerLineSheet:Class;
 		[Embed("assets/cannon_marker_line.png")] public var cannonMarkerLineSheet:Class;
 		public var cannonMarkerLine:FlxSprite = new FlxSprite();
-		public var bodyMarkerLine:FlxSprite = new FlxSprite();
+		//public var bodyMarkerLine:FlxSprite = new FlxSprite();
+		public var bodyMarkerGroup:FlxGroup;
+		public var bodyMarkerTimer:Number;
 		public var markerEnd:FlxSprite;
 		public var markerEndGroup:FlxGroup;
 		
@@ -687,7 +691,8 @@ package {
 			// marker line
 			//markerLine.makeGraphic(level.width,level.height,0x00000000);
 			//add(markerLine);
-			bodyMarkerLine = new FlxSprite(0,0,bodyMarkerLineSheet);
+			bodyMarkerGroup = new FlxGroup();
+			bodyMarkerTimer = 0;
 			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
 			markerEnd = new FlxSprite(0,0);
 			markerEnd.loadGraphic(handSheet,true,false,32,32);
@@ -695,7 +700,7 @@ package {
 			markerEnd.alpha = 0.5;
 			markerEnd.visible = false;
 			markerEndGroup = new FlxGroup();
-			add(bodyMarkerLine);
+			add(bodyMarkerGroup);
 			add(cannonMarkerLine);
 			markerEndGroup.add(markerEnd);
 			add(markerEndGroup);
@@ -812,6 +817,11 @@ package {
 			steamTimer += FlxG.elapsed;
 			if (steamTimer > steamTimerMax) {
 				steamTimer = 0;
+			}
+			
+			bodyMarkerTimer += FlxG.elapsed*DOT_SPEED;
+			if (bodyMarkerTimer > 1) {
+				bodyMarkerTimer -= 1;
 			}
 						
 			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
@@ -946,25 +956,6 @@ package {
 				}
 			}
 			
-			
-			if (bodyMode && !handOut && !handIn) {
-				theta = (arrow.angle)*Math.PI/180.0;
-				bodyMarkerLine.x = hand.x + hand.width/2.0 + (bodyMarkerLine.height/2.0)*Math.cos(theta);
-				bodyMarkerLine.y = hand.y + hand.height/2.0 - bodyMarkerLine.height/2.0 + (bodyMarkerLine.height/2.0)*Math.sin(theta);
-				bodyMarkerLine.angle = arrow.angle-90;
-				bodyMarkerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
-			} else {
-				bodyMarkerLine.alpha = 0;
-			}
-			if (cannonMode) {
-				theta = (arrow.angle)*Math.PI/180.0;
-				cannonMarkerLine.x = hand.x + hand.width/2.0 + (cannonMarkerLine.height/2.0)*Math.cos(theta);
-				cannonMarkerLine.y = hand.y + hand.height/2.0 - cannonMarkerLine.height/2.0 + (cannonMarkerLine.height/2.0)*Math.sin(theta);
-				cannonMarkerLine.angle = arrow.angle-90;
-				cannonMarkerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
-			} else {
-				cannonMarkerLine.alpha = 0;
-			}
 			/*
 			// marker line
 			markerLine.fill(0x00000000);
@@ -1433,12 +1424,10 @@ package {
 				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
-					
 					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
 					else if (body.angle == 270) {body.facing = FlxObject.RIGHT;}
 					else if (body.angle == 180) {body.facing = FlxObject.UP;}
 					else if (body.angle == 90) {body.facing = FlxObject.LEFT;}
-					
 					
 					if (handDir == FlxObject.LEFT) {hand.play("idle body left");}
 					else {hand.play("idle body right");}
@@ -1486,7 +1475,8 @@ package {
 						else if (hand.isTouching(FlxObject.RIGHT)) {hand.angle = 270;}
 						// The arm is retracting while holding
 						if (/*!FlxG.keys.SPACE*/handIn && hand.facing != body.facing) {
-							bodyTargetAngle = hand.angle;
+							//bodyTargetAngle = hand.angle; 
+							//to prevent corner bug, this ^ needs to be set when the body begins to be pulled in (otherwise handIn is false by here if the pulling takes 1 frame)
 							if (bodyTargetAngle > body.angle) {
 								body.angle += 4;
 							} else if (bodyTargetAngle < body.angle) {
@@ -1567,6 +1557,7 @@ package {
 				} if (handIn) {
 					//rad = Math.atan2(diffY, diffX);
 					if (/*hand.touching > 0 && hand.facing == hand.touching*/hand.facing != body.facing) {
+						bodyTargetAngle = hand.angle;
 						body.velocity.x = GRAPPLE_SPEED * Math.cos(/*rad*/Math.atan2(diffY, diffX));
 						body.velocity.y = GRAPPLE_SPEED * Math.sin(/*rad*/Math.atan2(diffY, diffX));
 						showArrow();
@@ -1778,6 +1769,34 @@ package {
 				}
 			}
 			
+			if (bodyMode && !handOut && !handIn) {
+				theta = (arrow.angle)*Math.PI/180.0;
+				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
+				for (var n:int = 0; n <= dotNum; n++) {
+					if (bodyMarkerGroup.length <= n) {
+						bodyMarkerGroup.add(new FlxSprite().makeGraphic(2, 2, 0xffff0000));
+					}
+					bodyMarkerGroup.members[n].x = body.getMidpoint().x + Math.cos(theta)*DOT_SPACING*(n + bodyMarkerTimer);
+					bodyMarkerGroup.members[n].y = body.getMidpoint().y + Math.sin(theta)*DOT_SPACING*(n + bodyMarkerTimer);
+					bodyMarkerGroup.members[n].alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
+				}
+				for (; n < bodyMarkerGroup.length; n++) {
+					bodyMarkerGroup.members[n].alpha = 0;
+				}
+				bodyMarkerGroup.visible = true;
+			} else {
+				bodyMarkerGroup.visible = false;
+			}
+			if (cannonMode) {
+				theta = (arrow.angle)*Math.PI/180.0;
+				cannonMarkerLine.x = hand.x + hand.width/2.0 + (cannonMarkerLine.height/2.0)*Math.cos(theta);
+				cannonMarkerLine.y = hand.y + hand.height/2.0 - cannonMarkerLine.height/2.0 + (cannonMarkerLine.height/2.0)*Math.sin(theta);
+				cannonMarkerLine.angle = arrow.angle-90;
+				cannonMarkerLine.alpha = 0.22 + 0.78*pulseTimer/pulseTimeMax;
+			} else {
+				cannonMarkerLine.alpha = 0;
+			}
+			
 			super.update();
 			
 			if (hand.velocity.x != 0) {
@@ -1849,7 +1868,7 @@ package {
 			//FlxG.collide(trashGroup,trashGroup);
 			FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
-			FlxG.overlap(hand, steams, handSteamOverlap);
+			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
