@@ -172,6 +172,7 @@ package {
 		public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
 		public var exitOn:Boolean;
+		public var col:uint; //pulse color
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
 		
@@ -1039,6 +1040,11 @@ package {
 				}
 			}
 			
+			var pulseNum:Number = int((pulseTimer/pulseTimeMax)*5) + 7;
+			if (pulseNum >= 15) {pulseNum = 15;}
+			if (pulseNum <= 7) {pulseNum = 7;}
+			col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
+			
 			if (!cannonMode && !bodyMode) {
 				
 				if (time >= IDLE_TIME) {
@@ -1062,11 +1068,6 @@ package {
 				} else {
 					hint.play("idle");
 				}
-				
-				var pulseNum:Number = int((pulseTimer/pulseTimeMax)*5) + 7;
-				if (pulseNum >= 15) {pulseNum = 15;}
-				if (pulseNum <= 7) {pulseNum = 7;}
-				var col:Number = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
 				
 				if (enteringBody) {
 					hand.color = col;
@@ -1983,6 +1984,8 @@ package {
 				//if (getHandTouching() != spr.facing) {
 					fixGravity(spr);
 				//}
+			} else if (spr == markerEnd) {
+				markerEnd.color = Math.min(col*2, 0xff0000);
 			} else if (spr in bodyGroup.members) {
 				//if (spr.touching != spr.facing) {
 					fixGravity(spr);
@@ -2574,9 +2577,10 @@ package {
 				markerEnd.y = hand.y;
 				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
 				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
+				markerEnd.color = 0xffffff;
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
-					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceCallback)) {
+					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
 						break;
 					}
 				}
@@ -2595,6 +2599,11 @@ package {
 			} else if (markerEnd.isTouching(FlxObject.DOWN)) {
 				markerEnd.angle = 0;
 			}
+		}
+		
+		public function raytraceDoorCallback(spr1:FlxSprite, spr2:FlxObject):void {
+			markerEnd.color = Math.min(col*2, 0xff0000);
+			raytraceCallback(spr1, spr2);
 		}
 	}
 }
