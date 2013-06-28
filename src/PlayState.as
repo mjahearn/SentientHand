@@ -911,7 +911,7 @@ package {
 				else if (curCannon < uint.MAX_VALUE) {enteringCannon = true;}
 			}
 			
-			var touchingMetal:Boolean = (onGround && isMetalInDir(hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
+			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
 			if (enteringBody || bodyMode) {
 				body = bodyGroup.members[curBody];
@@ -1775,7 +1775,10 @@ package {
 				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
 				for (var n:int = 0; n <= dotNum; n++) {
 					if (bodyMarkerGroup.length <= n) {
-						bodyMarkerGroup.add(new FlxSprite().makeGraphic(2, 2, 0xffff0000));
+						bodyMarkerGroup.add(new FlxSprite().makeGraphic(2, 2, 0xffffffff));
+					}
+					if (n > 0) {
+						bodyMarkerGroup.members[n].color = bodyMarkerGroup.members[n-1].color;
 					}
 					bodyMarkerGroup.members[n].x = body.getMidpoint().x + Math.cos(theta)*DOT_SPACING*(n + bodyMarkerTimer);
 					bodyMarkerGroup.members[n].y = body.getMidpoint().y + Math.sin(theta)*DOT_SPACING*(n + bodyMarkerTimer);
@@ -1928,7 +1931,7 @@ package {
 						} else {
 							setDir(hand,FlxObject.DOWN,true);
 						}
-					} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand.facing, 4)) { //replacing || lastTouchedWood
+					} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand, hand.facing, 4)) { //replacing || lastTouchedWood
 						setDir(hand,FlxObject.DOWN,true);
 					}
 				}/* else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE || hand.isTouching(FlxObject.DOWN))) {
@@ -1985,7 +1988,7 @@ package {
 					fixGravity(spr);
 				//}
 			} else if (spr == markerEnd) {
-				markerEnd.color = Math.min(col*2, 0xff0000);
+				setGrappleOkay();
 			} else if (spr in bodyGroup.members) {
 				//if (spr.touching != spr.facing) {
 					fixGravity(spr);
@@ -2049,28 +2052,17 @@ package {
 		*/
 				
 		public function fixGravity(spr:FlxSprite, isDoor:Boolean=false):void {
-			/*if ((getHandTouching() & spr.facing) >= spr.facing) {
-				if ((getHandTouching() & FlxObject.DOWN) > 0) {
-					setGravity(spr, FlxObject.DOWN, false);
-				} if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP,3))) {
-					setGravity(spr, FlxObject.UP, false);
-				} if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT,3))) {
-					setGravity(spr, FlxObject.LEFT, false);
-				} if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT,3))) {
-					setGravity(spr, FlxObject.RIGHT, false);
-				}
-			} else {*/
 			var hitOnlyWood:Boolean = true;
 				if ((getHandTouching() & FlxObject.DOWN) > 0) {
 					hitOnlyWood = false;
 					setDir(spr, FlxObject.DOWN);
-				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
+				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(hand,FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
 					hitOnlyWood = false;
 					setDir(spr, FlxObject.UP);
-				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(FlxObject.LEFT,4))) {
+				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(hand,FlxObject.LEFT,4))) {
 					hitOnlyWood = false;
 					setDir(spr, FlxObject.LEFT);
-				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(FlxObject.RIGHT,4))) {
+				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(hand,FlxObject.RIGHT,4))) {
 					hitOnlyWood = false;
 					setDir(spr, FlxObject.RIGHT);
 				}
@@ -2079,50 +2071,6 @@ package {
 				}
 			//}
 		}
-		
-		/*public function setGravity(spr:FlxSprite, dir:uint, reset:Boolean):void {
-			//if (reset) {
-				spr.facing = dir;
-				spr.acceleration.x = 0;
-				spr.acceleration.y = 0;
-			//} else {
-			//	spr.facing = spr.facing | dir;
-			//}
-			if (dir == FlxObject.DOWN) {
-				spr.acceleration.y = GRAV_RATE;
-			} else if (dir == FlxObject.UP) {
-				spr.acceleration.y = -GRAV_RATE;
-			} else if (dir == FlxObject.LEFT) {
-				spr.acceleration.x = -GRAV_RATE;
-			} else if (dir == FlxObject.RIGHT) {
-				spr.acceleration.x = GRAV_RATE;
-			}
-			if (onGround) {
-				if (Registry.continuityUntilRelease) {
-					//if (Registry.handRelative) {
-						if ((handIsFacing(FlxObject.DOWN) && (lastGround & FlxObject.UP) == FlxObject.UP)
-							|| (handIsFacing(FlxObject.UP) && (lastGround & FlxObject.DOWN) == FlxObject.DOWN)
-							|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
-							|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
-							if (tempGround == FlxObject.DOWN) {
-								tempGround = FlxObject.UP;
-							} else if (tempGround == FlxObject.UP) {
-								tempGround = FlxObject.DOWN;
-							} else if (tempGround == FlxObject.LEFT) {
-								tempGround = FlxObject.RIGHT;
-							} else if (tempGround == FlxObject.RIGHT) {
-								tempGround = FlxObject.LEFT;
-							}
-						}
-					//} else {
-					//	tempGround = lastGround;
-					//}
-				} else if (!Registry.handRelative) {
-					tempGround = dir;
-				}
-				lastGround = spr.facing;
-			} 
-		}*/
 		
 		public function setDir(spr:FlxSprite, dir:uint, grav:Boolean=false):void {
 			spr.facing = dir;
@@ -2434,18 +2382,18 @@ package {
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate */
-				if ((hand.isTouching(FlxObject.UP) && isMetalInDir(FlxObject.UP, 4)) 
-				 || (hand.isTouching(FlxObject.DOWN) && isMetalInDir(FlxObject.DOWN, 4))
-				 || (hand.isTouching(FlxObject.LEFT) && isMetalInDir(FlxObject.LEFT, 4))
-				 || (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(FlxObject.RIGHT, 4))) {
+				if ((hand.isTouching(FlxObject.UP) && isMetalInDir(hand, FlxObject.UP, 4)) 
+				 || (hand.isTouching(FlxObject.DOWN) && isMetalInDir(hand, FlxObject.DOWN, 4))
+				 || (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand, FlxObject.LEFT, 4))
+				 || (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand, FlxObject.RIGHT, 4))) {
 					metalStuff(1, hand);
 				}
 			}
 		}
 		
-		public function isMetalInDir(dir:uint, max:uint):Boolean {
-			var indX:uint = int(hand.x/8);
-			var indY:uint = int(hand.y/8);
+		public function isMetalInDir(spr:FlxSprite, dir:uint, max:uint):Boolean {
+			var indX:uint = int(spr.x/8);
+			var indY:uint = int(spr.y/8);
 			if (dir == FlxObject.LEFT) {
 				for (var a:uint = 0; a <= max; a++) {
 					if (indY < level.heightInTiles - a && isMetal(level.getTile(indX-1, indY+a))) {
@@ -2577,12 +2525,16 @@ package {
 				markerEnd.y = hand.y;
 				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
 				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
-				markerEnd.color = 0xffffff;
+				markerEnd.color = Math.min(col*2, 0xff0000);
+				bodyMarkerGroup.setAll("color", 0xff0000);
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
 					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
 						break;
 					}
+				}
+				if (FlxG.overlap(markerEnd, buttonGroup) || (markerEnd.touching != 0 && isMetalInDir(markerEnd, markerEnd.touching,4))) {
+					setGrappleOkay();
 				}
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
@@ -2602,8 +2554,13 @@ package {
 		}
 		
 		public function raytraceDoorCallback(spr1:FlxSprite, spr2:FlxObject):void {
-			markerEnd.color = Math.min(col*2, 0xff0000);
+			setGrappleOkay();
 			raytraceCallback(spr1, spr2);
+		}
+		
+		public function setGrappleOkay():void {
+			markerEnd.color = 0xffffff;
+			bodyMarkerGroup.setAll("color", 0xffffff);
 		}
 	}
 }
