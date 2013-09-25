@@ -840,6 +840,7 @@ package {
 			if (FlxG.paused) {
 				time = 0;
 			}
+			FlxG.log(time);
 			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
