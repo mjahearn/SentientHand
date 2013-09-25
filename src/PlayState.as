@@ -957,6 +957,9 @@ package {
 				}
 			}
 			
+			camTag.angle += (-camTag.angle + hand.angle)/8.0;
+			FlxG.camera.angle = -camTag.angle;
+			
 			/*
 			// marker line
 			markerLine.fill(0x00000000);
@@ -973,6 +976,7 @@ package {
 					
 					camTag.x += (-camTag.x + endX)/44.0;
 					camTag.y += (-camTag.y + endY)/44.0;
+					
 					// make objects glow
 					
 					
@@ -987,7 +991,16 @@ package {
 				camTag.x += (-camTag.x + hand.x)/8.0;
 				camTag.y += (-camTag.y + hand.y)/8.0;
 			} //
-		
+			
+			/*
+			var tagCenter:FlxPoint = camTag.getScreenXY();
+			var dScreenX:Number = FlxG.width/2.0 - tagCenter.x;
+			var dScreenY:Number = FlxG.height/2.0 - tagCenter.y;
+			FlxG.log(dScreenX + ',' + dScreenY);
+			FlxG.camera.target.x += dScreenX;
+			FlxG.camera.target.y += dScreenY;
+			//camTag.y -= dScreenY;
+			*/
 			
 			/* else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
