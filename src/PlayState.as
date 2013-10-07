@@ -52,6 +52,8 @@ package {
 		
 		//public const SOUND_ON:Boolean = false;
 		
+		private var levelFunctional:FlxTilemap;
+		
 		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
@@ -295,6 +297,9 @@ package {
 				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
 			}
 			
+						
+			levelFunctional = RegistryLevels.currentFlxTilemapFunctional();			
+			
 			levelMap = Registry.level;
 			midgroundMap = Registry.midground;
 			backgroundMap = Registry.background;
@@ -411,6 +416,14 @@ package {
 				exitPoint = new FlxPoint(0,0);
 			}
 			
+			
+			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
+			
+			this.setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
+			
+			if (Registry.DEBUG_ON) {add(levelFunctional);}
+			
+			/*
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
@@ -444,7 +457,7 @@ package {
 			// do we need a grass sound?
 			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, dirtCallback);
-			}
+			}*/
 			
 			
 			
@@ -1881,17 +1894,21 @@ package {
 			if (!onGround) {
 				touchingTrash = false;
 			}
-			FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
+			//FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
 			//FlxG.collide(trashGroup,trashGroup);
-			FlxG.collide(level, hand/*, levelHandCallback*/);
+			//FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
 			//FlxG.collide(flapGroup, hand, doorCallback);
-			FlxG.collide(level, bodyGroup);
+			//FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
 			/*FlxG.collide(markerEnd, level);
 			FlxG.collide(markerEnd, doorGroup);*/
-			if (FlxG.collide(markerEnd, level) || FlxG.collide(markerEnd, doorGroup)) {
+			
+			FlxG.collide(levelFunctional,hand);
+			FlxG.collide(levelFunctional,bodyGroup);
+			
+			if (FlxG.collide(markerEnd, /*level*/levelFunctional) || FlxG.collide(markerEnd, doorGroup)) {
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
 			}
@@ -2208,12 +2225,13 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
+		/*
 		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
 			var X:Number = 8*(int)(tile%map.widthInTiles);
 			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
-		}
+		}*/
 		
 		public function buttonReaction():void {
 			
@@ -2542,7 +2560,7 @@ package {
 				bodyMarkerGroup.setAll("color", 0xff0000);
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
-					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
+					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
 						break;
 					}
 				}
@@ -2574,6 +2592,42 @@ package {
 		public function setGrappleOkay():void {
 			markerEnd.color = 0xffffff;
 			bodyMarkerGroup.setAll("color", 0xffffff);
+		}
+		
+		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap,_hide:Boolean=true):FlxGroup {
+			var _group:FlxGroup = new FlxGroup();
+			for (var i:uint = 0; i <_spawn.length; i++) {
+				var _array:Array = _map.getTileInstances(_spawn[i]);
+				if (_array) {
+					for (var j:uint = 0; j < _array.length; j++) {
+						var _point:FlxPoint = pointForTile(_array[j],_map);
+						_group.add(new _class(_point.x,_point.y));
+						if (_hide) {
+							_map.setTileByIndex(_array[j],0);
+						}
+					}
+				}
+			}
+			return _group;
+		}
+		
+		private function setCallbackFromSpawn(_spawn:Array,_callback:Function,_map:FlxTilemap,_hide:Boolean=true):void {
+			for (var i:uint = 0; i <_spawn.length; i++) {
+				_map.setTileProperties(_spawn[i],FlxObject.ANY,_callback);
+				var _array:Array = _map.getTileInstances(_spawn[i]);
+				if (_array && _hide) {
+					for (var j:uint = 0; j < _array.length; j++) {
+						_map.setTileByIndex(_array[j],0);
+					}
+				}
+			}
+		}
+		
+		private function pointForTile(_tile:uint,_map:FlxTilemap):FlxPoint {
+			var _x:Number = (_map.width/_map.widthInTiles)*(int)(_tile%_map.widthInTiles);
+			var _y:Number = (_map.width/_map.widthInTiles)*(int)(_tile/_map.widthInTiles);
+			var _point:FlxPoint = new FlxPoint(_x,_y);
+			return _point;
 		}
 	}
 }
