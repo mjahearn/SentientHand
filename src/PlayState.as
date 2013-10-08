@@ -52,6 +52,8 @@ package {
 		
 		//public const SOUND_ON:Boolean = false;
 		
+		private var levelFunctional:FlxTilemap;
+		
 		/* Level Spawn Points */
 		public const HAND_SPAWN:uint = 191;
 		public const BODY_SPAWN:uint = 190;
@@ -296,6 +298,9 @@ package {
 				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
 			}
 			
+						
+			levelFunctional = RegistryLevels.currentFlxTilemapFunctional();			
+			
 			levelMap = Registry.level;
 			midgroundMap = Registry.midground;
 			backgroundMap = Registry.background;
@@ -400,8 +405,11 @@ package {
 			level.loadMap(new levelMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
-			//FlxG.camera.bounds = FlxG.worldBounds;
-			FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, level.width+FlxG.width, level.height+FlxG.height);
+			if (Registry.extendedCamera) {
+				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, level.width+FlxG.width, level.height+FlxG.height);
+			} else {
+				FlxG.camera.bounds = FlxG.worldBounds;
+			}
 			
 			// Exit arrow
 			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
@@ -413,6 +421,14 @@ package {
 				exitPoint = new FlxPoint(0,0);
 			}
 			
+			
+			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
+			
+			this.setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
+			
+			if (Registry.DEBUG_ON) {add(levelFunctional);}
+			
+			/*
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, woodCallback);
 			}
@@ -446,7 +462,7 @@ package {
 			// do we need a grass sound?
 			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
 				level.setTileProperties(i, FlxObject.ANY, dirtCallback);
-			}
+			}*/
 			
 			
 			
@@ -801,7 +817,7 @@ package {
 				add(text);
 			}
 			
-			FlxG.camera.follow(camTag/*, FlxCamera.STYLE_TOPDOWN*/);
+			FlxG.camera.follow(camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
 			
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
@@ -960,10 +976,17 @@ package {
 				}
 			}
 			
-			//if (camTag.angle != camAngle) {
-				camTag.angle += (-camTag.angle + /*camAngle*/hand.angle)/8.0;
-				FlxG.camera.angle = -camTag.angle;	
-			//}
+			if (Registry.cameraFollowsHand) {
+				if (onGround) {
+					camTag.angle += angleDifference(camAngle, camTag.angle)/8.0;
+				} else {
+					camTag.angle += angleDifference(hand.angle, camTag.angle)/8.0;
+				}
+				FlxG.camera.angle = -camTag.angle;
+			} else if (camTag.angle != camAngle) {
+				camTag.angle += (-camTag.angle + camAngle)/8.0;
+				FlxG.camera.angle = -camTag.angle;
+			}
 			
 			/*
 			// marker line
@@ -1886,17 +1909,21 @@ package {
 			if (!onGround) {
 				touchingTrash = false;
 			}
-			FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
+			//FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
 			//FlxG.collide(trashGroup,trashGroup);
-			FlxG.collide(level, hand/*, levelHandCallback*/);
+			//FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
 			//FlxG.collide(flapGroup, hand, doorCallback);
-			FlxG.collide(level, bodyGroup);
+			//FlxG.collide(level, bodyGroup);
 			FlxG.collide(doorGroup, bodyGroup);
 			/*FlxG.collide(markerEnd, level);
 			FlxG.collide(markerEnd, doorGroup);*/
-			if (FlxG.collide(markerEnd, level) || FlxG.collide(markerEnd, doorGroup)) {
+			
+			FlxG.collide(levelFunctional,hand);
+			FlxG.collide(levelFunctional,bodyGroup);
+			
+			if (FlxG.collide(markerEnd, /*level*/levelFunctional) || FlxG.collide(markerEnd, doorGroup)) {
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
 			}
@@ -2115,6 +2142,7 @@ package {
 				spr.maxVelocity.x = MAX_MOVE_VEL;
 				spr.maxVelocity.y = MAX_MOVE_VEL;
 				onGround = true;
+				camTag.angle = trueAngle(camTag.angle);
 			}
 			if (dir == FlxObject.DOWN) {
 				camAngle = 0;
@@ -2232,12 +2260,13 @@ package {
 			return(uint.MAX_VALUE);
 		}
 		
+		/*
 		public function pointForTile(tile:uint,map:FlxTilemap):FlxPoint {
 			var X:Number = 8*(int)(tile%map.widthInTiles);
 			var Y:Number = 8*(int)(tile/map.widthInTiles);
 			var p:FlxPoint = new FlxPoint(X,Y);
 			return p;
-		}
+		}*/
 		
 		public function buttonReaction():void {
 			
@@ -2566,7 +2595,7 @@ package {
 				bodyMarkerGroup.setAll("color", 0xff0000);
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
-					if (FlxG.collide(markerEnd, level, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
+					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
 						break;
 					}
 				}
@@ -2598,6 +2627,64 @@ package {
 		public function setGrappleOkay():void {
 			markerEnd.color = 0xffffff;
 			bodyMarkerGroup.setAll("color", 0xffffff);
+		}
+		
+		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap,_hide:Boolean=true):FlxGroup {
+			var _group:FlxGroup = new FlxGroup();
+			for (var i:uint = 0; i <_spawn.length; i++) {
+				var _array:Array = _map.getTileInstances(_spawn[i]);
+				if (_array) {
+					for (var j:uint = 0; j < _array.length; j++) {
+						var _point:FlxPoint = pointForTile(_array[j],_map);
+						_group.add(new _class(_point.x,_point.y));
+						if (_hide) {
+							_map.setTileByIndex(_array[j],0);
+						}
+					}
+				}
+			}
+			return _group;
+		}
+		
+		private function setCallbackFromSpawn(_spawn:Array,_callback:Function,_map:FlxTilemap,_hide:Boolean=true):void {
+			for (var i:uint = 0; i <_spawn.length; i++) {
+				_map.setTileProperties(_spawn[i],FlxObject.ANY,_callback);
+				var _array:Array = _map.getTileInstances(_spawn[i]);
+				if (_array && _hide) {
+					for (var j:uint = 0; j < _array.length; j++) {
+						_map.setTileByIndex(_array[j],0);
+					}
+				}
+			}
+		}
+		
+		private function pointForTile(_tile:uint,_map:FlxTilemap):FlxPoint {
+			var _x:Number = (_map.width/_map.widthInTiles)*(int)(_tile%_map.widthInTiles);
+			var _y:Number = (_map.width/_map.widthInTiles)*(int)(_tile/_map.widthInTiles);
+			var _point:FlxPoint = new FlxPoint(_x,_y);
+			return _point;
+		}
+		
+		private function trueAngle(a:Number):Number {
+			var r:Number = a % 360;
+			if (r <= -180) {
+				r += 360;
+			} else if (r > 180) {
+				r -= 360;
+			}
+			return r;
+		}
+		
+		private function angleDifference(a:Number, b:Number):Number {
+			var tA:Number = trueAngle(a);
+			var tB:Number = trueAngle(b);
+			
+			var d1:Number = tA-tB;
+			var d2:Number = d1>=0?d1-360:d1+360;
+			if (Math.abs(d1) < Math.abs(d2)) {
+				return d1;
+			}
+			return d2;
 		}
 	}
 }

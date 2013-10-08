@@ -43,6 +43,8 @@ package {
 		public static var musicSwitch:Boolean = true;
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
+		public static var cameraFollowsHand:Boolean = false;
+		public static var extendedCamera:Boolean = true;
 		public static var handRelative:Boolean = true;
 		public static var continuityUntilRelease:Boolean = false;
 		public static var jumping:Boolean = false;

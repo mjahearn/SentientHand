@@ -4,6 +4,8 @@ package
 	
 	public class LevelSelect extends FlxState
 	{	
+		public var camera:FlxButton;
+		public var range:FlxButton;
 		public var controls:FlxButton;
 		public var continuity:FlxButton;
 		public var jump:FlxButton;
@@ -15,24 +17,40 @@ package
 			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv \n I -> tsh_level06.csv");
 			add(text);
 			
-			var ctlText:FlxText = new FlxText(100, 150, 400, "Controls (click to change):");
-			controls = new FlxButton(100, 180, "Cam-Relative", changeControls);
+			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
+			camera = new FlxButton(100, 130, "Follow Gravity", changeCamera);
+			if (Registry.cameraFollowsHand) {
+				camera.label.text = "Follow Hand";
+			}
+			add(camText);
+			add(camera);
+			
+			var rangeText:FlxText = new FlxText(100, 200, 400, "Camera Range:");
+			range = new FlxButton(100, 230, "Level Bounds", changeRange);
+			if (Registry.extendedCamera) {
+				range.label.text = "Extended";
+			}
+			add(rangeText);
+			add(range);
+			
+			var ctlText:FlxText = new FlxText(100, 350, 400, "Control Stuff:");
+			controls = new FlxButton(100, 380, "Cam-Relative", changeControls);
 			if (Registry.handRelative) {
 				controls.label.text = "Hand-Relative";
 			}
 			add(ctlText);
 			add(controls);
 			
-			var conText:FlxText = new FlxText(100, 250, 400, "Continuity:");
-			continuity = new FlxButton(100, 280, "On", changeContinuity);
+			var conText:FlxText = new FlxText(250, 350, 400, "Continuity:");
+			continuity = new FlxButton(250, 380, "On", changeContinuity);
 			if (!Registry.continuityUntilRelease) {
 				continuity.label.text = "Off";
 			}
 			add(conText);
 			add(continuity);
 			
-			var jumpText:FlxText = new FlxText(100, 350, 400, "Jumping:");
-			jump = new FlxButton(100, 380, "On", changeJumping);
+			var jumpText:FlxText = new FlxText(400, 350, 400, "Jumping:");
+			jump = new FlxButton(400, 380, "On", changeJumping);
 			if (!Registry.jumping) {
 				jump.label.text = "Off";
 			}
@@ -87,6 +105,24 @@ package
 			}
 			
 			super.update();
+		}
+		
+		public function changeCamera():void {
+			Registry.cameraFollowsHand = !Registry.cameraFollowsHand;
+			if (Registry.cameraFollowsHand) {
+				camera.label.text = "Follow Hand";
+			} else {
+				camera.label.text = "Follow Gravity";
+			}
+		}
+		
+		public function changeRange():void {
+			Registry.extendedCamera = !Registry.extendedCamera;
+			if (Registry.extendedCamera) {
+				range.label.text = "Extended";
+			} else {
+				range.label.text = "Level Bounds";
+			}
 		}
 		
 		public function changeControls():void {
