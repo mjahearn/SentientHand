@@ -83,8 +83,8 @@ package {
 		public const BUTTON_PRESSED:uint = 0;
 		public const BUTTON_INIT:uint = 1;
 		
-		public const ACTION_KEY:String = "X";
-		public const BODY_KEY:String = "Z";
+		public const ACTION_KEY:String = "SPACE";
+		public const BODY_KEY:String = "CONTROL";
 		
 		public var reinvigorated:Boolean;
 		
@@ -275,6 +275,7 @@ package {
 		public var markerEndGroup:FlxGroup;
 		
 		public var camTag:FlxSprite = new FlxSprite();
+		public var camAngle:Number = new Number;
 		
 		/*public function PlayState(level:Class,midground:Class,background:Class) {
 			
@@ -399,7 +400,8 @@ package {
 			level.loadMap(new levelMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
-			FlxG.camera.bounds = FlxG.worldBounds;
+			//FlxG.camera.bounds = FlxG.worldBounds;
+			FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, level.width+FlxG.width, level.height+FlxG.height);
 			
 			// Exit arrow
 			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
@@ -799,7 +801,7 @@ package {
 				add(text);
 			}
 			
-			FlxG.camera.follow(camTag, FlxCamera.STYLE_TOPDOWN);
+			FlxG.camera.follow(camTag/*, FlxCamera.STYLE_TOPDOWN*/);
 			
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
@@ -840,7 +842,7 @@ package {
 			if (FlxG.paused) {
 				time = 0;
 			}
-			FlxG.log(time);
+			//FlxG.log(time);
 			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
@@ -958,6 +960,11 @@ package {
 				}
 			}
 			
+			//if (camTag.angle != camAngle) {
+				camTag.angle += (-camTag.angle + /*camAngle*/hand.angle)/8.0;
+				FlxG.camera.angle = -camTag.angle;	
+			//}
+			
 			/*
 			// marker line
 			markerLine.fill(0x00000000);
@@ -974,6 +981,7 @@ package {
 					
 					camTag.x += (-camTag.x + endX)/44.0;
 					camTag.y += (-camTag.y + endY)/44.0;
+					
 					// make objects glow
 					
 					
@@ -988,7 +996,16 @@ package {
 				camTag.x += (-camTag.x + hand.x)/8.0;
 				camTag.y += (-camTag.y + hand.y)/8.0;
 			} //
-		
+			
+			/*
+			var tagCenter:FlxPoint = camTag.getScreenXY();
+			var dScreenX:Number = FlxG.width/2.0 - tagCenter.x;
+			var dScreenY:Number = FlxG.height/2.0 - tagCenter.y;
+			FlxG.log(dScreenX + ',' + dScreenY);
+			FlxG.camera.target.x += dScreenX;
+			FlxG.camera.target.y += dScreenY;
+			//camTag.y -= dScreenY;
+			*/
 			
 			/* else if (cannonMode) {
 				rad = arrow.angle*Math.PI/180;
@@ -2098,6 +2115,25 @@ package {
 				spr.maxVelocity.x = MAX_MOVE_VEL;
 				spr.maxVelocity.y = MAX_MOVE_VEL;
 				onGround = true;
+			}
+			if (dir == FlxObject.DOWN) {
+				camAngle = 0;
+			} else if (dir == FlxObject.UP) {
+				if (camAngle < 0) {
+					camAngle = -180;
+				} else {
+					camAngle = 180;
+				}
+			} else if (dir == FlxObject.LEFT) {
+				if (camAngle == -180) {
+					camTag.angle = 180;
+				}
+				camAngle = 90;
+			} else if (dir == FlxObject.RIGHT) {
+				if (camAngle == 180) {
+					camTag.angle = -180;
+				}
+				camAngle = -90;
 			}
 			if (onGround) {
 				if (Registry.continuityUntilRelease) {
