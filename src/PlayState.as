@@ -19,6 +19,8 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		public const WALL_JUMP_VEL:Number = 100; //initial velocity (in pixels per second) of a hand jumping from the wall
 		public const CEIL_JUMP_VEL:Number = 50; //initial velocity (in pixels per second) of a hand jumping from the ceiling
+		
+		/*
 		public const METAL_MIN:uint = 64; //minimum index number of metal in the tilemap
 		public const METAL_MAX:uint = 147; //maximum index number of metal in the tilemap
 		public const WOOD_MIN:uint = 1; //minimum index number of wood in the tilemap
@@ -37,6 +39,7 @@ package {
 		public const GRASS_MAX:uint = 286;
 		public const UNTOUCHABLE_GRASS_MIN:uint = 264;
 		public const UNTOUCHABLE_GRASS_MAX:uint = 271;
+		*/
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		public const GRAPPLE_LENGTH:uint = 320; // maximum length of the grappling arm
@@ -2201,13 +2204,31 @@ package {
 		}
 		
 		public function isMetal(tile:uint):Boolean {
+			/*
 			return (tile >= METAL_MIN && tile <= METAL_MAX);
+			*/
+			for (var i:uint = 0; i < RegistryLevels.kSpawnMetal.length; i++) {
+				var index:uint = RegistryLevels.kSpawnMetal[i];
+				if (tile == index) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public function isUntouchable(tile:uint):Boolean {
+			/*
 			return (tile == 0 || (tile >= UNTOUCHABLE_MIN && tile <= UNTOUCHABLE_MAX)
 				|| (tile >= UNTOUCHABLE_OVERFLOW_MIN && tile <= UNTOUCHABLE_OVERFLOW_MAX)
 				|| (tile >= UNTOUCHABLE_GRASS_MIN && tile <= UNTOUCHABLE_GRASS_MAX));
+			*/
+			for (var i:uint = 0; i < RegistryLevels.kSpawnEmpty.length; i++) {
+				var index:uint = RegistryLevels.kSpawnEmpty[i];
+				if (tile == index) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public function handOverlapsBody():uint {
@@ -2462,7 +2483,7 @@ package {
 			var indY:uint = int(spr.y/8);
 			if (dir == FlxObject.LEFT) {
 				for (var a:uint = 0; a <= max; a++) {
-					if (indY < level.heightInTiles - a && isMetal(level.getTile(indX-1, indY+a))) {
+					if (indY < levelFunctional.heightInTiles - a && isMetal(levelFunctional.getTile(indX-1, indY+a))) {
 						return true;
 					}
 				}
@@ -2477,7 +2498,7 @@ package {
 				}
 			} else if (dir == FlxObject.RIGHT) {
 				for (var b:uint = 0; b <= max; b++) {
-					if (indY < level.heightInTiles - b && isMetal(level.getTile(indX+4, indY+b))) {
+					if (indY < levelFunctional.heightInTiles - b && isMetal(levelFunctional.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
@@ -2492,7 +2513,7 @@ package {
 				}
 			} else if (dir == FlxObject.UP) {
 				for (var c:uint = 0; c <= max; c++) {
-					if (indX < level.widthInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
+					if (indX < levelFunctional.widthInTiles - c && isMetal(levelFunctional.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
@@ -2507,7 +2528,7 @@ package {
 				}
 			} else if (dir == FlxObject.DOWN) {
 				for (var d:uint = 0; d <= max; d++) {
-					if (indX < level.widthInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
+					if (indX < levelFunctional.widthInTiles - d && isMetal(levelFunctional.getTile(indX+d, indY+4))) {
 						return true;
 					}
 				}
@@ -2544,7 +2565,7 @@ package {
 		
 		public function nothingCheckPattern(max:uint, indX:uint, indY:uint, fixedX:Boolean, forwards:Boolean):Boolean {
 			for (var a:uint = 0; a <= max; a++) {
-				if (indY < level.heightInTiles - a && fixedX?(!isUntouchable(level.getTile(indX+(forwards?4:-1), indY+a))):(!isUntouchable(level.getTile(indX+a, indY+(forwards?4:-1))))) {
+				if (indY < levelFunctional.heightInTiles - a && fixedX?(!isUntouchable(levelFunctional.getTile(indX+(forwards?4:-1), indY+a))):(!isUntouchable(levelFunctional.getTile(indX+a, indY+(forwards?4:-1))))) {
 					return true;
 				}
 			}
