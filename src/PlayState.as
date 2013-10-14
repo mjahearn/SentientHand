@@ -118,7 +118,8 @@ package {
 		
 		public var level:FlxTilemap;
 		public var levelBack:FlxTilemap;
-		public var hand:FlxSprite;
+		//public var hand:FlxSprite;
+		public var hand:SprHand;
 		public var hint:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
@@ -414,7 +415,9 @@ package {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
 			
+			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional,true).members[0];
 			// Exit arrow
+			/*
 			level.setTileProperties(EXIT_SPAWN,FlxObject.NONE);
 			var exitArray:Array = level.getTileInstances(EXIT_SPAWN);
 			if (exitArray) {
@@ -423,6 +426,10 @@ package {
 			} else {
 				exitPoint = new FlxPoint(0,0);
 			}
+			*/
+			exitPoint = new FlxPoint();
+			exitPoint.x = exitSprite.x;
+			exitPoint.y = exitSprite.y;
 			
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
@@ -469,7 +476,7 @@ package {
 			
 			
 			
-			
+			/*
 			// Cannons
 			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
 			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
@@ -485,31 +492,46 @@ package {
 					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
 					cannon.facing = FlxObject.DOWN;
 				}
+			}*/
+			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional,false);
+			for (i = 0; i < cannonGroup.length; i++) {
+				var cannon:FlxSprite = cannonGroup.members[i];
+				cannon.loadGraphic(cannonSheet);
+				cannon.facing = FlxObject.DOWN;
+				cannon.angle = 0;
 			}
 			add(cannonGroup);
+			cannonArmBaseGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional,true);
+			for (i = 0; i < cannonArmBaseGroup.length; i++) {
+				var armBase:FlxSprite = cannonArmBaseGroup.members[i];
+				armBase.loadGraphic(armBaseSheet);
+				armBase.facing = FlxObject.DOWN;
+			}
 			add(cannonArmBaseGroup);
 			
 			// Buttons
-			for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var buttonArray:Array = level.getTileInstances(i);
+			//for (i = BUTTON_MIN; i <= BUTTON_MAX; i++) {
+			for (var m:uint = 0; m < RegistryLevels.kSpawnButton.length; m++) {
+				i = RegistryLevels.kSpawnButton[m];
+				levelFunctional.setTileProperties(i,FlxObject.NONE);
+				var buttonArray:Array = levelFunctional.getTileInstances(i);
 				if (buttonArray) {
 					for (j = 0; j < buttonArray.length; j++) {
-						level.setTileByIndex(buttonArray[j],0);
-						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],level);
+						levelFunctional.setTileByIndex(buttonArray[j],0);
+						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],levelFunctional);
 						
 						// Decide button graphic
 						var buttonSheet:Class;
 						var w:Number;
 						var h:Number;
-						var buttonGaugeNumber:Number = (i-BUTTON_MIN)%4;
+						var buttonGaugeNumber:Number = i;//(i-BUTTON_MIN)%4;
 						var bangAngle:Number;
 						var bangDX:Number = 0;
 						var bangDY:Number = 0;
-						if (buttonGaugeNumber == 0) {buttonSheet = buttonLSheet; w = 8; h = 32; bangAngle = 90; bangDX = 8;}
-						else if (buttonGaugeNumber == 1) {buttonSheet = buttonUSheet; w = 32; h = 8; bangAngle = 180; bangDY = 8;}
-						else if (buttonGaugeNumber == 2) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32; bangAngle = -90; bangDX = -32;}
-						else if (buttonGaugeNumber == 3) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8; bangAngle = 0; bangDY = -32;}
+						if (buttonGaugeNumber == 8) {buttonSheet = buttonLSheet; w = 8; h = 32; bangAngle = 90; bangDX = 8;}
+						else if (buttonGaugeNumber == 7) {buttonSheet = buttonUSheet; w = 32; h = 8; bangAngle = 180; bangDY = 8;}
+						else if (buttonGaugeNumber == 9) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32; bangAngle = -90; bangDX = -32;}
+						else if (buttonGaugeNumber == 6) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8; bangAngle = 0; bangDY = -32;}
 						
 						
 						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
@@ -522,36 +544,28 @@ package {
 						var bang:FlxSprite = new FlxSprite(button.x+bangDX,button.y+bangDY);
 						bang.loadGraphic(bangSheet,true,false,32,32,true);
 						bang.angle = bangAngle;
-						//bang.addAnimation("idle",[0]);
 						bang.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
 						bang.play("excite");
-						//bang.alpha = 0.88;
 						buttonBangGroup.add(bang);
-						
-						
-						//how to handle different buttons doing different things:
-						/*if ( BUTTON IS A SPECIFIC BUTTON ) {
-						specialFunctionDefinedBelowButtonReactionThatCallsButtonReaction();
-						} else {*/
 						buttonReactionArray.push(buttonReaction);
-						//}
+						//levelFunctional.setTileProperties(i,FlxObject.NONE);
 					}
 				}
 			}
-			add(buttonGroup);
-			add(buttonBangGroup);
-			buttonMode = 0;
-			
+
 			// Bodies
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
-			level.setTileProperties(i,FlxObject.NONE);
-			var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
+			
+			//var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
+			//var bodyArray:Array = levelFunctional.getTileInstances(RegistryLevels.kSpawnLauncher[0]);
+			var bodyArray:Array = RegistryLevels.kSpawnLauncher;
 			if (bodyArray) {
 				for (j= 0; j < bodyArray.length; j++) {
-					level.setTileByIndex(bodyArray[j],0);
-					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],level);
+					FlxG.log(j);
+					levelFunctional.setTileByIndex(bodyArray[j],0);
+					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],levelFunctional);
 					
 					var body:FlxSprite = new FlxSprite(bodyPoint.x,bodyPoint.y,bodySheet); // need to adjust graphic
 					bodyTargetAngle = body.angle;
@@ -583,19 +597,21 @@ package {
 			add(bodyArmBaseGroup);
 			
 			// Doors
-			for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
-				level.setTileProperties(i,FlxObject.NONE);
-				var doorArray:Array = level.getTileInstances(i);
+			//for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
+			for (m = 0; m < RegistryLevels.kSpawnDoor.length; m++) {
+				i = RegistryLevels.kSpawnDoor[m];
+				levelFunctional.setTileProperties(i,FlxObject.NONE);
+				var doorArray:Array = levelFunctional.getTileInstances(i);
 				if (doorArray) {
 					for (j = 0; j < doorArray.length; j++) {
-						level.setTileByIndex(doorArray[j],0);
-						var doorPoint:FlxPoint = pointForTile(doorArray[j],level);
+						levelFunctional.setTileByIndex(doorArray[j],0);
+						var doorPoint:FlxPoint = pointForTile(doorArray[j],levelFunctional);
 						
 						// Decide door graphic
 						var doorSheet:Class;
-						var doorNumber:Number = (i-DOOR_MIN)%2;
-						if      (doorNumber == 0) {doorSheet = doorVSheet; w = 16; h = 64;}
-						else if (doorNumber == 1) {doorSheet = doorHSheet; w = 64; h = 16;}
+						var doorNumber:Number = i;//(i-DOOR_MIN)%2;
+						if      (doorNumber == 10) {doorSheet = doorVSheet; w = 16; h = 64;}
+						else if (doorNumber == 11) {doorSheet = doorHSheet; w = 64; h = 16;}
 						
 						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
 						door.immovable = true;
@@ -686,12 +702,15 @@ package {
 			}
 			add(steams);
 			
-			
+			/*
 			// Hand + Arms
 			level.setTileProperties(HAND_SPAWN,FlxObject.NONE);
 			var array:Array = level.getTileInstances(HAND_SPAWN);
 			var handPoint:FlxPoint = pointForTile(array[0],level);
 			level.setTileByIndex(array[0],0);
+			*/
+			
+			
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -727,7 +746,9 @@ package {
 			markerEndGroup.add(markerEnd);
 			add(markerEndGroup);
 			
-			hand = new FlxSprite(handPoint.x, handPoint.y);
+			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional,!Registry.DEBUG_ON).members[0];
+			
+			//hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
 			hand.addAnimation("crawl right",[0,1,2,3,4,5,6],22,true);
 			hand.addAnimation("idle right",[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
@@ -758,7 +779,7 @@ package {
 			if (signArray) {
 				for (j = 0; j < signArray.length; j++) {
 					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
-					midground.setTileByIndex(array[j],0);
+					midground.setTileByIndex(signArray[j],0);
 					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
 				}
 			}
