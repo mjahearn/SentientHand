@@ -548,10 +548,10 @@ package {
 						bang.play("excite");
 						buttonBangGroup.add(bang);
 						buttonReactionArray.push(buttonReaction);
-						//levelFunctional.setTileProperties(i,FlxObject.NONE);
 					}
 				}
 			}
+			add(buttonGroup);
 
 			// Bodies
 			bodyGroup = new FlxGroup();
@@ -561,9 +561,10 @@ package {
 			//var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
 			//var bodyArray:Array = levelFunctional.getTileInstances(RegistryLevels.kSpawnLauncher[0]);
 			var bodyArray:Array = RegistryLevels.kSpawnLauncher;
+			//levelFunctional.setTileProperties(bodyArray[0],FlxObject.NONE);
 			if (bodyArray) {
 				for (j= 0; j < bodyArray.length; j++) {
-					FlxG.log(j);
+					//FlxG.log(j);
 					levelFunctional.setTileByIndex(bodyArray[j],0);
 					var bodyPoint:FlxPoint = pointForTile(bodyArray[j],levelFunctional);
 					
