@@ -111,5 +111,7 @@ package {
 				Registry.music().play();
 			}
 		}
+		
+		[Embed("assets/hand.png")] public static const kHandSheet:Class;
 	}
 }

@@ -4,8 +4,15 @@ package
 	
 	public class RegistryLevels
 	{
+		public static const kSpawnEmpty:Array = [0];
 		public static const kSpawnWood:Array = [1];
 		public static const kSpawnMetal:Array = [2];
+		public static const kSpawnHand:Array = [3];
+		public static const kSpawnGrappler:Array = [4];
+		public static const kSpawnLauncher:Array = [5];
+		public static const kSpawnButton:Array = [6,7,8,9];
+		public static const kSpawnDoor:Array = [10,11];
+		public static const kSpawnExitArrow:Array = [12];
 		
 		public static function currentFlxTilemapFunctional():FlxTilemap {
 			var map:FlxTilemap = new FlxTilemap();
