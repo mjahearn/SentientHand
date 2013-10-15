@@ -104,8 +104,6 @@ package {
 		public var dbg:int;
 		public var rad:Number;
 		public var controlDirs:Array;
-		public var lastGround:uint;
-		public var tempGround:uint;
 		
 		public var jumpHintGroup:FlxGroup = new FlxGroup();
 		
@@ -144,9 +142,7 @@ package {
 		public var handMetalFlag:uint;
 		public var handWoodFlag:uint;
 		public var onGround:Boolean;
-		public var handTouching:uint;
 		public var lastVel:FlxPoint; //last nonzero hand velocity - used for convex corners
-		public var touchingTrash:Boolean;
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
@@ -181,7 +177,9 @@ package {
 		public var exitPoint:FlxPoint = new FlxPoint();
 		
 		public var trashGroup:FlxGroup = new FlxGroup();
-		public var lastTouchedDirt:Boolean = false;
+		public var lastTouchedDirt:Boolean;
+		
+		public var reversePolarity:Boolean;
 		
 		[Embed("assets/cannon.png")] public var cannonSheet:Class;
 		
@@ -307,12 +305,11 @@ package {
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
-			reinvigorated = false;//false; //ditto
+			reinvigorated = false; //ditto
+			lastTouchedDirt = false; //ditto ditto
 			doorsDead = false;
 			controlDirs = new Array();
-			lastGround = FlxObject.DOWN;
-			tempGround = FlxObject.DOWN;
-			
+			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
 			if (Registry.levelNum >= 5) {
@@ -790,10 +787,8 @@ package {
 			handGrab = false;
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			handTouching = hand.touching;
 			rad = 0;
 			lastVel = new FlxPoint();
-			touchingTrash = false;
 			
 			arrow = new FlxSprite();
 			arrow.loadGraphic(arrowSheet);
@@ -858,7 +853,6 @@ package {
 			if (FlxG.paused) {
 				time = 0;
 			}
-			//FlxG.log(time);
 			
 			//if (SOUND_ON) {Registry.update();}
 			Registry.update();
@@ -877,32 +871,17 @@ package {
 				}
 			}
 			
-			if (FlxG.keys.justPressed("DOWN") && controlDirs.indexOf(FlxObject.DOWN) == -1) {
-				controlDirs.push(FlxObject.DOWN);
-			}
-			if (FlxG.keys.justPressed("UP") && controlDirs.indexOf(FlxObject.UP) == -1) {
-				controlDirs.push(FlxObject.UP);
-			}
 			if (FlxG.keys.justPressed("RIGHT") && controlDirs.indexOf(FlxObject.RIGHT) == -1) {
 				controlDirs.push(FlxObject.RIGHT);
 			}
 			if (FlxG.keys.justPressed("LEFT") && controlDirs.indexOf(FlxObject.LEFT) == -1) {
 				controlDirs.push(FlxObject.LEFT);
 			}
-			if (FlxG.keys.justReleased("DOWN")) {
-				controlDirsRemove(FlxObject.DOWN);
-			}
-			if (FlxG.keys.justReleased("UP")) {
-				controlDirsRemove(FlxObject.UP);
-			}
 			if (FlxG.keys.justReleased("RIGHT")) {
 				controlDirsRemove(FlxObject.RIGHT);
 			}
 			if (FlxG.keys.justReleased("LEFT")) {
 				controlDirsRemove(FlxObject.LEFT);
-			}
-			if (controlDirs.length == 0) {
-				resetTempGround();
 			}
 			
 			//time += FlxG.elapsed;
@@ -978,13 +957,13 @@ package {
 			
 			if (Registry.cameraFollowsHand) {
 				if (onGround) {
-					camTag.angle += angleDifference(camAngle, camTag.angle)/8.0;
+					camTag.angle += angleDifference(camAngle, camTag.angle)/12.0;
 				} else {
-					camTag.angle += angleDifference(hand.angle, camTag.angle)/8.0;
+					camTag.angle += angleDifference(hand.angle, camTag.angle)/12.0;
 				}
 				FlxG.camera.angle = -camTag.angle;
 			} else if (camTag.angle != camAngle) {
-				camTag.angle += (-camTag.angle + camAngle)/8.0;
+				camTag.angle += (-camTag.angle + camAngle)/12.0;
 				FlxG.camera.angle = -camTag.angle;
 			}
 			
@@ -993,7 +972,7 @@ package {
 			markerLine.fill(0x00000000);
 			*/
 			if (bodyMode) {
-				if (!handOut && !handIn) {// && !handOut && !handIn) {
+				if (!handOut && !handIn) {
 					rad = arrow.angle*Math.PI/180;
 					var startX:Number = hand.x+hand.width/2.0;
 					var startY:Number = hand.y+hand.height/2.0;
@@ -1024,7 +1003,6 @@ package {
 			var tagCenter:FlxPoint = camTag.getScreenXY();
 			var dScreenX:Number = FlxG.width/2.0 - tagCenter.x;
 			var dScreenY:Number = FlxG.height/2.0 - tagCenter.y;
-			FlxG.log(dScreenX + ',' + dScreenY);
 			FlxG.camera.target.x += dScreenX;
 			FlxG.camera.target.y += dScreenY;
 			//camTag.y -= dScreenY;
@@ -1217,7 +1195,7 @@ package {
 				}
 				
 				// cannon fire
-				if (cannonMode && FlxG.keys.justPressed("X")) {
+				if (cannonMode && FlxG.keys.justPressed(ACTION_KEY)) {
 					cannonShotSound.stop();
 					cannonShotSound.play();
 				}
@@ -1388,7 +1366,7 @@ package {
 						}
 					}
 					// The hand is about to jump from a flat surface
-					if (FlxG.keys.justPressed(ACTION_KEY) && (hand.facing != FlxObject.DOWN || Registry.jumping)) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && hand.facing != FlxObject.DOWN) {
 						if (handDir == FlxObject.LEFT) {hand.play("fall left");} //<- placeholder {hand.play("jump left");}
 						else if (handDir == FlxObject.RIGHT) {hand.play("fall right");} //<- placeholder {hand.play("jump right");}
 					}
@@ -1557,8 +1535,6 @@ package {
 				}
 			}
 			
-			//FlxG.log(steamTimer);
-			
 			/* End Animations */
 			
 			if (bodyMode || cannonMode) {
@@ -1660,12 +1636,6 @@ package {
 						cannonMode = false;
 						markerEnd.visible = false;
 						setDir(hand, body.facing);
-						lastGround = body.facing;
-						if (Registry.handRelative) {
-							tempGround = FlxObject.DOWN;
-						} else {
-							tempGround = body.facing;
-						}
 					}
 					rad = Math.PI*arrow.angle/180;
 					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
@@ -1711,7 +1681,6 @@ package {
 			} else {
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
-						
 						bodyMode = true;
 						lastTouchedWood = false;
 						handFalling = false;
@@ -1734,19 +1703,11 @@ package {
 						if (Registry.neverEnteredBodyOrCannon) {
 							Registry.neverEnteredBodyOrCannon = false;
 						}
-						
 					} else if (enteringCannon) {
-						
 						cannonMode = true;
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
-						lastGround = body.facing;
-						if (Registry.handRelative) {
-							tempGround = FlxObject.DOWN;
-						} else {
-							tempGround = body.facing;
-						}
 						
 						hand.velocity.x = 0;
 						hand.velocity.y = 0;
@@ -1793,10 +1754,7 @@ package {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
 						} if (FlxG.keys.justPressed(ACTION_KEY)) {
-							if (Registry.jumping && handIsFacing(FlxObject.DOWN)) {
-								jumpStuff();
-								hand.velocity.y = -FLOOR_JUMP_VEL;
-							} else if (handIsFacing(FlxObject.UP)) {
+							if (handIsFacing(FlxObject.UP)) {
 								jumpStuff();
 								hand.velocity.y = CEIL_JUMP_VEL;
 							} else if (handIsFacing(FlxObject.LEFT)) {
@@ -1905,12 +1863,6 @@ package {
 			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			//FlxG.collide(level,trashGroup);
-			if (!onGround) {
-				touchingTrash = false;
-			}
-			//FlxG.collide(trashGroup, hand,stupidCallback);//, woodCallback);
-			//FlxG.collide(trashGroup,trashGroup);
 			//FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
@@ -1927,73 +1879,55 @@ package {
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
 			}
-			handTouching = hand.touching;
 			correctMetal();
-			if (bodyMode) {
-				//was block stuff
-			} else {
-				if (onGround/* && (!hand.isTouching(hand.facing) || (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE && !hand.isTouching(FlxObject.DOWN)))*/) {
-					lastGround = hand.facing;
-					if (isNothingInDir(hand.facing, 4)) {
-						if (touchingMetal) { //was the player touching metal the last frame?
-							if (hand.facing == FlxObject.LEFT) {
-								if (lastVel.y > 0) {
-									setDir(hand,FlxObject.UP,true);
-									hand.acceleration.y -= MOVE_ACCEL;
-								} else {
-									setDir(hand,FlxObject.DOWN,true);
-									hand.acceleration.y += MOVE_ACCEL;
-								}
-								hand.acceleration.x = -GRAV_RATE;
-							} else if (hand.facing == FlxObject.RIGHT) {
-								if (lastVel.y > 0) {
-									setDir(hand,FlxObject.UP,true);
-									hand.acceleration.y -= MOVE_ACCEL;
-								} else {
-									setDir(hand,FlxObject.DOWN,true);
-									hand.acceleration.y += MOVE_ACCEL;
-								}
-								hand.acceleration.x = GRAV_RATE;
-							} else if (hand.facing == FlxObject.DOWN) {
-								if (lastVel.x > 0) {
-									setDir(hand,FlxObject.LEFT,true);
-									hand.acceleration.x -= MOVE_ACCEL;
-								} else {
-									setDir(hand,FlxObject.RIGHT,true);
-									hand.acceleration.x += MOVE_ACCEL;
-								}
-								hand.acceleration.y = GRAV_RATE;
-							} else if (hand.facing == FlxObject.UP) {
-								if (lastVel.x > 0) {
-									setDir(hand,FlxObject.LEFT,true);
-									hand.acceleration.x -= MOVE_ACCEL;
-								} else {
-									setDir(hand,FlxObject.RIGHT,true);
-									hand.acceleration.x += MOVE_ACCEL;
-								}
-								hand.acceleration.y = -GRAV_RATE;
+			if (!bodyMode && onGround) {
+				if (isNothingInDir(hand.facing, 4)) {
+					if (touchingMetal) { //was the player touching metal the last frame?
+						if (hand.facing == FlxObject.LEFT) {
+							if (lastVel.y > 0) {
+								setDir(hand,FlxObject.UP,true);
+								hand.acceleration.y -= MOVE_ACCEL;
+							} else {
+								setDir(hand,FlxObject.DOWN,true);
+								hand.acceleration.y += MOVE_ACCEL;
 							}
-						} else {
-							setDir(hand,FlxObject.DOWN,true);
+							hand.acceleration.x = -GRAV_RATE;
+						} else if (hand.facing == FlxObject.RIGHT) {
+							if (lastVel.y > 0) {
+								setDir(hand,FlxObject.UP,true);
+								hand.acceleration.y -= MOVE_ACCEL;
+							} else {
+								setDir(hand,FlxObject.DOWN,true);
+								hand.acceleration.y += MOVE_ACCEL;
+							}
+							hand.acceleration.x = GRAV_RATE;
+						} else if (hand.facing == FlxObject.DOWN) {
+							if (lastVel.x > 0) {
+								setDir(hand,FlxObject.LEFT,true);
+								hand.acceleration.x -= MOVE_ACCEL;
+							} else {
+								setDir(hand,FlxObject.RIGHT,true);
+								hand.acceleration.x += MOVE_ACCEL;
+							}
+							hand.acceleration.y = GRAV_RATE;
+						} else if (hand.facing == FlxObject.UP) {
+							if (lastVel.x > 0) {
+								setDir(hand,FlxObject.LEFT,true);
+								hand.acceleration.x -= MOVE_ACCEL;
+							} else {
+								setDir(hand,FlxObject.RIGHT,true);
+								hand.acceleration.x += MOVE_ACCEL;
+							}
+							hand.acceleration.y = -GRAV_RATE;
 						}
-					} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand, hand.facing, 4)) { //replacing || lastTouchedWood
+					} else {
 						setDir(hand,FlxObject.DOWN,true);
 					}
-				}/* else if (!onGround && hand.isTouching(hand.facing) && (handWoodFlag == uint.MAX_VALUE || handMetalFlag < uint.MAX_VALUE || hand.isTouching(FlxObject.DOWN))) {
-					
-					// probably this should happen when it loses contact with the surface in the first place
-					if      (hand.isTouching(FlxObject.LEFT)) {hand.facing = FlxObject.LEFT;}
-					else if (hand.isTouching(FlxObject.UP  )) {hand.facing = FlxObject.UP;}
-					else if (hand.isTouching(FlxObject.RIGHT)) {hand.facing = FlxObject.RIGHT;}
-					else                                       {hand.facing = FlxObject.DOWN;}
-					
-					onGround = true;
-					setDir(hand, hand.facing);
-				}*/
-				// ^ I *think* this block is redundant...
+				} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand, hand.facing, 4)) { //replacing || lastTouchedWood
+					setDir(hand,FlxObject.DOWN,true);
+				}
 			}
-			
-			
+						
 			// Pause
 			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
@@ -2022,40 +1956,40 @@ package {
 		}*/
 		
 		public function metalCallback(tile:FlxTile, spr:FlxSprite):void {
-			metalStuff(tile.mapIndex, spr);
+			if (reversePolarity) {
+				woodStuff(tile.mapIndex, spr);
+			} else {
+				metalStuff(tile.mapIndex, spr);
+			}
 		}
 		
 		public function metalStuff(ind:uint, spr:FlxSprite):void {
 			if (spr == hand && !cannonMode) {
 				handMetalFlag = ind;
 				lastTouchedWood = false;
-				//if (getHandTouching() != spr.facing) {
-					fixGravity(spr);
-				//}
+				fixGravity(spr);
 			} else if (spr == markerEnd) {
 				setGrappleOkay();
 			} else if (spr in bodyGroup.members) {
-				//if (spr.touching != spr.facing) {
-					fixGravity(spr);
-				//}
+				fixGravity(spr);
 			}
 		}
 		
 		public function woodCallback(tile:FlxTile, spr:FlxSprite):void {
-			woodStuff(tile.mapIndex, spr);
-		}
-		
-		public function stupidCallback(spr1:FlxSprite,spr2:FlxSprite):void {
-			//lastTouchedWood = true;
-			touchingTrash = true;
-			woodStuff(1, hand);
+			if (reversePolarity) {
+				metalStuff(tile.mapIndex, spr);
+			} else {
+				woodStuff(tile.mapIndex, spr);
+			}
 		}
 		
 		public function woodStuff(ind:uint, spr:FlxSprite):void {
 			if (spr == hand) {
 				handWoodFlag = ind;
 				lastTouchedWood = true;
-				if (/*getHandTouching() != spr.facing && onGround &&*/ !bodyMode) {fixGravity(spr);}
+				if (!bodyMode) {
+					fixGravity(spr);
+				}
 			}
 		}
 		
@@ -2067,15 +2001,11 @@ package {
 		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
-				//if (getHandTouching() != spr2.facing) {
-					fixGravity(spr2, true);
-				//}
+				fixGravity(spr2, true);
 				lastTouchedWood = false;
 			} else {
 				handMetalFlag = 1;
-				//if (getHandTouching() != spr1.facing) {
-					fixGravity(spr1, true);
-				//}
+				fixGravity(spr1, true);
 				lastTouchedWood = false;
 			}
 		}
@@ -2098,23 +2028,22 @@ package {
 				
 		public function fixGravity(spr:FlxSprite, isDoor:Boolean=false):void {
 			var hitOnlyWood:Boolean = true;
-				if ((getHandTouching() & FlxObject.DOWN) > 0) {
-					hitOnlyWood = false;
-					setDir(spr, FlxObject.DOWN);
-				} else if ((getHandTouching() & FlxObject.UP) > 0 && (isDoor || isMetalInDir(hand,FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
-					hitOnlyWood = false;
-					setDir(spr, FlxObject.UP);
-				} else if ((getHandTouching() & FlxObject.LEFT) > 0 && (isDoor || isMetalInDir(hand,FlxObject.LEFT,4))) {
-					hitOnlyWood = false;
-					setDir(spr, FlxObject.LEFT);
-				} else if ((getHandTouching() & FlxObject.RIGHT) > 0 && (isDoor || isMetalInDir(hand,FlxObject.RIGHT,4))) {
-					hitOnlyWood = false;
-					setDir(spr, FlxObject.RIGHT);
-				}
-				if (hitOnlyWood && !onGround && spr.facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by steam
-					setDir(spr, FlxObject.DOWN, true);
-				}
-			//}
+			if (hand.isTouching(FlxObject.DOWN)) {
+				hitOnlyWood = false;
+				setDir(spr, FlxObject.DOWN);
+			} else if (hand.isTouching(FlxObject.UP) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
+				hitOnlyWood = false;
+				setDir(spr, FlxObject.UP);
+			} else if (hand.isTouching(FlxObject.LEFT) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.LEFT,4))) {
+				hitOnlyWood = false;
+				setDir(spr, FlxObject.LEFT);
+			} else if (hand.isTouching(FlxObject.RIGHT) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.RIGHT,4))) {
+				hitOnlyWood = false;
+				setDir(spr, FlxObject.RIGHT);
+			}
+			if (hitOnlyWood && !onGround && spr.facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by steam
+				setDir(spr, FlxObject.DOWN, true);
+			}
 		}
 		
 		public function setDir(spr:FlxSprite, dir:uint, grav:Boolean=false):void {
@@ -2163,31 +2092,6 @@ package {
 				}
 				camAngle = -90;
 			}
-			if (onGround) {
-				if (Registry.continuityUntilRelease) {
-					//if (Registry.handRelative) {
-					if ((handIsFacing(FlxObject.DOWN) && (lastGround & FlxObject.UP) == FlxObject.UP)
-						|| (handIsFacing(FlxObject.UP) && (lastGround & FlxObject.DOWN) == FlxObject.DOWN)
-						|| (handIsFacing(FlxObject.LEFT) && (lastGround & FlxObject.RIGHT) == FlxObject.RIGHT)
-						|| (handIsFacing(FlxObject.RIGHT) && (lastGround & FlxObject.LEFT) == FlxObject.LEFT)) {
-						if (tempGround == FlxObject.DOWN) {
-							tempGround = FlxObject.UP;
-						} else if (tempGround == FlxObject.UP) {
-							tempGround = FlxObject.DOWN;
-						} else if (tempGround == FlxObject.LEFT) {
-							tempGround = FlxObject.RIGHT;
-						} else if (tempGround == FlxObject.RIGHT) {
-							tempGround = FlxObject.LEFT;
-						}
-					}
-					//} else {
-					//	tempGround = lastGround;
-					//}
-				} else if (!Registry.handRelative) {
-					tempGround = dir;
-				}
-				lastGround = spr.facing;
-			} 
 		}
 		
 		public function handIsFacing(dir:uint):Boolean {
@@ -2201,13 +2105,18 @@ package {
 		}
 		
 		public function isMetal(tile:uint):Boolean {
-			return (tile >= METAL_MIN && tile <= METAL_MAX);
+			//return (tile >= METAL_MIN && tile <= METAL_MAX);
+			if (reversePolarity) {
+				return RegistryLevels.kSpawnWood.indexOf(tile) != -1;
+			}
+			return RegistryLevels.kSpawnMetal.indexOf(tile) != -1;
 		}
 		
 		public function isUntouchable(tile:uint):Boolean {
-			return (tile == 0 || (tile >= UNTOUCHABLE_MIN && tile <= UNTOUCHABLE_MAX)
+			/*return (tile == 0 || (tile >= UNTOUCHABLE_MIN && tile <= UNTOUCHABLE_MAX)
 				|| (tile >= UNTOUCHABLE_OVERFLOW_MIN && tile <= UNTOUCHABLE_OVERFLOW_MAX)
-				|| (tile >= UNTOUCHABLE_GRASS_MIN && tile <= UNTOUCHABLE_GRASS_MAX));
+				|| (tile >= UNTOUCHABLE_GRASS_MIN && tile <= UNTOUCHABLE_GRASS_MAX));*/
+			return tile == 0;
 		}
 		
 		public function handOverlapsBody():uint {
@@ -2339,54 +2248,15 @@ package {
 				}
 			}
 			*/
+			reversePolarity = !reversePolarity;
 		}
 		
 		public function playerIsPressing(dir:uint):Boolean {
-			//if (Registry.continuityUntilRelease) {
-				if (dir == FlxObject.LEFT) {
-					if (tempGround == FlxObject.DOWN) {
-						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
-					} else if (tempGround == FlxObject.LEFT) {
-						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
-					} else if (tempGround == FlxObject.UP) {
-						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
-					} else if (tempGround == FlxObject.RIGHT) {
-						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
-					}
-				} else if (dir == FlxObject.RIGHT) {
-					if (tempGround == FlxObject.DOWN) {
-						return controlDirs.indexOf(FlxObject.LEFT) < controlDirs.indexOf(FlxObject.RIGHT);
-					} else if (tempGround == FlxObject.LEFT) {
-						return controlDirs.indexOf(FlxObject.UP) < controlDirs.indexOf(FlxObject.DOWN);
-					} else if (tempGround == FlxObject.UP) {
-						return controlDirs.indexOf(FlxObject.RIGHT) < controlDirs.indexOf(FlxObject.LEFT);
-					} else if (tempGround == FlxObject.RIGHT) {
-						return controlDirs.indexOf(FlxObject.DOWN) < controlDirs.indexOf(FlxObject.UP);
-					}
-				}
-			/*} else {
-				if (dir == FlxObject.LEFT) {
-					if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.LEFT))) {
-						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
-					} else if (handIsFacing(FlxObject.LEFT) && !handIsFacing(FlxObject.UP)) {
-						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
-					} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.RIGHT)) {
-						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
-					} else if (handIsFacing(FlxObject.RIGHT)) {
-						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
-					}
-				} else if (dir == FlxObject.RIGHT) {
-					if (Registry.handRelative || (handIsFacing(FlxObject.DOWN) && !handIsFacing(FlxObject.RIGHT))) {
-						return controlDirs.indexOf(FlxObject.RIGHT) > controlDirs.indexOf(FlxObject.LEFT);
-					} else if (handIsFacing(FlxObject.RIGHT) && !handIsFacing(FlxObject.UP)) {
-						return controlDirs.indexOf(FlxObject.UP) > controlDirs.indexOf(FlxObject.DOWN);
-					} else if (handIsFacing(FlxObject.UP) && !handIsFacing(FlxObject.LEFT)) {
-						return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);	
-					} else if (handIsFacing(FlxObject.LEFT)) {
-						return controlDirs.indexOf(FlxObject.DOWN) > controlDirs.indexOf(FlxObject.UP);
-					}
-				}
-			}*/
+			if (dir == FlxObject.LEFT) {
+				return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
+			} else if (dir == FlxObject.RIGHT) {
+				return controlDirs.indexOf(FlxObject.LEFT) < controlDirs.indexOf(FlxObject.RIGHT);
+			}
 			return false;
 		}
 		
@@ -2408,41 +2278,12 @@ package {
 			}
 		}
 		
-		/*public function goToNextIteration():void {
-			//Registry.iteration++;
-			Registry.levelNum = 0;
-			FlxG.switchState(new PlayState(Registry.levelOrder[0],Registry.midgroundMap,Registry.backgroundMap));
-		}*/
-		
 		public function controlDirsRemove(dir:uint):void {
 			var cD:int = controlDirs.indexOf(dir);
 			if (cD != -1) {
 				controlDirs.splice(cD, 1);
 			}
 		}
-		
-		public function getHandTouching():uint {
-			/*if (hand.touching == handTouching) {
-				return handTouching;
-			}
-			if (handTouching != 0 && (isMultiDirection(handTouching))) {// || !isMultiDirection(hand.touching))(hand.touching & handTouching) >= hand.touching) { //originally >= handTouching if this causes problems
-				return handTouching;
-			}*/
-			return hand.touching;
-		}
-		
-		public function resetTempGround():void {
-			lastGround = hand.facing;
-			if (Registry.handRelative) {
-				tempGround = FlxObject.DOWN;
-			} else {
-				tempGround = hand.facing;
-			}
-		}
-		
-		/*public function isMultiDirection(n:uint):Boolean {
-			return ((n & FlxObject.DOWN) > 0 && (n ^ FlxObject.DOWN) > 0) || ((n & FlxObject.UP) > 0 && (n ^ FlxObject.UP) > 0) || ((n & FlxObject.LEFT) > 0 && (n ^ FlxObject.LEFT) > 0);
-		}*/
 		
 		public function correctMetal():void {
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
@@ -2462,61 +2303,69 @@ package {
 			var indY:uint = int(spr.y/8);
 			if (dir == FlxObject.LEFT) {
 				for (var a:uint = 0; a <= max; a++) {
-					if (indY < level.heightInTiles - a && isMetal(level.getTile(indX-1, indY+a))) {
+					if (indY < levelFunctional.heightInTiles - a && isMetal(levelFunctional.getTile(indX-1, indY+a))) {
 						return true;
 					}
 				}
-				for (var aD:uint = 0; aD < doorGroup.length; aD++) {
-					if (doorGroup.members[aD].height == 64) {
-						var doorAX:uint = int(doorGroup.members[aD].x/8);
-						var doorAY:uint = int(doorGroup.members[aD].y/8);
-						if (doorAX == indX-2 && doorAY >= indY - 7 && doorAY <= indY + 4) {
-							return true;
+				if (!reversePolarity) {
+					for (var aD:uint = 0; aD < doorGroup.length; aD++) {
+						if (doorGroup.members[aD].height == 64) {
+							var doorAX:uint = int(doorGroup.members[aD].x/8);
+							var doorAY:uint = int(doorGroup.members[aD].y/8);
+							if (doorAX == indX-2 && doorAY >= indY - 7 && doorAY <= indY + 4) {
+								return true;
+							}
 						}
 					}
 				}
 			} else if (dir == FlxObject.RIGHT) {
 				for (var b:uint = 0; b <= max; b++) {
-					if (indY < level.heightInTiles - b && isMetal(level.getTile(indX+4, indY+b))) {
+					if (indY < levelFunctional.heightInTiles - b && isMetal(levelFunctional.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
-				for (var bD:uint = 0; bD < doorGroup.length; bD++) {
-					if (doorGroup.members[bD].height == 64) {
-						var doorBX:uint = int(doorGroup.members[bD].x/8);
-						var doorBY:uint = int(doorGroup.members[bD].y/8);
-						if (doorBX == indX+4 && doorBY >= indY - 7 && doorBY <= indY + 4) {
-							return true;
+				if (!reversePolarity) {
+					for (var bD:uint = 0; bD < doorGroup.length; bD++) {
+						if (doorGroup.members[bD].height == 64) {
+							var doorBX:uint = int(doorGroup.members[bD].x/8);
+							var doorBY:uint = int(doorGroup.members[bD].y/8);
+							if (doorBX == indX+4 && doorBY >= indY - 7 && doorBY <= indY + 4) {
+								return true;
+							}
 						}
 					}
 				}
 			} else if (dir == FlxObject.UP) {
 				for (var c:uint = 0; c <= max; c++) {
-					if (indX < level.widthInTiles - c && isMetal(level.getTile(indX+c, indY-1))) {
+					if (indX < levelFunctional.widthInTiles - c && isMetal(levelFunctional.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
-				for (var cD:uint = 0; cD < doorGroup.length; cD++) {
-					if (doorGroup.members[cD].width == 64) {
-						var doorCX:uint = int(doorGroup.members[cD].x/8);
-						var doorCY:uint = int(doorGroup.members[cD].y/8);
-						if (doorCY == indY-2 && doorCX >= indX - 7 && doorCX <= indX + 4) {
-							return true;
+				if (!reversePolarity) {
+					for (var cD:uint = 0; cD < doorGroup.length; cD++) {
+						if (doorGroup.members[cD].width == 64) {
+							var doorCX:uint = int(doorGroup.members[cD].x/8);
+							var doorCY:uint = int(doorGroup.members[cD].y/8);
+							if (doorCY == indY-2 && doorCX >= indX - 7 && doorCX <= indX + 4) {
+								return true;
+							}
 						}
 					}
 				}
 			} else if (dir == FlxObject.DOWN) {
 				for (var d:uint = 0; d <= max; d++) {
-					if (indX < level.widthInTiles - d && isMetal(level.getTile(indX+d, indY+4))) {
+					if (indX < levelFunctional.widthInTiles - d && isMetal(levelFunctional.getTile(indX+d, indY+4))) {
 						return true;
 					}
 				}
-				for (var dD:uint = 0; dD < doorGroup.length; dD++) {
-					if (doorGroup.members[dD].width == 64) {
-						var doorDX:uint = int(doorGroup.members[dD].x/8);
-						var doorDY:uint = int(doorGroup.members[dD].y/8);
-						if (doorDY == indY+4 && doorDX >= indX - 7 && doorDX <= indX + 4) {
-							return true;
+				if (!reversePolarity) {
+					for (var dD:uint = 0; dD < doorGroup.length; dD++) {
+						if (doorGroup.members[dD].width == 64) {
+							var doorDX:uint = int(doorGroup.members[dD].x/8);
+							var doorDY:uint = int(doorGroup.members[dD].y/8);
+							if (doorDY == indY+4 && doorDX >= indX - 7 && doorDX <= indX + 4) {
+								return true;
+							}
 						}
 					}
 				}
@@ -2525,9 +2374,6 @@ package {
 		}
 		
 		public function isNothingInDir(dir:uint, max:uint):Boolean {
-			/*if (touchingTrash) {
-				return false;
-			}*/
 			var indX:uint = int(hand.x/8);
 			var indY:uint = int(hand.y/8);
 			if (dir == FlxObject.LEFT && nothingCheckPattern(max, indX, indY, true, false)) {
@@ -2544,7 +2390,7 @@ package {
 		
 		public function nothingCheckPattern(max:uint, indX:uint, indY:uint, fixedX:Boolean, forwards:Boolean):Boolean {
 			for (var a:uint = 0; a <= max; a++) {
-				if (indY < level.heightInTiles - a && fixedX?(!isUntouchable(level.getTile(indX+(forwards?4:-1), indY+a))):(!isUntouchable(level.getTile(indX+a, indY+(forwards?4:-1))))) {
+				if (indY < levelFunctional.heightInTiles - a && fixedX?(!isUntouchable(levelFunctional.getTile(indX+(forwards?4:-1), indY+a))):(!isUntouchable(levelFunctional.getTile(indX+a, indY+(forwards?4:-1))))) {
 					return true;
 				}
 			}
@@ -2558,30 +2404,29 @@ package {
 					}
 				}
 			}
-			for (var t:uint = 0; t < trashGroup.length; t++) {
+			/*for (var t:uint = 0; t < trashGroup.length; t++) {
 				var trashX:uint = int(trashGroup.members[t].x/8);
 				var trashY:uint = int(trashGroup.members[t].y/8);
 				if (fixedX?(trashX == indX+(forwards?4:-4) && trashY >= indY - 3 && trashY <= indY + 4)
 					:(trashY == indY+(forwards?4:-4) && trashX >= indX - 3 && trashX <= indX + 4)) {
 					return true;
 				}
-			}
+			}*/
 			return false;
 		}
 		
 		public function jumpStuff():void {
 			handFalling = true;
 			Registry.neverJumped = false;
-			lastGround = hand.facing;
 			setDir(hand,FlxObject.DOWN,true);
 		}
 		
-		public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
+		/*public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
 			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
 			if (steam.frame > 0 && !bodyMode && !cannonMode) {
 				setDir(hand, steam.facing, true);
 			}
-		}
+		}*/
 		
 		public function updateRaytrace(angle:Number):void {
 			if (bodyMode) {

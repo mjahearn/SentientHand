@@ -95,7 +95,7 @@ package
 			super.update();
 		}*/
 		
-		public function changeControls():void {
+		/*public function changeControls():void {
 			Registry.handRelative = !Registry.handRelative;
 			if (Registry.handRelative) {
 				controls.label.text = "Hand-Relative";
@@ -120,6 +120,6 @@ package
 			} else {
 				jump.label.text = "Off";
 			}
-		}
+		}*/
 	}
 }

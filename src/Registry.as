@@ -45,9 +45,6 @@ package {
 		public static var dumb:Boolean = false;
 		public static var cameraFollowsHand:Boolean = false;
 		public static var extendedCamera:Boolean = true;
-		public static var handRelative:Boolean = true;
-		public static var continuityUntilRelease:Boolean = false;
-		public static var jumping:Boolean = false;
 		
 		public static var level:Class;
 		public static var midground:Class;
@@ -59,7 +56,6 @@ package {
 		public static const SOUND_ON:Boolean = true;
 		public static const DEBUG_ON:Boolean = true;
 		
-		//public static var iteration:uint = 0;
 		public static var levelNum:uint = 0;
 		public static var levelNumPrevious:uint = levelNum;
 		

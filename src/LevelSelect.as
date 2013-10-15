@@ -6,9 +6,6 @@ package
 	{	
 		public var camera:FlxButton;
 		public var range:FlxButton;
-		public var controls:FlxButton;
-		public var continuity:FlxButton;
-		public var jump:FlxButton;
 		override public function create():void {
 			
 			Registry.midground = Registry.midgroundMap;
@@ -32,30 +29,6 @@ package
 			}
 			add(rangeText);
 			add(range);
-			
-			var ctlText:FlxText = new FlxText(100, 350, 400, "Control Stuff:");
-			controls = new FlxButton(100, 380, "Cam-Relative", changeControls);
-			if (Registry.handRelative) {
-				controls.label.text = "Hand-Relative";
-			}
-			add(ctlText);
-			add(controls);
-			
-			var conText:FlxText = new FlxText(250, 350, 400, "Continuity:");
-			continuity = new FlxButton(250, 380, "On", changeContinuity);
-			if (!Registry.continuityUntilRelease) {
-				continuity.label.text = "Off";
-			}
-			add(conText);
-			add(continuity);
-			
-			var jumpText:FlxText = new FlxText(400, 350, 400, "Jumping:");
-			jump = new FlxButton(400, 380, "On", changeJumping);
-			if (!Registry.jumping) {
-				jump.label.text = "Off";
-			}
-			add(jumpText);
-			add(jump);
 		}
 		
 		override public function update():void {
@@ -122,33 +95,6 @@ package
 				range.label.text = "Extended";
 			} else {
 				range.label.text = "Level Bounds";
-			}
-		}
-		
-		public function changeControls():void {
-			Registry.handRelative = !Registry.handRelative;
-			if (Registry.handRelative) {
-				controls.label.text = "Hand-Relative";
-			} else {
-				controls.label.text = "Cam-Relative";
-			}
-		}
-		
-		public function changeContinuity():void {
-			Registry.continuityUntilRelease = !Registry.continuityUntilRelease;
-			if (Registry.continuityUntilRelease) {
-				continuity.label.text = "On";
-			} else {
-				continuity.label.text = "Off";
-			}
-		}
-		
-		public function changeJumping():void {
-			Registry.jumping = !Registry.jumping;
-			if (Registry.jumping) {
-				jump.label.text = "On";
-			} else {
-				jump.label.text = "Off";
 			}
 		}
 	}
