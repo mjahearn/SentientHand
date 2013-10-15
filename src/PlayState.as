@@ -552,15 +552,43 @@ package {
 				}
 			}
 			add(buttonGroup);
-
+			
+			
+			bodyGearGroup = new FlxGroup();
+			bodyHeadGroup = new FlxGroup();
+			bodyGroup = groupFromSpawn(RegistryLevels.kSpawnGrappler,FlxSprite,levelFunctional,true);
+			for (i = 0; i < bodyGroup.length; i++) {
+				var body:FlxSprite = bodyGroup.members[i];
+				body.loadGraphic(bodySheet);
+				bodyTargetAngle = body.angle;
+				var bodyGear:FlxSprite = new FlxSprite(body.x,body.y,bodyGearSheet);
+				bodyGearGroup.add(bodyGear);
+				// the positioning should be based on angle too
+				var bodyHead:FlxSprite = new FlxSprite(body.x,body.y,headSheet);
+				bodyHead.y -= bodyHead.height;
+				bodyHeadGroup.add(bodyHead);
+				
+				bodyArmBaseGroup.add(new FlxSprite(body.x,body.y,armBaseSheet));
+				body.facing = FlxObject.DOWN;
+				
+				var theta:Number = (body.angle-90)*Math.PI/180.0;
+				
+				bodyHead.x = body.x + body.width/2.0 - bodyHead.width/2.0 + (bodyHead.height*1.5)*Math.cos(theta);
+				bodyHead.y = body.y + body.height/2.0 - bodyHead.height/2.0 + (bodyHead.height*1.5)*Math.sin(theta);
+				bodyHead.angle = body.angle;
+				
+				bodyGear.x = body.x + body.width/2.0 - bodyGear.width/2.0 + (bodyGear.width/2.0)*Math.cos(theta-Math.PI/2.0);
+				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
+			}
+			
+			/*
 			// Bodies
 			bodyGroup = new FlxGroup();
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
 			
 			//var bodyArray:Array = level.getTileInstances(BODY_SPAWN);
-			//var bodyArray:Array = levelFunctional.getTileInstances(RegistryLevels.kSpawnLauncher[0]);
-			var bodyArray:Array = RegistryLevels.kSpawnLauncher;
+			var bodyArray:Array = levelFunctional.getTileInstances(RegistryLevels.kSpawnLauncher[0]);
 			//levelFunctional.setTileProperties(bodyArray[0],FlxObject.NONE);
 			if (bodyArray) {
 				for (j= 0; j < bodyArray.length; j++) {
@@ -592,6 +620,7 @@ package {
 					bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.width/2.0)*Math.sin(theta-Math.PI/2.0);
 				}
 			}
+			*/
 			add(bodyGroup);
 			add(bodyGearGroup);
 			add(bodyHeadGroup);
@@ -747,7 +776,7 @@ package {
 			markerEndGroup.add(markerEnd);
 			add(markerEndGroup);
 			
-			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional,!Registry.DEBUG_ON).members[0];
+			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional,true).members[0];
 			
 			//hand = new FlxSprite(handPoint.x, handPoint.y);
 			hand.loadGraphic(handSheet,true,false,32,32,true);
