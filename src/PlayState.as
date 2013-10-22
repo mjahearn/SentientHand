@@ -1,6 +1,8 @@
 package {
 	
 	import flashx.textLayout.formats.Float;
+	import flash.media.SoundMixer;
+	import flash.media.SoundTransform;
 	
 	import org.flixel.*;
 	import org.flixel.system.FlxTile;
@@ -248,7 +250,9 @@ package {
 		public var camAngle:Number = new Number;
 		
 		override public function create():void {
-			
+			if (!Registry.SOUND_ON) {
+				SoundMixer.soundTransform = new SoundTransform(0);	
+			}
 			ambientSteamSound.volume = 0.5;
 			
 			if (!Registry.DEBUG_ON) {
@@ -647,15 +651,11 @@ package {
 			exitRad = FlxG.height/2 - exitArrow.width;
 			exitOn = false;
 			
-			// marker line
-			//markerLine.makeGraphic(level.width,level.height,0x00000000);
-			//add(markerLine);
 			bodyMarkerGroup = new FlxGroup();
 			bodyMarkerTimer = 0;
 			cannonMarkerLine = new FlxSprite(0,0,cannonMarkerLineSheet);
 			markerEnd = new FlxSprite(0,0);
-			//markerEnd.loadGraphic(handSheet,true,false,32,32);
-			markerEnd.loadGraphic(Registry.kHandSheet,true,false,32,32);
+			markerEnd.loadGraphic(/*handSheet*/Registry.kHandSheet,true,false,32,32);
 			markerEnd.frame = 21;
 			markerEnd.alpha = 0.5;
 			markerEnd.visible = false;
@@ -887,10 +887,6 @@ package {
 				FlxG.camera.angle = -camTag.angle;
 			}
 			
-			/*
-			// marker line
-			markerLine.fill(0x00000000);
-			*/
 			if (bodyMode) {
 				if (!handOut && !handIn) {
 					rad = arrow.angle*Math.PI/180;
@@ -898,8 +894,6 @@ package {
 					var startY:Number = hand.y+hand.height/2.0;
 					var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
 					var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
-					//markerLine.drawLine(startX,startY,endX,endY,0xFFad0222,2);
-					
 					
 					camTag.x += (-camTag.x + endX)/44.0;
 					camTag.y += (-camTag.y + endY)/44.0;
@@ -2332,14 +2326,6 @@ package {
 					}
 				}
 			}
-			/*for (var t:uint = 0; t < trashGroup.length; t++) {
-				var trashX:uint = int(trashGroup.members[t].x/8);
-				var trashY:uint = int(trashGroup.members[t].y/8);
-				if (fixedX?(trashX == indX+(forwards?4:-4) && trashY >= indY - 3 && trashY <= indY + 4)
-					:(trashY == indY+(forwards?4:-4) && trashX >= indX - 3 && trashX <= indX + 4)) {
-					return true;
-				}
-			}*/
 			return false;
 		}
 		

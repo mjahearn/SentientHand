@@ -35,7 +35,7 @@ package
 			addAnimation(kAnimExtendRight,[35,36],22,false);
 			addAnimation(kAnimExtendLeft,[40,41],22,false);
 			
-			play(kAnimIdleRight);
+			play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
 			maxVelocity = kMaxVel;
 			drag = kDrag;
 		}
