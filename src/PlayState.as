@@ -81,7 +81,10 @@ package {
 		public var doorsDead:Boolean;
 		
 		public var level:FlxTilemap;
-		public var levelBack:FlxTilemap;
+		public var midground:FlxTilemap;
+		public var background:FlxTilemap;
+		//public var levelMid:FlxTilemap;
+		//public var levelBack:FlxTilemap;
 		//public var hand:FlxSprite;
 		public var hand:SprHand;
 		public var hint:FlxSprite;
@@ -157,9 +160,11 @@ package {
 		
 		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
 		
+		/*
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
+		*/
 		
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		//[Embed("assets/hand.png")] public var handSheet:Class;
@@ -251,18 +256,25 @@ package {
 			
 			ambientSteamSound.volume = 0.5;
 			
+			/*
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
 				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
 				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
 			}
 			
+			*/
 						
-			levelFunctional = RegistryLevels.currentFlxTilemapFunctional();			
+			levelFunctional = RegistryLevels.lvlFunc();
+			level = RegistryLevels.lvlCosmFront();
+			midground = RegistryLevels.lvlCosmMid();
+			background = RegistryLevels.lvlCosmBack();
 			
+			/*
 			levelMap = Registry.level;
 			midgroundMap = Registry.midground;
 			backgroundMap = Registry.background;
+			*/
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
@@ -273,7 +285,8 @@ package {
 			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
-			if (Registry.levelNum >= 5) {
+			if (RegistryLevels.num >= 5) {
+			//if (Registry.levelNum >= 5) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
@@ -283,13 +296,13 @@ package {
 			}
 			
 			/* Background */
-			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
+			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
 			
 			/* Midground */
-			var midground:FlxTilemap = new FlxTilemap();
-			midground.loadMap(new midgroundMap,midgroundset,8,8);
+			//var midground:FlxTilemap = new FlxTilemap();
+			//midground.loadMap(new midgroundMap,midgroundset,8,8);
 			
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
 				var gearArray:Array = midground.getTileInstances(i);
@@ -355,8 +368,8 @@ package {
 
 			/* Level */
 			
-			level = new FlxTilemap();
-			level.loadMap(new levelMap,tileset,8,8);
+			//level = new FlxTilemap();
+			//level.loadMap(new levelMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			if (Registry.extendedCamera) {
@@ -757,8 +770,9 @@ package {
 			if (bodyMarkerTimer > 1) {
 				bodyMarkerTimer -= 1;
 			}
-						
-			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+				
+			if (RegistryLevels.num) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
 				time += FlxG.elapsed;
@@ -784,7 +798,8 @@ package {
 			
 			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
-				if (doorsDead || Registry.levelNum == 5) {
+				//if (doorsDead || Registry.levelNum == 5) {
+				if (doorsDead || RegistryLevels.num == 5) {
 					goToNextLevel();
 				} else {
 					FlxG.resetState();
@@ -2196,7 +2211,8 @@ package {
 			ambientElectricalHumSound.stop();
 			
 			RegistryLevels.num++;
-			
+			FlxG.switchState(new PlayState);
+			/*
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
@@ -2206,6 +2222,7 @@ package {
 			} else {
 				FlxG.switchState(new EndState());
 			}
+			*/
 		}
 		
 		public function controlDirsRemove(dir:uint):void {
