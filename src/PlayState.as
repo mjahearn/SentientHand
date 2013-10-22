@@ -83,7 +83,10 @@ package {
 		public var doorsDead:Boolean;
 		
 		public var level:FlxTilemap;
-		public var levelBack:FlxTilemap;
+		public var midground:FlxTilemap;
+		public var background:FlxTilemap;
+		//public var levelMid:FlxTilemap;
+		//public var levelBack:FlxTilemap;
 		//public var hand:FlxSprite;
 		public var hand:SprHand;
 		public var hint:FlxSprite;
@@ -106,7 +109,7 @@ package {
 		public var handDir:uint;
 		
 		public var handFalling:Boolean;
-		public var bodyMode:Boolean;
+		//public var bodyMode:Boolean;
 		public var cannonMode:Boolean;
 		public var handOut:Boolean;
 		public var handIn:Boolean;
@@ -159,9 +162,11 @@ package {
 		
 		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
 		
+		/*
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
 		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
 		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
+		*/
 		
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		//[Embed("assets/hand.png")] public var handSheet:Class;
@@ -255,18 +260,25 @@ package {
 			}
 			ambientSteamSound.volume = 0.5;
 			
+			/*
 			if (!Registry.DEBUG_ON) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
 				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
 				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
 			}
 			
+			*/
 						
-			levelFunctional = RegistryLevels.currentFlxTilemapFunctional();			
+			levelFunctional = RegistryLevels.lvlFunc();
+			level = RegistryLevels.lvlCosmFront();
+			midground = RegistryLevels.lvlCosmMid();
+			background = RegistryLevels.lvlCosmBack();
 			
+			/*
 			levelMap = Registry.level;
 			midgroundMap = Registry.midground;
 			backgroundMap = Registry.background;
+			*/
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
@@ -277,7 +289,8 @@ package {
 			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
-			if (Registry.levelNum >= 5) {
+			if (RegistryLevels.num >= 5) {
+			//if (Registry.levelNum >= 5) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
@@ -287,13 +300,13 @@ package {
 			}
 			
 			/* Background */
-			var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
+			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
 			add(background);
 			
 			/* Midground */
-			var midground:FlxTilemap = new FlxTilemap();
-			midground.loadMap(new midgroundMap,midgroundset,8,8);
+			//var midground:FlxTilemap = new FlxTilemap();
+			//midground.loadMap(new midgroundMap,midgroundset,8,8);
 			
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
 				var gearArray:Array = midground.getTileInstances(i);
@@ -359,8 +372,8 @@ package {
 
 			/* Level */
 			
-			level = new FlxTilemap();
-			level.loadMap(new levelMap,tileset,8,8);
+			//level = new FlxTilemap();
+			//level.loadMap(new levelMap,tileset,8,8);
 			add(level);
 			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
 			if (Registry.extendedCamera) {
@@ -706,7 +719,7 @@ package {
 			
 			electricity.play("electricute");
 			
-			bodyMode = false;
+			//bodyMode = false;
 			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
@@ -757,12 +770,15 @@ package {
 			if (bodyMarkerTimer > 1) {
 				bodyMarkerTimer -= 1;
 			}
-						
-			if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+				
+			if (RegistryLevels.num) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
-			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			if ((hand.isAttachedToBody() || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			//if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
 				time += FlxG.elapsed;
-			} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			//} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
 				time += FlxG.elapsed;
 			} else {
 				time = 0;
@@ -784,7 +800,8 @@ package {
 			
 			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
-				if (doorsDead || Registry.levelNum == 5) {
+				//if (doorsDead || Registry.levelNum == 5) {
+				if (doorsDead || RegistryLevels.num == 5) {
 					goToNextLevel();
 				} else {
 					FlxG.resetState();
@@ -814,7 +831,8 @@ package {
 			var enteringCannon:Boolean = false;
 			var enteringBody:Boolean = false;
 			
-			if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody() && !cannonMode) {
+			//if (!bodyMode && !cannonMode) {
 				curBody = handOverlapsBody();
 				curCannon = handOverlapsCannon();
 			
@@ -831,7 +849,8 @@ package {
 			
 			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
-			if (enteringBody || bodyMode) {
+			if (enteringBody || hand.isAttachedToBody()) {
+			//if (enteringBody || bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
@@ -887,7 +906,7 @@ package {
 				FlxG.camera.angle = -camTag.angle;
 			}
 			
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
 				if (!handOut && !handIn) {
 					rad = arrow.angle*Math.PI/180;
 					var startX:Number = hand.x+hand.width/2.0;
@@ -978,7 +997,8 @@ package {
 			if (pulseNum <= 7) {pulseNum = 7;}
 			col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
 			
-			if (!cannonMode && !bodyMode) {
+			if (!cannonMode && !hand.isAttachedToBody()) {
+			//if (!cannonMode && !bodyMode) {
 				
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
@@ -1013,7 +1033,8 @@ package {
 					body.color = col;
 					armBase.color = col;
 				}
-			} else if (cannonMode || bodyMode) {
+			} else if (cannonMode || hand.isAttachedToBody()) {
+			//} else if (cannonMode || bodyMode) {
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
 				} else if (Registry.neverAimedBodyOrCannon) {
@@ -1029,147 +1050,150 @@ package {
 			}
 			
 			/* Begin Audio */
-			if (Registry.SOUND_ON) {
+			// Something's not quite right here...
+			// The hand jumped
+			if ((!hand.isAttachedToBody() && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+			//if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+				jumpSound.play();
+			} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.touching) {
+			//} else if ((!bodyMode && !cannonMode) && hand.touching) {
+				jumpSound.stop();
+			}
 				
-				// Something's not quite right here...
-				// The hand jumped
-				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
-					jumpSound.play();
-				} else if ((!bodyMode && !cannonMode) && hand.touching) {
-					jumpSound.stop();
-				}
-				
-				// The hand is crawling on wood or metal
-				if ((!bodyMode &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-					/*if (lastTouchedWood && !lastTouchedDirt) {
-						metalCrawlSound.stop();
-						dirtFootstepsSound.stop();
-						woodCrawlSound.play();
-					} else if (lastTouchedDirt) {
-						metalCrawlSound.stop();
-						woodCrawlSound.stop();
-						dirtFootstepsSound.play();
-					} else {
-						woodCrawlSound.stop();
-						dirtFootstepsSound.stop();
-						metalCrawlSound.play();
-						
-					}*/
-					if (touchingMetal) {
-						woodCrawlSound.stop();
-						dirtFootstepsSound.stop();
-						metalCrawlSound.play();
-					} else if (lastTouchedDirt) {
-						metalCrawlSound.stop();
-						woodCrawlSound.stop();
-						dirtFootstepsSound.play();
-					} else {
-						metalCrawlSound.stop();
-						dirtFootstepsSound.stop();
-						woodCrawlSound.play();
-					}
-				} else {
-					woodCrawlSound.stop();
+			// The hand is crawling on wood or metal
+			if ((!hand.isAttachedToBody() &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+			//if ((!bodyMode &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+				/*if (lastTouchedWood && !lastTouchedDirt) {
 					metalCrawlSound.stop();
 					dirtFootstepsSound.stop();
-				}
-				// The hand is in the body, aiming
-				if ((bodyMode || cannonMode) && !handOut && !handIn) {
-					grappleExtendSound.stop();
-					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
-						robodyAimSound.play();
-					} else {
-						robodyAimSound.stop();
-					}
-				}
-					// The hand is launching out of the body
-				else if (bodyMode && (handOut || handIn)) {
-					robodyLandOnWallSound.stop();
-					robodyAimSound.stop();
-					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
-						grappleExtendSound.play();
-					} else {
-						grappleExtendSound.stop();
-					}
+					woodCrawlSound.play();
+				} else if (lastTouchedDirt) {
+					metalCrawlSound.stop();
+					woodCrawlSound.stop();
+					dirtFootstepsSound.play();
 				} else {
-					grappleExtendSound.stop();
-					robodyAimSound.stop();
-				}
-				
-				// The body just hit a wall
-				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
-					robodyLandOnWallSound.play();
-				}
-				
-				// hand electricity
-				if (/*hand.touching && !lastTouchedWood*/touchingMetal) {
-					ambientElectricalHumSound.play();
-				} else {
-					ambientElectricalHumSound.stop();
-				}
-				
-				// cannon fire
-				if (cannonMode && FlxG.keys.justPressed(ACTION_KEY)) {
-					cannonShotSound.stop();
-					cannonShotSound.play();
-				}
-				
-				// hand landed
-				//if ((lastVel.x != 0 && lastVel.y != 0) || handFalling) {
-				if (!lastTouchedDirt) {
-					if (hand.justTouched(FlxObject.ANY)) {
-						if (!lastTouchedWood) {
-							handLandingOnMetalSound.stop();
-							handLandingOnDirtSound.stop();
-							handLandingOnMetalSound.play();
-						} else {
-							handLandingOnNonstickMetalSound.stop();
-							handLandingOnDirtSound.stop();
-							handLandingOnNonstickMetalSound.play();
-						}
-					}
-				} else if (hand.justTouched(FlxObject.ANY)) {
-					handLandingOnNonstickMetalSound.stop();
-					handLandingOnMetalSound.stop();
-					handLandingOnDirtSound.play();
-				}
-				//}
-				
-				
-				// button press, gears, steam
-				for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
-					var button:FlxSprite = buttonGroup.members[qq];
-					var buttonState:Boolean = buttonStateArray[qq];
-					if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) {
-						buttonPressSound.stop();
-						buttonPressSound.play();
-					}
-					/*
-					if (button.frame == 2) {
-						ambientGearsSound.play();
-					}
-					if (button.frame == 3) {
-						ambientSteamSound.play();
-					}
-					*/
+					woodCrawlSound.stop();
+					dirtFootstepsSound.stop();
+					metalCrawlSound.play();
 					
+				}*/
+				if (touchingMetal) {
+					woodCrawlSound.stop();
+					dirtFootstepsSound.stop();
+					metalCrawlSound.play();
+				} else if (lastTouchedDirt) {
+					metalCrawlSound.stop();
+					woodCrawlSound.stop();
+					dirtFootstepsSound.play();
+				} else {
+					metalCrawlSound.stop();
+					dirtFootstepsSound.stop();
+					woodCrawlSound.play();
 				}
-				
-				for (qq = 0; qq < steams.length; qq++) {
-					if (steams.members[qq].frame == 1) {
-						ambientSteamSound.stop();
-						ambientSteamSound.play();
+			} else {
+				woodCrawlSound.stop();
+				metalCrawlSound.stop();
+				dirtFootstepsSound.stop();
+			}
+			// The hand is in the body, aiming
+			if ((hand.isAttachedToBody() || cannonMode) && !handOut && !handIn) {
+			//if ((bodyMode || cannonMode) && !handOut && !handIn) {
+				grappleExtendSound.stop();
+				if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
+					robodyAimSound.play();
+				} else {
+					robodyAimSound.stop();
+				}
+			}
+				// The hand is launching out of the body
+			else if (hand.isAttachedToBody() && (handOut || handIn)) {
+			//else if (bodyMode && (handOut || handIn)) {
+				robodyLandOnWallSound.stop();
+				robodyAimSound.stop();
+				if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
+					grappleExtendSound.play();
+				} else {
+					grappleExtendSound.stop();
+				}
+			} else {
+				grappleExtendSound.stop();
+				robodyAimSound.stop();
+			}
+			
+			// The body just hit a wall
+			if (hand.isAttachedToBody() && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+			//if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+				robodyLandOnWallSound.play();
+			}
+			
+			// hand electricity
+			if (/*hand.touching && !lastTouchedWood*/touchingMetal) {
+				ambientElectricalHumSound.play();
+			} else {
+				ambientElectricalHumSound.stop();
+			}
+			
+			// cannon fire
+			if (cannonMode && FlxG.keys.justPressed(ACTION_KEY)) {
+				cannonShotSound.stop();
+				cannonShotSound.play();
+			}
+			
+			// hand landed
+			//if ((lastVel.x != 0 && lastVel.y != 0) || handFalling) {
+			if (!lastTouchedDirt) {
+				if (hand.justTouched(FlxObject.ANY)) {
+					if (!lastTouchedWood) {
+						handLandingOnMetalSound.stop();
+						handLandingOnDirtSound.stop();
+						handLandingOnMetalSound.play();
+					} else {
+						handLandingOnNonstickMetalSound.stop();
+						handLandingOnDirtSound.stop();
+						handLandingOnNonstickMetalSound.play();
 					}
 				}
+			} else if (hand.justTouched(FlxObject.ANY)) {
+				handLandingOnNonstickMetalSound.stop();
+				handLandingOnMetalSound.stop();
+				handLandingOnDirtSound.play();
+			}
+			//}
+			
+			
+			// button press, gears, steam
+			for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
+				var button:FlxSprite = buttonGroup.members[qq];
+				var buttonState:Boolean = buttonStateArray[qq];
+				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) {
+					buttonPressSound.stop();
+					buttonPressSound.play();
+				}
+				/*
+				if (button.frame == 2) {
+					ambientGearsSound.play();
+				}
+				if (button.frame == 3) {
+					ambientSteamSound.play();
+				}
+				*/
 				
-				
-				// door open
-				for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
-					if (doorGroup.members[ab].frame == 1) {
-						doorOpenSound.stop();
-						doorOpenSound.play();
-						ambientGearsSound.play();
-					}
+			}
+			
+			for (qq = 0; qq < steams.length; qq++) {
+				if (steams.members[qq].frame == 1) {
+					ambientSteamSound.stop();
+					ambientSteamSound.play();
+				}
+			}
+			
+			
+			// door open
+			for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
+				if (doorGroup.members[ab].frame == 1) {
+					doorOpenSound.stop();
+					doorOpenSound.play();
+					ambientGearsSound.play();
 				}
 			}
 			/* End Audio */
@@ -1179,7 +1203,8 @@ package {
 			timeFallen += FlxG.elapsed;
 			
 			// less janky way of getting gears/heads to move with body...
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode) {
 				
 				var theta:Number = (body.angle-90)*Math.PI/180.0;
 				
@@ -1191,7 +1216,8 @@ package {
 				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.height/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
 			}
-			if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody() || cannonMode) {
+			//if (bodyMode || cannonMode) {
 				if (!handOut) {
 					armBase.angle = hand.angle - 180;
 				}
@@ -1242,7 +1268,8 @@ package {
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
-			if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody() && !cannonMode) {
+			//if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					//bodyTargetAngle = hand.angle;
@@ -1353,7 +1380,8 @@ package {
 			}
 			
 			// The hand is attached to a body
-			else if (bodyMode || cannonMode) {
+			else if (hand.isAttachedToBody() || cannonMode) {
+			//else if (bodyMode || cannonMode) {
 				// The hand is idling in the body
 				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
@@ -1451,7 +1479,8 @@ package {
 			
 			/* End Animations */
 			
-			if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody() || cannonMode) {
+			//if (bodyMode || cannonMode) {
 				
 				// Fixes some bugs with grappling, maybe also redundant?
 				if (!hand.overlaps(body)) {
@@ -1543,16 +1572,19 @@ package {
 						updateRaytrace(arrow.angle);
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
-						if (bodyMode) {
+						if (hand.isAttachedToBody()) {
+						//if (bodyMode) {
 							lastTouchedWood = false;
 						}
-						bodyMode = false;
+						detachHandFromBody();
+						//bodyMode = false;
 						cannonMode = false;
 						markerEnd.visible = false;
 						setDir(hand, body.facing);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToBody()) {
+					//if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
 						markerEnd.visible = false;
@@ -1595,7 +1627,8 @@ package {
 			} else {
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
-						bodyMode = true;
+						//bodyMode = true;
+						attachHandToBody();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -1683,7 +1716,8 @@ package {
 				}
 			}
 			
-			if (bodyMode && !handOut && !handIn) {
+			if (hand.isAttachedToBody() && !handOut && !handIn) {
+			//if (bodyMode && !handOut && !handIn) {
 				theta = (arrow.angle)*Math.PI/180.0;
 				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
 				for (var n:int = 0; n <= dotNum; n++) {
@@ -1794,7 +1828,8 @@ package {
 				markerEnd.velocity.y = 0;
 			}
 			correctMetal();
-			if (!bodyMode && onGround) {
+			if (!hand.isAttachedToBody() && onGround) {
+			//if (!bodyMode && onGround) {
 				if (isNothingInDir(hand.facing, 4)) {
 					if (touchingMetal) { //was the player touching metal the last frame?
 						if (hand.facing == FlxObject.LEFT) {
@@ -1850,7 +1885,8 @@ package {
 			}
 			
 			if (FlxG.paused) {
-				if (bodyMode || cannonMode) {
+				if (hand.isAttachedToBody() || cannonMode) {
+				//if (bodyMode || cannonMode) {
 					pause.con.play("attached");
 				} else {
 					pause.con.play("detached");
@@ -1901,7 +1937,8 @@ package {
 			if (spr == hand) {
 				handWoodFlag = ind;
 				lastTouchedWood = true;
-				if (!bodyMode) {
+				if (!hand.isAttachedToBody()) {
+				//if (!bodyMode) {
 					fixGravity(spr);
 				}
 			}
@@ -2189,6 +2226,9 @@ package {
 			ambientSteamSound.stop();
 			ambientElectricalHumSound.stop();
 			
+			RegistryLevels.num++;
+			FlxG.switchState(new PlayState);
+			/*
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];
@@ -2198,6 +2238,7 @@ package {
 			} else {
 				FlxG.switchState(new EndState());
 			}
+			*/
 		}
 		
 		public function controlDirsRemove(dir:uint):void {
@@ -2343,7 +2384,8 @@ package {
 		}*/
 		
 		public function updateRaytrace(angle:Number):void {
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode) {
 				markerEnd.angle = angle-90;
 				var theta:Number = angle*Math.PI/180.0;
 				markerEnd.x = hand.x;
@@ -2444,6 +2486,16 @@ package {
 				return d1;
 			}
 			return d2;
+		}
+		
+		private function attachHandToBody():void {
+			// any stuff we want here, like sfx etc
+			hand.attachToBody();
+		}
+		
+		private function detachHandFromBody():void {
+			// sfx etc
+			hand.detachFromBody();
 		}
 	}
 }

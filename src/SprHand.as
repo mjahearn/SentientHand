@@ -19,6 +19,10 @@ package
 		public static const kAnimExtendRight:String = "extend right";
 		public static const kAnimExtendLeft:String = "extend left";
 		
+		protected var _isInBody:Boolean;
+		protected var _isLeft:Boolean;
+		protected var _isRight:Boolean;
+		
 		public function SprHand(X:Number=0, Y:Number=0, SimpleGraphic:Class=null)
 		{
 			super(X, Y);
@@ -38,6 +42,40 @@ package
 			play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
 			maxVelocity = kMaxVel;
 			drag = kDrag;
+		}
+		
+		override public function update():void {
+			super.update();
+			
+			if (_isInBody) {
+				
+			}
+			else {
+				
+			}
+			
+			_isLeft = false;
+			_isRight = false;
+		}
+		
+		public function attachToBody():void {
+			_isInBody = true;
+		}
+		
+		public function detachFromBody():void {
+			_isInBody = false;
+		}
+		
+		public function moveLeft():void {
+			_isLeft = true;
+		}
+		
+		public function moveRight():void {
+			_isRight = true;
+		}
+		
+		public function isAttachedToBody():Boolean {
+			return _isInBody;
 		}
 	}
 }
