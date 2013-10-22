@@ -2195,6 +2195,8 @@ package {
 			ambientSteamSound.stop();
 			ambientElectricalHumSound.stop();
 			
+			RegistryLevels.num++;
+			
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {
 				Registry.level = Registry.levelOrder[Registry.levelNum];

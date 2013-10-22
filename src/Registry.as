@@ -53,7 +53,7 @@ package {
 		//public static var firstButton:Array = new Array();
 		//public static var secondButton:Array = new Array();
 		
-		public static const SOUND_ON:Boolean = true;
+		public static const SOUND_ON:Boolean = false;
 		public static const DEBUG_ON:Boolean = true;
 		
 		public static var levelNum:uint = 0;
