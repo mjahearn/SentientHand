@@ -107,7 +107,7 @@ package {
 		public var handDir:uint;
 		
 		public var handFalling:Boolean;
-		public var bodyMode:Boolean;
+		//public var bodyMode:Boolean;
 		public var cannonMode:Boolean;
 		public var handOut:Boolean;
 		public var handIn:Boolean;
@@ -719,7 +719,7 @@ package {
 			
 			electricity.play("electricute");
 			
-			bodyMode = false;
+			//bodyMode = false;
 			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
@@ -774,9 +774,11 @@ package {
 			if (RegistryLevels.num) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
-			if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			if ((hand.isAttachedToBody() || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			//if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
 				time += FlxG.elapsed;
-			} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			//} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
 				time += FlxG.elapsed;
 			} else {
 				time = 0;
@@ -829,7 +831,8 @@ package {
 			var enteringCannon:Boolean = false;
 			var enteringBody:Boolean = false;
 			
-			if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody() && !cannonMode) {
+			//if (!bodyMode && !cannonMode) {
 				curBody = handOverlapsBody();
 				curCannon = handOverlapsCannon();
 			
@@ -846,7 +849,8 @@ package {
 			
 			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
-			if (enteringBody || bodyMode) {
+			if (enteringBody || hand.isAttachedToBody()) {
+			//if (enteringBody || bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
@@ -906,7 +910,8 @@ package {
 			// marker line
 			markerLine.fill(0x00000000);
 			*/
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode) {
 				if (!handOut && !handIn) {
 					rad = arrow.angle*Math.PI/180;
 					var startX:Number = hand.x+hand.width/2.0;
@@ -999,7 +1004,8 @@ package {
 			if (pulseNum <= 7) {pulseNum = 7;}
 			col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
 			
-			if (!cannonMode && !bodyMode) {
+			if (!cannonMode && !hand.isAttachedToBody()) {
+			//if (!cannonMode && !bodyMode) {
 				
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
@@ -1034,7 +1040,8 @@ package {
 					body.color = col;
 					armBase.color = col;
 				}
-			} else if (cannonMode || bodyMode) {
+			} else if (cannonMode || hand.isAttachedToBody()) {
+			//} else if (cannonMode || bodyMode) {
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
 				} else if (Registry.neverAimedBodyOrCannon) {
@@ -1054,14 +1061,17 @@ package {
 				
 				// Something's not quite right here...
 				// The hand jumped
-				if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+				if ((!hand.isAttachedToBody() && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+				//if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
 					jumpSound.play();
-				} else if ((!bodyMode && !cannonMode) && hand.touching) {
+				} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.touching) {
+				//} else if ((!bodyMode && !cannonMode) && hand.touching) {
 					jumpSound.stop();
 				}
 				
 				// The hand is crawling on wood or metal
-				if ((!bodyMode &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+				if ((!hand.isAttachedToBody() &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+				//if ((!bodyMode &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
 					/*if (lastTouchedWood && !lastTouchedDirt) {
 						metalCrawlSound.stop();
 						dirtFootstepsSound.stop();
@@ -1095,7 +1105,8 @@ package {
 					dirtFootstepsSound.stop();
 				}
 				// The hand is in the body, aiming
-				if ((bodyMode || cannonMode) && !handOut && !handIn) {
+				if ((hand.isAttachedToBody() || cannonMode) && !handOut && !handIn) {
+				//if ((bodyMode || cannonMode) && !handOut && !handIn) {
 					grappleExtendSound.stop();
 					if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 						robodyAimSound.play();
@@ -1104,7 +1115,8 @@ package {
 					}
 				}
 					// The hand is launching out of the body
-				else if (bodyMode && (handOut || handIn)) {
+				else if (hand.isAttachedToBody() && (handOut || handIn)) {
+				//else if (bodyMode && (handOut || handIn)) {
 					robodyLandOnWallSound.stop();
 					robodyAimSound.stop();
 					if (hand.velocity.x !=0 || hand.velocity.y != 0 || body.velocity.x != 0 || body.velocity.y != 0) {
@@ -1118,7 +1130,8 @@ package {
 				}
 				
 				// The body just hit a wall
-				if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+				if (hand.isAttachedToBody() && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+				//if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 					robodyLandOnWallSound.play();
 				}
 				
@@ -1200,7 +1213,8 @@ package {
 			timeFallen += FlxG.elapsed;
 			
 			// less janky way of getting gears/heads to move with body...
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode) {
 				
 				var theta:Number = (body.angle-90)*Math.PI/180.0;
 				
@@ -1212,7 +1226,8 @@ package {
 				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.height/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
 			}
-			if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody() || cannonMode) {
+			//if (bodyMode || cannonMode) {
 				if (!handOut) {
 					armBase.angle = hand.angle - 180;
 				}
@@ -1263,7 +1278,8 @@ package {
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
-			if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody() && !cannonMode) {
+			//if (!bodyMode && !cannonMode) {
 				// The hand is about to mount a body
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					//bodyTargetAngle = hand.angle;
@@ -1374,7 +1390,8 @@ package {
 			}
 			
 			// The hand is attached to a body
-			else if (bodyMode || cannonMode) {
+			else if (hand.isAttachedToBody() || cannonMode) {
+			//else if (bodyMode || cannonMode) {
 				// The hand is idling in the body
 				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
@@ -1472,7 +1489,8 @@ package {
 			
 			/* End Animations */
 			
-			if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody() || cannonMode) {
+			//if (bodyMode || cannonMode) {
 				
 				// Fixes some bugs with grappling, maybe also redundant?
 				if (!hand.overlaps(body)) {
@@ -1564,16 +1582,19 @@ package {
 						updateRaytrace(arrow.angle);
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
-						if (bodyMode) {
+						if (hand.isAttachedToBody()) {
+						//if (bodyMode) {
 							lastTouchedWood = false;
 						}
-						bodyMode = false;
+						detachHandFromBody();
+						//bodyMode = false;
 						cannonMode = false;
 						markerEnd.visible = false;
 						setDir(hand, body.facing);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToBody()) {
+					//if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
 						markerEnd.visible = false;
@@ -1616,7 +1637,8 @@ package {
 			} else {
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
-						bodyMode = true;
+						//bodyMode = true;
+						attachHandToBody();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -1704,7 +1726,8 @@ package {
 				}
 			}
 			
-			if (bodyMode && !handOut && !handIn) {
+			if (hand.isAttachedToBody() && !handOut && !handIn) {
+			//if (bodyMode && !handOut && !handIn) {
 				theta = (arrow.angle)*Math.PI/180.0;
 				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
 				for (var n:int = 0; n <= dotNum; n++) {
@@ -1815,7 +1838,8 @@ package {
 				markerEnd.velocity.y = 0;
 			}
 			correctMetal();
-			if (!bodyMode && onGround) {
+			if (!hand.isAttachedToBody() && onGround) {
+			//if (!bodyMode && onGround) {
 				if (isNothingInDir(hand.facing, 4)) {
 					if (touchingMetal) { //was the player touching metal the last frame?
 						if (hand.facing == FlxObject.LEFT) {
@@ -1871,7 +1895,8 @@ package {
 			}
 			
 			if (FlxG.paused) {
-				if (bodyMode || cannonMode) {
+				if (hand.isAttachedToBody() || cannonMode) {
+				//if (bodyMode || cannonMode) {
 					pause.con.play("attached");
 				} else {
 					pause.con.play("detached");
@@ -1922,7 +1947,8 @@ package {
 			if (spr == hand) {
 				handWoodFlag = ind;
 				lastTouchedWood = true;
-				if (!bodyMode) {
+				if (!hand.isAttachedToBody()) {
+				//if (!bodyMode) {
 					fixGravity(spr);
 				}
 			}
@@ -2376,7 +2402,8 @@ package {
 		}*/
 		
 		public function updateRaytrace(angle:Number):void {
-			if (bodyMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode) {
 				markerEnd.angle = angle-90;
 				var theta:Number = angle*Math.PI/180.0;
 				markerEnd.x = hand.x;
@@ -2477,6 +2504,16 @@ package {
 				return d1;
 			}
 			return d2;
+		}
+		
+		private function attachHandToBody():void {
+			// any stuff we want here, like sfx etc
+			hand.attachToBody();
+		}
+		
+		private function detachHandFromBody():void {
+			// sfx etc
+			hand.detachFromBody();
 		}
 	}
 }
