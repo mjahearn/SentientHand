@@ -80,7 +80,7 @@ package {
 		
 		public var electricityNum:int = 1;
 		
-		public var doorsDead:Boolean;
+		//public var doorsDead:Boolean;
 		
 		public var level:FlxTilemap;
 		public var midground:FlxTilemap;
@@ -134,7 +134,7 @@ package {
 		public var buttonMode:uint;
 		public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
-		public var doorGroup:FlxGroup = new FlxGroup();
+		//public var doorGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -191,8 +191,8 @@ package {
 		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
 		[Embed("assets/button_r.png")] public var buttonRSheet:Class;
 		
-		[Embed("assets/door_h.png")] public var doorHSheet:Class;
-		[Embed("assets/door_v.png")] public var doorVSheet:Class;
+		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
+		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
@@ -213,7 +213,7 @@ package {
 		[Embed("assets/ButtonPress.mp3")] public var buttonPressSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
 		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
-		[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
+		//[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
 		
@@ -231,8 +231,8 @@ package {
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
-		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);//ambientSteamSFX,true);
-		public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
+		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(/*doorOpenSFX);*/ambientSteamSFX,true);
+		//public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
@@ -284,7 +284,7 @@ package {
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			reinvigorated = false; //ditto
 			lastTouchedDirt = false; //ditto ditto
-			doorsDead = false;
+			//doorsDead = false;
 			controlDirs = new Array();
 			reversePolarity = false;
 			
@@ -543,7 +543,7 @@ package {
 			
 			// Doors
 			//for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
-			for (m = 0; m < RegistryLevels.kSpawnDoor.length; m++) {
+			/*for (m = 0; m < RegistryLevels.kSpawnDoor.length; m++) {
 				i = RegistryLevels.kSpawnDoor[m];
 				levelFunctional.setTileProperties(i,FlxObject.NONE);
 				var doorArray:Array = levelFunctional.getTileInstances(i);
@@ -573,7 +573,7 @@ package {
 					}
 				}
 			}
-			add(doorGroup);
+			add(doorGroup);*/
 			
 			
 			// Steam
@@ -800,12 +800,12 @@ package {
 			
 			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
-				//if (doorsDead || Registry.levelNum == 5) {
-				if (doorsDead || RegistryLevels.num == 5) {
+				//if (doorsDead || RegistryLevels.num == 5) {
+				//maybe replace the old doorsDead check with a check to see if the hand is in the right place?
 					goToNextLevel();
-				} else {
+				/*} else {
 					FlxG.resetState();
-				}
+				}*/
 			}
 			
 			if (FlxG.keys.justPressed("RIGHT") && controlDirs.indexOf(FlxObject.RIGHT) == -1) {
@@ -1189,13 +1189,13 @@ package {
 			
 			
 			// door open
-			for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
+			/*for (var ab:int = doorGroup.length-1; ab >= 0; ab--) {
 				if (doorGroup.members[ab].frame == 1) {
 					doorOpenSound.stop();
 					doorOpenSound.play();
 					ambientGearsSound.play();
 				}
-			}
+			}*/
 			/* End Audio */
 			
 			// to time the fall for the different falling rot, really belongs with anim stuff
@@ -1234,16 +1234,19 @@ package {
 				buttonState = buttonStateArray[mm];
 				var bangFrame:Number = buttonBangGroup.members[mm].frame;
 				buttonBangGroup.members[mm].alpha = (6.0 - bangFrame)/6.0 + 0.22;
-				if (button.frame != BUTTON_PRESSED && (hand.overlaps(button) && !buttonState)) { // should change this to make it only recognize the space where the button is visually
+				if (button.frame != BUTTON_PRESSED && hand.overlaps(button) && !buttonState && onGround) { // should change this to make it only recognize the space where the button is visually
 					button.frame = BUTTON_PRESSED;
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
-					buttonBangGroup.members[mm].kill();
-					for (var bb:String in doorGroup.members) {
+					//buttonBangGroup.members[mm].kill();
+					/*for (var bb:String in doorGroup.members) {
 						var door:FlxSprite = doorGroup.members[bb];
 						if (door.frame == 13) {door.play("pulse 1");}
 						else if (14 <= door.frame && door.frame <= 17) {door.play("pulse 2");}
-					}
+					}*/
+				} else if (button.frame == BUTTON_PRESSED && !hand.overlaps(button) && buttonState) { // should change this to make it only recognize the space where the button is visually
+					button.frame = BUTTON_INIT;
+					buttonStateArray[mm] = false;
 				}
 			}
 			
@@ -1759,7 +1762,7 @@ package {
 			
 			//var doorsJustDied:Boolean = false;
 			//if (!doorsDead) {
-			for (var a:int = doorGroup.length-1; a >= 0; a--) {
+			/*for (var a:int = doorGroup.length-1; a >= 0; a--) {
 				if (doorGroup.members[a].frame == 12) {
 					doorGroup.members[a].kill();
 					ambientGearsSound.stop();
@@ -1767,7 +1770,7 @@ package {
 					doorsDead = true;
 					//doorsJustDied = true;
 				}
-			}
+			}*/
 			//}
 			
 			/*
@@ -1812,18 +1815,18 @@ package {
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 			//FlxG.collide(level, hand/*, levelHandCallback*/);
-			FlxG.collide(doorGroup, hand, doorCallback);
+			//FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
 			//FlxG.collide(flapGroup, hand, doorCallback);
 			//FlxG.collide(level, bodyGroup);
-			FlxG.collide(doorGroup, bodyGroup);
+			//FlxG.collide(doorGroup, bodyGroup);
 			/*FlxG.collide(markerEnd, level);
 			FlxG.collide(markerEnd, doorGroup);*/
 			
 			FlxG.collide(levelFunctional,hand);
 			FlxG.collide(levelFunctional,bodyGroup);
 			
-			if (FlxG.collide(markerEnd, /*level*/levelFunctional) || FlxG.collide(markerEnd, doorGroup)) {
+			if (FlxG.collide(markerEnd, /*level*/levelFunctional)/* || FlxG.collide(markerEnd, doorGroup)*/) {
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
 			}
@@ -1949,7 +1952,7 @@ package {
 			woodCallback(tile,spr);
 		}
 		
-		public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
+		/*public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
 			if (spr2 == hand) {
 				handMetalFlag = 1;
 				fixGravity(spr2, true);
@@ -1959,7 +1962,7 @@ package {
 				fixGravity(spr1, true);
 				lastTouchedWood = false;
 			}
-		}
+		}*/
 		
 		/*
 		public function hitUp(spr1:FlxSprite, spr2:FlxSprite):void {
@@ -2142,9 +2145,9 @@ package {
 			
 			steamsNumber++;
 			if (buttonStateArray.indexOf(false) == -1) {
-				for (var a:int = 0; a < doorGroup.length; a++) {
+				/*for (var a:int = 0; a < doorGroup.length; a++) {
 					doorGroup.members[a].play("open");
-				}
+				}*/
 				exitOn = true;
 				//exitArrow.visible = true;
 				
@@ -2157,40 +2160,20 @@ package {
 				
 				reinvigorated = true;
 			}
-			buttonMode++;
-			if (buttonMode == 1) {
+			//buttonMode++;
+			/*if (buttonMode == 1) {
 				for (var b:uint = 0; b < buttonGroup.length; b++) {
 					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
 						buttonGroup.members[b].frame = 2;
-						
-						/*
-						//
-						//reinvigorated = true;
-						for (mn = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
-							if (steamsNumberArray[mn] < steamsNumber) {
-								steams.members[mn].play("puff");
-							}
-						}
-						*/
 					}
 				}
 			} else {
 				for (var c:uint = 0; c < buttonGroup.length; c++) {
 					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
 						buttonGroup.members[c].frame = 3;
-						
-						/*
-						//
-						for (mn = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
-							if (steamsNumberArray[mn] < steamsNumber) {
-								steams.members[mn].play("puff");
-							}
-						}
-						*/
-						
 					}
 				}
-			}
+			}*/
 			/*
 			if (reinvigorated) {
 				reinvigorated = false;
@@ -2270,7 +2253,7 @@ package {
 						return true;
 					}
 				}
-				if (!reversePolarity) {
+				/*if (!reversePolarity) {
 					for (var aD:uint = 0; aD < doorGroup.length; aD++) {
 						if (doorGroup.members[aD].height == 64) {
 							var doorAX:uint = int(doorGroup.members[aD].x/8);
@@ -2280,14 +2263,14 @@ package {
 							}
 						}
 					}
-				}
+				}*/
 			} else if (dir == FlxObject.RIGHT) {
 				for (var b:uint = 0; b <= max; b++) {
 					if (indY < levelFunctional.heightInTiles - b && isMetal(levelFunctional.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
-				if (!reversePolarity) {
+				/*if (!reversePolarity) {
 					for (var bD:uint = 0; bD < doorGroup.length; bD++) {
 						if (doorGroup.members[bD].height == 64) {
 							var doorBX:uint = int(doorGroup.members[bD].x/8);
@@ -2297,14 +2280,14 @@ package {
 							}
 						}
 					}
-				}
+				}*/
 			} else if (dir == FlxObject.UP) {
 				for (var c:uint = 0; c <= max; c++) {
 					if (indX < levelFunctional.widthInTiles - c && isMetal(levelFunctional.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
-				if (!reversePolarity) {
+				/*if (!reversePolarity) {
 					for (var cD:uint = 0; cD < doorGroup.length; cD++) {
 						if (doorGroup.members[cD].width == 64) {
 							var doorCX:uint = int(doorGroup.members[cD].x/8);
@@ -2314,14 +2297,14 @@ package {
 							}
 						}
 					}
-				}
+				}*/
 			} else if (dir == FlxObject.DOWN) {
 				for (var d:uint = 0; d <= max; d++) {
 					if (indX < levelFunctional.widthInTiles - d && isMetal(levelFunctional.getTile(indX+d, indY+4))) {
 						return true;
 					}
 				}
-				if (!reversePolarity) {
+				/*if (!reversePolarity) {
 					for (var dD:uint = 0; dD < doorGroup.length; dD++) {
 						if (doorGroup.members[dD].width == 64) {
 							var doorDX:uint = int(doorGroup.members[dD].x/8);
@@ -2331,7 +2314,7 @@ package {
 							}
 						}
 					}
-				}
+				}*/
 			}
 			return false;
 		}
@@ -2357,7 +2340,7 @@ package {
 					return true;
 				}
 			}
-			for (var aD:uint = 0; aD < doorGroup.length; aD++) {
+			/*for (var aD:uint = 0; aD < doorGroup.length; aD++) {
 				if (fixedX?doorGroup.members[aD].height:doorGroup.members[aD].width == 64) {
 					var doorAX:uint = int(doorGroup.members[aD].x/8);
 					var doorAY:uint = int(doorGroup.members[aD].y/8);
@@ -2366,7 +2349,7 @@ package {
 						return true;
 					}
 				}
-			}
+			}*/
 			return false;
 		}
 		
@@ -2396,7 +2379,7 @@ package {
 				bodyMarkerGroup.setAll("color", 0xff0000);
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
-					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback) || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)) {
+					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback)/* || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)*/) {
 						break;
 					}
 				}
@@ -2420,10 +2403,10 @@ package {
 			}
 		}
 		
-		public function raytraceDoorCallback(spr1:FlxSprite, spr2:FlxObject):void {
+		/*public function raytraceDoorCallback(spr1:FlxSprite, spr2:FlxObject):void {
 			setGrappleOkay();
 			raytraceCallback(spr1, spr2);
-		}
+		}*/
 		
 		public function setGrappleOkay():void {
 			markerEnd.color = 0xffffff;
