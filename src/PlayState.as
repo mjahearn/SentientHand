@@ -1579,6 +1579,7 @@ package {
 						//if (bodyMode) {
 							lastTouchedWood = false;
 						}
+						controlDirs = new Array();
 						detachHandFromBody();
 						//bodyMode = false;
 						cannonMode = false;
@@ -1630,6 +1631,7 @@ package {
 			} else {
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
+						controlDirs = new Array();
 						//bodyMode = true;
 						attachHandToBody();
 						lastTouchedWood = false;
@@ -1654,6 +1656,7 @@ package {
 							Registry.neverEnteredBodyOrCannon = false;
 						}
 					} else if (enteringCannon) {
+						controlDirs = new Array();
 						cannonMode = true;
 						lastTouchedWood = false;
 						handFalling = false;
@@ -1811,7 +1814,6 @@ package {
 				}
 			}
 			*/
-			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 			//FlxG.collide(level, hand/*, levelHandCallback*/);

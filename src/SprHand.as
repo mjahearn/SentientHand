@@ -1,7 +1,6 @@
 package
 {
-	import org.flixel.FlxPoint;
-	import org.flixel.FlxSprite;
+	import org.flixel.*;
 	
 	public class SprHand extends FlxSprite
 	{
