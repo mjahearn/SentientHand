@@ -252,6 +252,13 @@ package {
 		public var camTag:FlxSprite = new FlxSprite();
 		public var camAngle:Number = new Number;
 		
+		//private var testHint:SprHint;
+		
+		private var hintArrowKeysGroup:FlxGroup;
+		private var dripperEvent:EventTimer;
+		private var dripGroup:FlxGroup;
+		private var roachGroup:FlxGroup;
+		
 		override public function create():void {
 			
 			ambientSteamSound.volume = 0.5;
@@ -365,7 +372,9 @@ package {
 					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
 				}
 			}
-
+			
+			addhints();
+			
 			/* Level */
 			
 			//level = new FlxTilemap();
@@ -678,6 +687,8 @@ package {
 			markerEndGroup.add(markerEnd);
 			add(markerEndGroup);
 			
+			addDripperEvent();
+			
 			// Hand
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional,true).members[0];
 			add(hand);
@@ -747,9 +758,62 @@ package {
 			
 			FlxG.camera.follow(camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
 			
+			/*
+			// TEST HINT
+			testHint = new SprHint();
+			testHint.y -= testHint.width;
+			testHint.angle = 30;
+			testHint.text = "Press the #M key to do something. No fucking clue what."
+			add(testHint);
+			*/
+			
+			addRoaches();
+			
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
 			add(overlay);
+		}
+		
+		private function addhints():void {
+			
+			var i:uint;
+			var tmpHint:SprHint;
+			
+			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level,true);
+			for (i = 0; i < hintArrowKeysGroup.length; i++) {
+				tmpHint = hintArrowKeysGroup.members[i];
+				tmpHint.text = "SCRAP is incapable of pressing ARROW KEYS to MOVE.";
+			}
+			add(hintArrowKeysGroup);
+		}
+		
+		private function addDripperEvent():void {
+			
+			dripGroup = new FlxGroup();
+			var tmpMaybeDrip:Function = function():void {
+				
+				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,level,false);
+				
+				for (var i:uint = 0; i < tmpDripGroup.length; i++) {
+					var tmpDrip:SprDrip = tmpDripGroup.members[i];
+					if (maybe()) {
+						add(tmpDrip);
+						dripGroup.add(tmpDrip);
+					}
+				}
+			}
+			
+			dripperEvent = new EventTimer(2.2,tmpMaybeDrip);
+			add(dripperEvent);
+		}
+		
+		private function maybe():Boolean {
+			return Math.random()*2 > 1;
+		}
+		
+		private function addRoaches():void {
+			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,level,false);
+			add(roachGroup);
 		}
 		
 		override public function update():void {
@@ -1819,8 +1883,14 @@ package {
 			}
 			*/
 			
+			for (var mmmmm:uint = 0; mmmmm < roachGroup.length; mmmmm++) {
+				var tmpRoach:SprRoach = roachGroup.members[mmmmm];
+				tmpRoach.goAwayFromSprite(hand);
+			}
+			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
+			FlxG.collide(dripGroup,levelFunctional);
 			//FlxG.collide(level, hand/*, levelHandCallback*/);
 			FlxG.collide(doorGroup, hand, doorCallback);
 			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on

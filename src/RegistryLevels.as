@@ -15,6 +15,11 @@ package
 		public static const kSpawnDoor:Array = [10,11];
 		public static const kSpawnExitArrow:Array = [12];
 		
+		// COSMETIC SPAWNS
+		public static const kSpawnHintArrowKeys:Array = [293];
+		public static const kSpawnDrip:Array = [294];
+		public static const kSpawnRoaches:Array = [295];
+		
 		/**
 		 * The current functional tilemap.
 		 * Calls <code>currentFuncCSV</code> to determine the specific tilemap to load.

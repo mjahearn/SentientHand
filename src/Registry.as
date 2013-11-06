@@ -35,15 +35,15 @@ package {
 		*/
 		
 		
-		[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
-		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
+		//[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
+		//[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
 		/*
 		public static const levelOrder:Array = new Array(level01, level02, level03, level04, level05, level06);
 		public static const backOrder:Array = new Array(back01, back02, back03, back04, back05, back06);
 		public static const midOrder:Array = new Array(mid01, mid02, mid03, mid04, mid05, mid06);
 		*/
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
+		//public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
 		//public static var music:FlxSound = new FlxSound();
 		public static var music1:FlxSound = new FlxSound();
 		public static var music2:FlxSound = new FlxSound();
@@ -82,7 +82,7 @@ package {
 		}
 		
 		public static function update():void {
-			FlxG.log(":: MUSIC PLAYING BROKEN TEMPORARILY ::");
+			//FlxG.log(":: MUSIC PLAYING BROKEN TEMPORARILY ::");
 			if (SOUND_ON) {
 				/*				
 				if (stupid && levelNum < soundOrder.length) {
@@ -117,5 +117,9 @@ package {
 		}
 		
 		[Embed("assets/hand.png")] public static const kHandSheet:Class;
+		[Embed("assets/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;
+		[Embed("assets/spr_hint.png")] public static const kHintSheet:Class;
+		[Embed("assets/spr_drip.png")] public static const kDripSheet:Class;
+		[Embed("assets/spr_roach.png")] public static const kRoachSheet:Class;
 	}
 }
