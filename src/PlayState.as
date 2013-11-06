@@ -59,8 +59,6 @@ package {
 		public const ACTION_KEY:String = "SPACE";
 		public const BODY_KEY:String = "CONTROL";
 		
-		public var reinvigorated:Boolean;
-		
 		public var pause:PauseState;
 		
 		public var touchedExitPoint:Boolean = false;
@@ -79,8 +77,6 @@ package {
 		public var jumpHintGroup:FlxGroup = new FlxGroup();
 		
 		public var electricityNum:int = 1;
-		
-		//public var doorsDead:Boolean;
 		
 		public var level:FlxTilemap;
 		public var midground:FlxTilemap;
@@ -109,8 +105,6 @@ package {
 		public var handDir:uint;
 		
 		public var handFalling:Boolean;
-		//public var bodyMode:Boolean;
-		public var cannonMode:Boolean;
 		public var handOut:Boolean;
 		public var handIn:Boolean;
 		public var handGrab:Boolean;
@@ -134,8 +128,6 @@ package {
 		public var buttonMode:uint;
 		public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
-		//public var doorGroup:FlxGroup = new FlxGroup();
-		
 		public var electricity:FlxSprite;
 		
 		public var timeFallen:Number;
@@ -144,7 +136,7 @@ package {
 		//public var hintArrow:FlxSprite = new FlxSprite();
 		public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
-		public var exitOn:Boolean;
+		//public var exitOn:Boolean;
 		public var col:uint; //pulse color
 		
 		public var cannonGroup:FlxGroup = new FlxGroup();
@@ -282,8 +274,7 @@ package {
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
-			reinvigorated = false; //ditto
-			lastTouchedDirt = false; //ditto ditto
+			lastTouchedDirt = false; //ditto
 			//doorsDead = false;
 			controlDirs = new Array();
 			reversePolarity = false;
@@ -433,9 +424,9 @@ package {
 			
 			
 			
-			/*
+			
 			// Cannons
-			level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
+			/*level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
 			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
 			if (cannonArray) {
 				for (j = 0; j < cannonArray.length; j++) {
@@ -541,41 +532,6 @@ package {
 			add(bodyHeadGroup);
 			add(bodyArmBaseGroup);
 			
-			// Doors
-			//for (i = DOOR_MIN; i <= DOOR_MAX; i++) {
-			/*for (m = 0; m < RegistryLevels.kSpawnDoor.length; m++) {
-				i = RegistryLevels.kSpawnDoor[m];
-				levelFunctional.setTileProperties(i,FlxObject.NONE);
-				var doorArray:Array = levelFunctional.getTileInstances(i);
-				if (doorArray) {
-					for (j = 0; j < doorArray.length; j++) {
-						levelFunctional.setTileByIndex(doorArray[j],0);
-						var doorPoint:FlxPoint = pointForTile(doorArray[j],levelFunctional);
-						
-						// Decide door graphic
-						var doorSheet:Class;
-						var doorNumber:Number = i;//(i-DOOR_MIN)%2;
-						if      (doorNumber == 10) {doorSheet = doorVSheet; w = 16; h = 64;}
-						else if (doorNumber == 11) {doorSheet = doorHSheet; w = 64; h = 16;}
-						
-						var door:FlxSprite = new FlxSprite(doorPoint.x,doorPoint.y);
-						door.immovable = true;
-						door.loadGraphic(doorSheet,true,false,w,h,true);
-						//door.addAnimation("closed",[0]);
-						door.addAnimation("open",[1,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,7,8,9,10,11,12],22,false);
-						//door.play("closed");
-						door.addAnimation("pulse 1",[17,17,17,16,15,14,14,14,15,16,17,17,17],10,true);
-						door.addAnimation("pulse 2",[21,21,20,19,18,18,19,20,21,21],10,true);
-						door.frame = 13;
-						
-						
-						doorGroup.add(door);
-					}
-				}
-			}
-			add(doorGroup);*/
-			
-			
 			// Steam
 			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 			for (var b:uint = 0; b < STEAM.length; b++) {
@@ -662,7 +618,7 @@ package {
 			exitArrow.visible = false;
 			add(exitArrow);
 			exitRad = FlxG.height/2 - exitArrow.width;
-			exitOn = false;
+			//exitOn = false;
 			
 			bodyMarkerGroup = new FlxGroup();
 			bodyMarkerTimer = 0;
@@ -719,8 +675,6 @@ package {
 			
 			electricity.play("electricute");
 			
-			//bodyMode = false;
-			cannonMode = false;
 			curBody = uint.MAX_VALUE;
 			handOut = false;
 			handIn = false;
@@ -774,11 +728,11 @@ package {
 			if (RegistryLevels.num) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
-			if ((hand.isAttachedToBody() || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
-			//if ((bodyMode || cannonMode) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			if (hand.isAttachedToBody() && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
+			//if ((bodyMode || hand.isAttachedToCannon()) && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
 				time += FlxG.elapsed;
-			} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
-			//} else if ((!bodyMode && !cannonMode) && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			} else if (!hand.isAttachedToBody() && hand.velocity.x == 0 && hand.velocity.y == 0) {
+			//} else if ((!bodyMode && !hand.isAttachedToCannon()) && hand.velocity.x == 0 && hand.velocity.y == 0) {
 				time += FlxG.elapsed;
 			} else {
 				time = 0;
@@ -831,8 +785,8 @@ package {
 			var enteringCannon:Boolean = false;
 			var enteringBody:Boolean = false;
 			
-			if (!hand.isAttachedToBody() && !cannonMode) {
-			//if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody()) {
+			//if (!bodyMode && !hand.isAttachedToCannon()) {
 				curBody = handOverlapsBody();
 				curCannon = handOverlapsCannon();
 			
@@ -849,13 +803,13 @@ package {
 			
 			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
-			if (enteringBody || hand.isAttachedToBody()) {
+			if (enteringBody || hand.isAttachedToGrappler()) {
 			//if (enteringBody || bodyMode) {
 				body = bodyGroup.members[curBody];
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
 				armBase = bodyArmBaseGroup.members[curBody];
-			} else if (enteringCannon || cannonMode) {
+			} else if (enteringCannon || hand.isAttachedToCannon()) {
 				body = cannonGroup.members[curCannon];
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}
@@ -866,7 +820,7 @@ package {
 				bodyGear = bodyGearGroup.members[curBody];
 				bodyHead = bodyHeadGroup.members[curBody];
 				armBase = bodyArmBaseGroup.members[curBody];
-			} if (cannonMode) {
+			} if (hand.isAttachedToCannon()) {
 				body = cannonGroup.members[curCannon];
 				armBase = cannonArmBaseGroup.members[curCannon];
 			}*/
@@ -875,7 +829,7 @@ package {
 				touchedExitPoint = true;
 			}
 			
-			if (exitOn) {
+			/*if (exitOn) {
 				if (exitPoint.x < FlxG.camera.scroll.x || exitPoint.x >= FlxG.camera.scroll.x + FlxG.width ||
 					exitPoint.y < FlxG.camera.scroll.y || exitPoint.y >= FlxG.camera.scroll.y + FlxG.height) {
 					if (!exitArrow.visible) {
@@ -892,7 +846,7 @@ package {
 				} else if (exitArrow.visible) {
 					exitArrow.visible = false;
 				}
-			}
+			}*/
 			
 			if (Registry.cameraFollowsHand) {
 				if (onGround) {
@@ -906,16 +860,16 @@ package {
 				FlxG.camera.angle = -camTag.angle;
 			}
 			
-			if (hand.isAttachedToBody()) {
+			if (hand.isAttachedToGrappler()) {
 				if (!handOut && !handIn) {
-					rad = arrow.angle*Math.PI/180;
+					/*rad = arrow.angle*Math.PI/180;
 					var startX:Number = hand.x+hand.width/2.0;
 					var startY:Number = hand.y+hand.height/2.0;
 					var endX:Number = startX + GRAPPLE_LENGTH * Math.cos(rad);
-					var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);
+					var endY:Number = startY + GRAPPLE_LENGTH * Math.sin(rad);*/
 					
-					camTag.x += (-camTag.x + endX)/44.0;
-					camTag.y += (-camTag.y + endY)/44.0;
+					camTag.x += (-camTag.x + /*endX*/markerEnd.x)/44.0;
+					camTag.y += (-camTag.y + /*endY*/markerEnd.y)/44.0;
 					
 					// make objects glow
 					
@@ -941,7 +895,7 @@ package {
 			//camTag.y -= dScreenY;
 			*/
 			
-			/* else if (cannonMode) {
+			/* else if (hand.isAttachedToCannon()) {
 				rad = arrow.angle*Math.PI/180;
 				startX = hand.x+hand.width/2.0;
 				startY = hand.y+hand.height/2.0;
@@ -997,8 +951,8 @@ package {
 			if (pulseNum <= 7) {pulseNum = 7;}
 			col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
 			
-			if (!cannonMode && !hand.isAttachedToBody()) {
-			//if (!cannonMode && !bodyMode) {
+			if (!hand.isAttachedToBody()) {
+			//if (!hand.isAttachedToCannon() && !bodyMode) {
 				
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
@@ -1033,8 +987,8 @@ package {
 					body.color = col;
 					armBase.color = col;
 				}
-			} else if (cannonMode || hand.isAttachedToBody()) {
-			//} else if (cannonMode || bodyMode) {
+			} else if (hand.isAttachedToBody()) {
+			//} else if (hand.isAttachedToCannon() || bodyMode) {
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
 				} else if (Registry.neverAimedBodyOrCannon) {
@@ -1052,17 +1006,17 @@ package {
 			/* Begin Audio */
 			// Something's not quite right here...
 			// The hand jumped
-			if ((!hand.isAttachedToBody() && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
-			//if ((!bodyMode && !cannonMode) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+			if (!hand.isAttachedToBody() && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
+			//if ((!bodyMode && !hand.isAttachedToCannon()) && FlxG.keys.justPressed(ACTION_KEY) && /*hand.touching*/onGround && hand.facing != FlxObject.DOWN) {
 				jumpSound.play();
-			} else if ((!hand.isAttachedToBody() && !cannonMode) && hand.touching) {
-			//} else if ((!bodyMode && !cannonMode) && hand.touching) {
+			} else if (!hand.isAttachedToBody() && hand.touching) {
+			//} else if ((!bodyMode && !hand.isAttachedToCannon()) && hand.touching) {
 				jumpSound.stop();
 			}
 				
 			// The hand is crawling on wood or metal
-			if ((!hand.isAttachedToBody() &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-			//if ((!bodyMode &&!cannonMode) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+			if (!hand.isAttachedToBody() && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
+			//if ((!bodyMode &&!hand.isAttachedToCannon()) && /*hand.touching*/onGround && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
 				/*if (lastTouchedWood && !lastTouchedDirt) {
 					metalCrawlSound.stop();
 					dirtFootstepsSound.stop();
@@ -1096,8 +1050,8 @@ package {
 				dirtFootstepsSound.stop();
 			}
 			// The hand is in the body, aiming
-			if ((hand.isAttachedToBody() || cannonMode) && !handOut && !handIn) {
-			//if ((bodyMode || cannonMode) && !handOut && !handIn) {
+			if (hand.isAttachedToBody() && !handOut && !handIn) {
+			//if ((bodyMode || hand.isAttachedToCannon()) && !handOut && !handIn) {
 				grappleExtendSound.stop();
 				if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
 					robodyAimSound.play();
@@ -1106,7 +1060,7 @@ package {
 				}
 			}
 				// The hand is launching out of the body
-			else if (hand.isAttachedToBody() && (handOut || handIn)) {
+			else if (hand.isAttachedToGrappler() && (handOut || handIn)) {
 			//else if (bodyMode && (handOut || handIn)) {
 				robodyLandOnWallSound.stop();
 				robodyAimSound.stop();
@@ -1121,7 +1075,7 @@ package {
 			}
 			
 			// The body just hit a wall
-			if (hand.isAttachedToBody() && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
+			if (hand.isAttachedToGrappler() && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 			//if (bodyMode && handIn && hand.overlaps(body) && ((hand.angle < body.angle - 270) || (body.angle - 90 < hand.angle))) {
 				robodyLandOnWallSound.play();
 			}
@@ -1134,7 +1088,7 @@ package {
 			}
 			
 			// cannon fire
-			if (cannonMode && FlxG.keys.justPressed(ACTION_KEY)) {
+			if (hand.isAttachedToCannon() && FlxG.keys.justPressed(ACTION_KEY)) {
 				cannonShotSound.stop();
 				cannonShotSound.play();
 			}
@@ -1203,7 +1157,7 @@ package {
 			timeFallen += FlxG.elapsed;
 			
 			// less janky way of getting gears/heads to move with body...
-			if (hand.isAttachedToBody()) {
+			if (hand.isAttachedToGrappler()) {
 			//if (bodyMode) {
 				
 				var theta:Number = (body.angle-90)*Math.PI/180.0;
@@ -1216,8 +1170,8 @@ package {
 				bodyGear.y = body.y + body.height/2.0 - bodyGear.height/2.0 + (bodyGear.height/2.0)*Math.sin(theta-Math.PI/2.0);
 				bodyGear.angle = -hand.angle;
 			}
-			if (hand.isAttachedToBody() || cannonMode) {
-			//if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody()) {
+			//if (bodyMode || hand.isAttachedToCannon()) {
 				if (!handOut) {
 					armBase.angle = hand.angle - 180;
 				}
@@ -1251,28 +1205,26 @@ package {
 			}
 			
 			// Bring midground to life
-			if (reinvigorated) {
 				
 				// Steam
 				
 				// Spin Gears // should eventually make them accel into spin
-				var gear:FlxSprite;
-				for (var jjj:String in gearInGroup.members) {
-					gear = gearInGroup.members[jjj];
-					gear.angle += 0.5*(64.0/gear.width);
-					if (gear.angle > 360) {gear.angle = 0;}
-				}
-				for (jjj in gearOutGroup.members) {
-					gear = gearOutGroup.members[jjj];
-					gear.angle -= 0.5*(64.0/gear.width);
-					if (gear.angle < 0) {gear.angle = 360;}
-				}
+			var gear:FlxSprite;
+			for (var jjj:String in gearInGroup.members) {
+				gear = gearInGroup.members[jjj];
+				gear.angle += 0.5*(64.0/gear.width);
+				if (gear.angle > 360) {gear.angle = 0;}
+			}
+			for (jjj in gearOutGroup.members) {
+				gear = gearOutGroup.members[jjj];
+				gear.angle -= 0.5*(64.0/gear.width);
+				if (gear.angle < 0) {gear.angle = 360;}
 			}
 			
 			/* Begin Animations */
 			// The hand is not attached to a body
-			if (!hand.isAttachedToBody() && !cannonMode) {
-			//if (!bodyMode && !cannonMode) {
+			if (!hand.isAttachedToBody()) {
+			//if (!bodyMode && !hand.isAttachedToCannon()) {
 				// The hand is about to mount a body
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					//bodyTargetAngle = hand.angle;
@@ -1383,8 +1335,8 @@ package {
 			}
 			
 			// The hand is attached to a body
-			else if (hand.isAttachedToBody() || cannonMode) {
-			//else if (bodyMode || cannonMode) {
+			else if (hand.isAttachedToBody()) {
+			//else if (bodyMode || hand.isAttachedToCannon()) {
 				// The hand is idling in the body
 				if (!handOut && !handIn) {
 					hand.angle = arrow.angle - 90;
@@ -1482,8 +1434,7 @@ package {
 			
 			/* End Animations */
 			
-			if (hand.isAttachedToBody() || cannonMode) {
-			//if (bodyMode || cannonMode) {
+			if (hand.isAttachedToBody()) {
 				
 				// Fixes some bugs with grappling, maybe also redundant?
 				if (!hand.overlaps(body)) {
@@ -1575,19 +1526,20 @@ package {
 						updateRaytrace(arrow.angle);
 					}
 					if (FlxG.keys.justPressed(BODY_KEY)) {
-						if (hand.isAttachedToBody()) {
+						if (hand.isAttachedToGrappler()) {
 						//if (bodyMode) {
 							lastTouchedWood = false;
+							hand.detachFromGrappler();
+						} else if (hand.isAttachedToCannon()) {
+							hand.detachFromCannon();
 						}
 						controlDirs = new Array();
-						detachHandFromBody();
 						//bodyMode = false;
-						cannonMode = false;
 						markerEnd.visible = false;
 						setDir(hand, body.facing);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToBody()) {
+					if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToGrappler()) {
 					//if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
 						shootAngle = arrow.angle;
 						handOut = true;
@@ -1614,8 +1566,8 @@ package {
 							Registry.neverFiredBodyOrCannon = false;
 						}
 						
-					} else if (FlxG.keys.justPressed(ACTION_KEY) && cannonMode) {
-						cannonMode = false;
+					} else if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToCannon()) {
+						hand.detachFromCannon(); //change to fireCannon method
 						//rad = Math.PI*arrow.angle/180;
 						
 						setDir(hand,FlxObject.DOWN,true);
@@ -1632,8 +1584,7 @@ package {
 				if (FlxG.keys.justPressed(BODY_KEY)) {
 					if (enteringBody) {
 						controlDirs = new Array();
-						//bodyMode = true;
-						attachHandToBody();
+						hand.attachToGrappler();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -1657,7 +1608,7 @@ package {
 						}
 					} else if (enteringCannon) {
 						controlDirs = new Array();
-						cannonMode = true;
+						hand.attachToCannon();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -1722,8 +1673,7 @@ package {
 				}
 			}
 			
-			if (hand.isAttachedToBody() && !handOut && !handIn) {
-			//if (bodyMode && !handOut && !handIn) {
+			if (hand.isAttachedToGrappler() && !handOut && !handIn) {
 				theta = (arrow.angle)*Math.PI/180.0;
 				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
 				for (var n:int = 0; n <= dotNum; n++) {
@@ -1744,7 +1694,7 @@ package {
 			} else {
 				bodyMarkerGroup.visible = false;
 			}
-			if (cannonMode) {
+			if (hand.isAttachedToCannon()) {
 				theta = (arrow.angle)*Math.PI/180.0;
 				cannonMarkerLine.x = hand.x + hand.width/2.0 + (cannonMarkerLine.height/2.0)*Math.cos(theta);
 				cannonMarkerLine.y = hand.y + hand.height/2.0 - cannonMarkerLine.height/2.0 + (cannonMarkerLine.height/2.0)*Math.sin(theta);
@@ -1763,77 +1713,18 @@ package {
 				lastVel.y = hand.velocity.y;
 			}
 			
-			//var doorsJustDied:Boolean = false;
-			//if (!doorsDead) {
-			/*for (var a:int = doorGroup.length-1; a >= 0; a--) {
-				if (doorGroup.members[a].frame == 12) {
-					doorGroup.members[a].kill();
-					ambientGearsSound.stop();
-					reinvigorated = false;
-					doorsDead = true;
-					//doorsJustDied = true;
-				}
-			}*/
-			//}
-			
-			/*
-			// catch all drop doors
-			//if (doorsDead) {
-			if (doorsJustDied) {// && !doorsDead) {
-				//doorsDead = true;
-				for (a = bodyGroup.length-1; a >= 0; a--) {
-					var bbody:FlxSprite = bodyGroup.members[a];
-					var bbodyGear:FlxSprite = bodyGearGroup.members[a];
-					var bbodyHead:FlxSprite = bodyHeadGroup.members[a];
-					var barmBase:FlxSprite = bodyArmBaseGroup.members[a];
-					if (!bbody.touching) {
-						
-						bbody.acceleration.y = MAX_GRAV_VEL;
-						if (0 > bbody.angle || bbody.angle < 360) {
-							if (0 > bbody.angle) {
-								bbody.angle += 5;
-							} else {
-								bbody.angle -= 5;
-							}
-						}
-						
-						var btheta:Number = (bbody.angle-90)*Math.PI/180.0;
-						bbodyHead.x = bbody.x + bbody.width/2.0 - bbodyHead.width/2.0 + (bbodyHead.height*1.5)*Math.cos(btheta);
-						bbodyHead.y = bbody.y + bbody.height/2.0 - bbodyHead.height/2.0 + (bbodyHead.height*1.5)*Math.sin(btheta);
-						bbodyHead.angle = bbody.angle;
-						bbodyGear.x = bbody.x + bbody.width/2.0 - bbodyGear.width/2.0 + (bbodyGear.width/2.0)*Math.cos(btheta-Math.PI/2.0);
-						bbodyGear.y = bbody.y + bbody.height/2.0 - bbodyGear.height/2.0 + (bbodyGear.width/2.0)*Math.sin(btheta-Math.PI/2.0);
-						barmBase.x = bbody.x;
-						barmBase.y = bbody.y;
-					}
-					
-					if (bbody.justTouched(FlxObject.DOWN)) {
-						bbody.facing = FlxObject.DOWN;
-						bbody.angle = 0;
-					}
-				}
-			}
-			*/
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
-			//FlxG.collide(level, hand/*, levelHandCallback*/);
-			//FlxG.collide(doorGroup, hand, doorCallback);
-			//FlxG.overlap(hand, steams, handSteamOverlap); //uncomment to turn steam pushing back on
-			//FlxG.collide(flapGroup, hand, doorCallback);
-			//FlxG.collide(level, bodyGroup);
-			//FlxG.collide(doorGroup, bodyGroup);
-			/*FlxG.collide(markerEnd, level);
-			FlxG.collide(markerEnd, doorGroup);*/
 			
 			FlxG.collide(levelFunctional,hand);
 			FlxG.collide(levelFunctional,bodyGroup);
 			
-			if (FlxG.collide(markerEnd, /*level*/levelFunctional)/* || FlxG.collide(markerEnd, doorGroup)*/) {
+			if (FlxG.collide(markerEnd, levelFunctional)) {
 				markerEnd.velocity.x = 0;
 				markerEnd.velocity.y = 0;
 			}
 			correctMetal();
-			if (!hand.isAttachedToBody() && onGround) {
+			if (!hand.isAttachedToGrappler() && onGround) {
 			//if (!bodyMode && onGround) {
 				if (isNothingInDir(hand.facing, 4)) {
 					if (touchingMetal) { //was the player touching metal the last frame?
@@ -1890,8 +1781,7 @@ package {
 			}
 			
 			if (FlxG.paused) {
-				if (hand.isAttachedToBody() || cannonMode) {
-				//if (bodyMode || cannonMode) {
+				if (hand.isAttachedToBody()) {
 					pause.con.play("attached");
 				} else {
 					pause.con.play("detached");
@@ -1919,7 +1809,7 @@ package {
 		}
 		
 		public function metalStuff(ind:uint, spr:FlxSprite):void {
-			if (spr == hand && !cannonMode) {
+			if (spr == hand && !hand.isAttachedToCannon()) {
 				handMetalFlag = ind;
 				lastTouchedWood = false;
 				fixGravity(spr);
@@ -1942,7 +1832,7 @@ package {
 			if (spr == hand) {
 				handWoodFlag = ind;
 				lastTouchedWood = true;
-				if (!hand.isAttachedToBody()) {
+				if (!hand.isAttachedToGrappler()) {
 				//if (!bodyMode) {
 					fixGravity(spr);
 				}
@@ -1953,18 +1843,6 @@ package {
 			lastTouchedDirt = true;
 			woodCallback(tile,spr);
 		}
-		
-		/*public function doorCallback(spr1:FlxSprite, spr2:FlxSprite):void {
-			if (spr2 == hand) {
-				handMetalFlag = 1;
-				fixGravity(spr2, true);
-				lastTouchedWood = false;
-			} else {
-				handMetalFlag = 1;
-				fixGravity(spr1, true);
-				lastTouchedWood = false;
-			}
-		}*/
 		
 		/*
 		public function hitUp(spr1:FlxSprite, spr2:FlxSprite):void {
@@ -1982,18 +1860,18 @@ package {
 		}
 		*/
 				
-		public function fixGravity(spr:FlxSprite, isDoor:Boolean=false):void {
+		public function fixGravity(spr:FlxSprite):void {
 			var hitOnlyWood:Boolean = true;
 			if (hand.isTouching(FlxObject.DOWN)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.DOWN);
-			} else if (hand.isTouching(FlxObject.UP) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.UP,4))) { //max was originally 3, but I think that was a typo from back when there were corners
+			} else if (hand.isTouching(FlxObject.UP) && isMetalInDir(hand,FlxObject.UP,4)) { //max was originally 3, but I think that was a typo from back when there were corners
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.UP);
-			} else if (hand.isTouching(FlxObject.LEFT) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.LEFT,4))) {
+			} else if (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand,FlxObject.LEFT,4)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.LEFT);
-			} else if (hand.isTouching(FlxObject.RIGHT) && ((isDoor && !reversePolarity) || isMetalInDir(hand,FlxObject.RIGHT,4))) {
+			} else if (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand,FlxObject.RIGHT,4)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.RIGHT);
 			}
@@ -2146,36 +2024,6 @@ package {
 			steamTimer = 0;
 			
 			steamsNumber++;
-			if (buttonStateArray.indexOf(false) == -1) {
-				/*for (var a:int = 0; a < doorGroup.length; a++) {
-					doorGroup.members[a].play("open");
-				}*/
-				exitOn = true;
-				//exitArrow.visible = true;
-				
-				for (var mn:int = 0; mn < steams.length; mn++) {//(var m:String in steams.members) {
-					//if (steamsNumberArray[mn] < steamsNumber) {
-					steams.members[mn].play("idle");
-					//}
-				}
-				steamsNumber = 0;
-				
-				reinvigorated = true;
-			}
-			//buttonMode++;
-			/*if (buttonMode == 1) {
-				for (var b:uint = 0; b < buttonGroup.length; b++) {
-					if (buttonGroup.members[b].frame != BUTTON_PRESSED) {
-						buttonGroup.members[b].frame = 2;
-					}
-				}
-			} else {
-				for (var c:uint = 0; c < buttonGroup.length; c++) {
-					if (buttonGroup.members[c].frame != BUTTON_PRESSED) {
-						buttonGroup.members[c].frame = 3;
-					}
-				}
-			}*/
 			/*
 			if (reinvigorated) {
 				reinvigorated = false;
@@ -2255,68 +2103,24 @@ package {
 						return true;
 					}
 				}
-				/*if (!reversePolarity) {
-					for (var aD:uint = 0; aD < doorGroup.length; aD++) {
-						if (doorGroup.members[aD].height == 64) {
-							var doorAX:uint = int(doorGroup.members[aD].x/8);
-							var doorAY:uint = int(doorGroup.members[aD].y/8);
-							if (doorAX == indX-2 && doorAY >= indY - 7 && doorAY <= indY + 4) {
-								return true;
-							}
-						}
-					}
-				}*/
 			} else if (dir == FlxObject.RIGHT) {
 				for (var b:uint = 0; b <= max; b++) {
 					if (indY < levelFunctional.heightInTiles - b && isMetal(levelFunctional.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
-				/*if (!reversePolarity) {
-					for (var bD:uint = 0; bD < doorGroup.length; bD++) {
-						if (doorGroup.members[bD].height == 64) {
-							var doorBX:uint = int(doorGroup.members[bD].x/8);
-							var doorBY:uint = int(doorGroup.members[bD].y/8);
-							if (doorBX == indX+4 && doorBY >= indY - 7 && doorBY <= indY + 4) {
-								return true;
-							}
-						}
-					}
-				}*/
 			} else if (dir == FlxObject.UP) {
 				for (var c:uint = 0; c <= max; c++) {
 					if (indX < levelFunctional.widthInTiles - c && isMetal(levelFunctional.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
-				/*if (!reversePolarity) {
-					for (var cD:uint = 0; cD < doorGroup.length; cD++) {
-						if (doorGroup.members[cD].width == 64) {
-							var doorCX:uint = int(doorGroup.members[cD].x/8);
-							var doorCY:uint = int(doorGroup.members[cD].y/8);
-							if (doorCY == indY-2 && doorCX >= indX - 7 && doorCX <= indX + 4) {
-								return true;
-							}
-						}
-					}
-				}*/
 			} else if (dir == FlxObject.DOWN) {
 				for (var d:uint = 0; d <= max; d++) {
 					if (indX < levelFunctional.widthInTiles - d && isMetal(levelFunctional.getTile(indX+d, indY+4))) {
 						return true;
 					}
 				}
-				/*if (!reversePolarity) {
-					for (var dD:uint = 0; dD < doorGroup.length; dD++) {
-						if (doorGroup.members[dD].width == 64) {
-							var doorDX:uint = int(doorGroup.members[dD].x/8);
-							var doorDY:uint = int(doorGroup.members[dD].y/8);
-							if (doorDY == indY+4 && doorDX >= indX - 7 && doorDX <= indX + 4) {
-								return true;
-							}
-						}
-					}
-				}*/
 			}
 			return false;
 		}
@@ -2342,16 +2146,6 @@ package {
 					return true;
 				}
 			}
-			/*for (var aD:uint = 0; aD < doorGroup.length; aD++) {
-				if (fixedX?doorGroup.members[aD].height:doorGroup.members[aD].width == 64) {
-					var doorAX:uint = int(doorGroup.members[aD].x/8);
-					var doorAY:uint = int(doorGroup.members[aD].y/8);
-					if (fixedX?(doorAX == indX+(forwards?4:-2) && doorAY >= indY - 7 && doorAY <= indY + 4)
-						:(doorAY == indY+(forwards?4:-2) && doorAX >= indX - 7 && doorAX <= indX + 4)) {
-						return true;
-					}
-				}
-			}*/
 			return false;
 		}
 		
@@ -2361,15 +2155,8 @@ package {
 			setDir(hand,FlxObject.DOWN,true);
 		}
 		
-		/*public function handSteamOverlap(spr1:FlxSprite, spr2:FlxSprite):void {
-			var steam:FlxSprite = (spr1==hand)?spr2:spr1;
-			if (steam.frame > 0 && !bodyMode && !cannonMode) {
-				setDir(hand, steam.facing, true);
-			}
-		}*/
-		
 		public function updateRaytrace(angle:Number):void {
-			if (hand.isAttachedToBody()) {
+			if (hand.isAttachedToGrappler()) {
 			//if (bodyMode) {
 				markerEnd.angle = angle-90;
 				var theta:Number = angle*Math.PI/180.0;
@@ -2404,11 +2191,6 @@ package {
 				markerEnd.angle = 0;
 			}
 		}
-		
-		/*public function raytraceDoorCallback(spr1:FlxSprite, spr2:FlxObject):void {
-			setGrappleOkay();
-			raytraceCallback(spr1, spr2);
-		}*/
 		
 		public function setGrappleOkay():void {
 			markerEnd.color = 0xffffff;
@@ -2471,16 +2253,6 @@ package {
 				return d1;
 			}
 			return d2;
-		}
-		
-		private function attachHandToBody():void {
-			// any stuff we want here, like sfx etc
-			hand.attachToBody();
-		}
-		
-		private function detachHandFromBody():void {
-			// sfx etc
-			hand.detachFromBody();
 		}
 	}
 }

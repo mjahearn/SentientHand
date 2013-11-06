@@ -18,7 +18,8 @@ package
 		public static const kAnimExtendRight:String = "extend right";
 		public static const kAnimExtendLeft:String = "extend left";
 		
-		protected var _isInBody:Boolean;
+		protected var _isInGrappler:Boolean;
+		protected var _isInCannon:Boolean;
 		protected var _isLeft:Boolean;
 		protected var _isRight:Boolean;
 		
@@ -41,12 +42,15 @@ package
 			play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
 			maxVelocity = kMaxVel;
 			drag = kDrag;
+			
+			_isInGrappler = false;
+			_isInCannon = false;
 		}
 		
 		override public function update():void {
 			super.update();
 			
-			if (_isInBody) {
+			if (_isInGrappler) {
 				
 			}
 			else {
@@ -57,12 +61,24 @@ package
 			_isRight = false;
 		}
 		
-		public function attachToBody():void {
-			_isInBody = true;
+		public function attachToGrappler():void {
+			// any stuff we want here, like sfx etc
+			_isInGrappler = true;
 		}
 		
-		public function detachFromBody():void {
-			_isInBody = false;
+		public function detachFromGrappler():void {
+			// sfx etc
+			_isInGrappler = false;
+		}
+		
+		public function attachToCannon():void {
+			// sfx etc
+			_isInCannon = true;
+		}
+		
+		public function detachFromCannon():void {
+			// sfx etc
+			_isInCannon = false;
 		}
 		
 		public function moveLeft():void {
@@ -73,8 +89,16 @@ package
 			_isRight = true;
 		}
 		
+		public function isAttachedToGrappler():Boolean {
+			return _isInGrappler;
+		}
+		
+		public function isAttachedToCannon():Boolean {
+			return _isInCannon;
+		}
+		
 		public function isAttachedToBody():Boolean {
-			return _isInBody;
+			return _isInGrappler || _isInCannon;
 		}
 	}
 }
