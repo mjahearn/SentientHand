@@ -17,6 +17,9 @@ package
 		private const kAnimUnpressRed:String = "kAnimUnpressRed";
 		private const kAnimUnpressYellow:String = "kAnimUnpressYellow";
 		
+		private const kImgW:Number = 32;
+		private const kImgH:Number = 8;
+		
 		public function SprButton(X:Number=0, Y:Number=0)
 		{
 			super(X, Y, Registry.kHandSheet);
@@ -30,23 +33,23 @@ package
 			
 			if (tmpOrientation == kDown) {
 				tmpSimpleGraphic = Registry.kButtonDSheet;
-				tmpW = 32;
-				tmpH = 8;
+				tmpW = kImgW;
+				tmpH = kImgH;
 			}
 			else if (tmpOrientation == kRight) {
 				tmpSimpleGraphic = Registry.kButtonRSheet;
-				tmpW = 8;
-				tmpH = 32;
+				tmpW = kImgH;
+				tmpH = kImgW;
 			}
 			else if (tmpOrientation == kUp) {
 				tmpSimpleGraphic = Registry.kButtonUSheet;
-				tmpW = 32;
-				tmpH = 8;
+				tmpW = kImgW;
+				tmpH = kImgH;
 			}
 			else if (tmpOrientation == kLeft) {
 				tmpSimpleGraphic = Registry.kButtonLSheet;
-				tmpW = 8;
-				tmpH = 32;
+				tmpW = kImgH;
+				tmpH = kImgW;
 			}
 			else {
 				Registry.log(this+" given incorrect orientation: "+tmpOrientation);
@@ -86,7 +89,6 @@ package
 		}
 		
 		public function toggleColor():void {
-			Registry.log("toggling...");
 			isYellow = !isYellow;
 		}
 	}
