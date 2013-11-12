@@ -4,6 +4,7 @@ package {
 	
 	public class Registry {
 		
+		public static function log(tmpData:Object):void {FlxG.log(tmpData);}
 		//[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
 		//[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
@@ -73,5 +74,9 @@ package {
 		[Embed("assets/spr_hint.png")] public static const kHintSheet:Class;
 		[Embed("assets/spr_drip.png")] public static const kDripSheet:Class;
 		[Embed("assets/spr_roach.png")] public static const kRoachSheet:Class;
+		[Embed("assets/button_d.png")] public static const kButtonDSheet:Class;
+		[Embed("assets/button_l.png")] public static const kButtonLSheet:Class;
+		[Embed("assets/button_u.png")] public static const kButtonUSheet:Class;
+		[Embed("assets/button_r.png")] public static const kButtonRSheet:Class;
 	}
 }

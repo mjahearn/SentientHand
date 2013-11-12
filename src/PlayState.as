@@ -1,8 +1,9 @@
 package {
 	
-	import flashx.textLayout.formats.Float;
 	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
+	
+	import flashx.textLayout.formats.Float;
 	
 	import org.flixel.*;
 	import org.flixel.system.FlxTile;
@@ -53,8 +54,8 @@ package {
 		public const SIGN_SPAWN:uint = 33;
 		
 		//button animation frames
-		public const BUTTON_PRESSED:uint = 0;
-		public const BUTTON_INIT:uint = 1;
+		//public const BUTTON_PRESSED:uint = 0;
+		//public const BUTTON_INIT:uint = 1;
 		
 		public const ACTION_KEY:String = "SPACE";
 		public const BODY_KEY:String = "CONTROL";
@@ -123,8 +124,8 @@ package {
 		//public var handReturnedToBody:Boolean = false;
 		
 		public var buttonGroup:FlxGroup = new FlxGroup();
-		public var buttonStateArray:Array = new Array();
-		public var buttonReactionArray:Array = new Array();
+		//public var buttonStateArray:Array = new Array();
+		//public var buttonReactionArray:Array = new Array();
 		public var buttonMode:uint;
 		public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
@@ -177,11 +178,6 @@ package {
 		public static var levelMap:Class;
 		public static var midgroundMap:Class;
 		public static var backgroundMap:Class;
-		
-		[Embed("assets/button_d.png")] public var buttonDSheet:Class;
-		[Embed("assets/button_l.png")] public var buttonLSheet:Class;
-		[Embed("assets/button_u.png")] public var buttonUSheet:Class;
-		[Embed("assets/button_r.png")] public var buttonRSheet:Class;
 		
 		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
@@ -368,7 +364,7 @@ package {
 				}
 			}
 			
-			addhints();
+			addHints();
 			
 			/* Level */
 			
@@ -382,7 +378,7 @@ package {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
 			
-			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional,true).members[0];
+			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional).members[0];
 			// Exit arrow
 			exitPoint = new FlxPoint();
 			exitPoint.x = exitSprite.x;
@@ -450,7 +446,7 @@ package {
 					cannon.facing = FlxObject.DOWN;
 				}
 			}*/
-			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional,false);
+			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional);
 			for (i = 0; i < cannonGroup.length; i++) {
 				var cannon:FlxSprite = cannonGroup.members[i];
 				cannon.loadGraphic(cannonSheet);
@@ -458,7 +454,7 @@ package {
 				cannon.angle = 0;
 			}
 			add(cannonGroup);
-			cannonArmBaseGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional,true);
+			cannonArmBaseGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional);
 			for (i = 0; i < cannonArmBaseGroup.length; i++) {
 				var armBase:FlxSprite = cannonArmBaseGroup.members[i];
 				armBase.loadGraphic(armBaseSheet);
@@ -466,6 +462,7 @@ package {
 			}
 			add(cannonArmBaseGroup);
 			
+			/*
 			// Buttons
 			for (var m:uint = 0; m < RegistryLevels.kSpawnButton.length; m++) {
 				i = RegistryLevels.kSpawnButton[m];
@@ -508,11 +505,14 @@ package {
 				}
 			}
 			add(buttonGroup);
+			add(buttonBangGroup);
+			*/
+			addButtons();
 			
 			
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
-			bodyGroup = groupFromSpawn(RegistryLevels.kSpawnGrappler,FlxSprite,levelFunctional,true);
+			bodyGroup = groupFromSpawn(RegistryLevels.kSpawnGrappler,FlxSprite,levelFunctional);
 			for (i = 0; i < bodyGroup.length; i++) {
 				var body:FlxSprite = bodyGroup.members[i];
 				body.loadGraphic(bodySheet);
@@ -646,7 +646,7 @@ package {
 			addDripperEvent();
 			
 			// Hand
-			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional,true).members[0];
+			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
 			add(hand);
 			handDir = FlxObject.RIGHT;
 			setDir(hand, FlxObject.DOWN, true);
@@ -726,14 +726,79 @@ package {
 			overlay.makeGraphic(level.width,level.height,0xff000000);
 			overlay.alpha = 0;
 			add(overlay);
+			
+			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 		}
 		
-		private function addhints():void {
+		private function stupidCollisionThing():void {
+			for (var i:uint = 0; i < RegistryLevels.kSpawnEmpty.length; i++) {
+				var tmpArray:Array = levelFunctional.getTileInstances(RegistryLevels.kSpawnEmpty[i]);
+				if (tmpArray) {
+					for (var j:uint = 0; j < tmpArray.length; j++) {
+						levelFunctional.setTileByIndex(tmpArray[j],0,false);
+					}
+				}
+			}
+		}
+		
+		private function addButtons():void {
+			buttonGroup = new FlxGroup();
+			
+			var i:uint;
+			var tmpBtn:SprButton;
+			
+			// DOWN
+			var buttonDGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnButtonD,SprButton,levelFunctional);
+			for (i = 0; i < buttonDGroup.length; i++) {
+				tmpBtn = buttonDGroup.members[i];
+				tmpBtn.orientation = SprButton.kDown;
+			}
+			addMembersInGroupToGroup(buttonDGroup,buttonGroup);
+			
+			// RIGHT
+			var buttonRGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnButtonR,SprButton,levelFunctional);
+			for (i = 0; i < buttonRGroup.length; i++) {
+				tmpBtn = buttonRGroup.members[i];
+				tmpBtn.orientation = SprButton.kRight;
+			}
+			addMembersInGroupToGroup(buttonRGroup,buttonGroup);
+			
+			// UP
+			var buttonUGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnButtonU,SprButton,levelFunctional);
+			for (i = 0; i < buttonUGroup.length; i++) {
+				tmpBtn = buttonUGroup.members[i];
+				tmpBtn.orientation = SprButton.kUp;
+			}
+			addMembersInGroupToGroup(buttonUGroup,buttonGroup);
+			
+			// LEFT
+			var buttonLGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnButtonL,SprButton,levelFunctional);
+			for (i = 0; i < buttonLGroup.length; i++) {
+				tmpBtn = buttonLGroup.members[i];
+				tmpBtn.orientation = SprButton.kLeft;
+			}
+			addMembersInGroupToGroup(buttonLGroup,buttonGroup);
+			
+			for (i = 0; i < buttonGroup.length; i++) {
+				tmpBtn = buttonGroup.members[i];
+				tmpBtn.reactionToPress = buttonReaction;
+			}
+			
+			add(buttonGroup);
+		}
+		
+		private function addMembersInGroupToGroup(tmpFrom:FlxGroup,tmpTo:FlxGroup):void {
+			for (var i:uint = 0; i < tmpFrom.length; i++) {
+				tmpTo.add(tmpFrom.members[i]);
+			}
+		}
+		
+		private function addHints():void {
 			
 			var i:uint;
 			var tmpHint:SprHint;
 			
-			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level,true);
+			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level);
 			for (i = 0; i < hintArrowKeysGroup.length; i++) {
 				tmpHint = hintArrowKeysGroup.members[i];
 				tmpHint.text = "SCRAP is incapable of pressing ARROW KEYS to MOVE.";
@@ -746,7 +811,7 @@ package {
 			dripGroup = new FlxGroup();
 			var tmpMaybeDrip:Function = function():void {
 				
-				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,level,false);
+				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,level);
 				
 				for (var i:uint = 0; i < tmpDripGroup.length; i++) {
 					var tmpDrip:SprDrip = tmpDripGroup.members[i];
@@ -766,7 +831,7 @@ package {
 		}
 		
 		private function addRoaches():void {
-			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,level,false);
+			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,level);
 			add(roachGroup);
 		}
 		
@@ -1180,6 +1245,7 @@ package {
 			
 			
 			// button press, gears, steam
+			/*
 			for (var qq:uint = 0; qq < buttonGroup.length; qq++) {
 				var button:FlxSprite = buttonGroup.members[qq];
 				var buttonState:Boolean = buttonStateArray[qq];
@@ -1187,6 +1253,7 @@ package {
 					buttonPressSound.stop();
 					buttonPressSound.play();
 				}
+			*/
 				/*
 				if (button.frame == 2) {
 					ambientGearsSound.play();
@@ -1195,10 +1262,12 @@ package {
 					ambientSteamSound.play();
 				}
 				*/
-				
-			}
+				/*
+			}*/
 			
-			for (qq = 0; qq < steams.length; qq++) {
+			checkIfButtonPressedByHand();
+			
+			for (var qq:uint = 0; qq < steams.length; qq++) {
 				if (steams.members[qq].frame == 1) {
 					ambientSteamSound.stop();
 					ambientSteamSound.play();
@@ -1246,6 +1315,7 @@ package {
 			// make arrow pulse
 			exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;
 			
+			/*
 			// Press Buttons!
 			for (var mm:uint = 0; mm < buttonGroup.length; mm++) {
 				button = buttonGroup.members[mm];
@@ -1256,17 +1326,17 @@ package {
 					button.frame = BUTTON_PRESSED;
 					buttonStateArray[mm] = true;
 					buttonReactionArray[mm]();
-					//buttonBangGroup.members[mm].kill();
+					//buttonBangGroup.members[mm].kill();*/
 					/*for (var bb:String in doorGroup.members) {
 						var door:FlxSprite = doorGroup.members[bb];
 						if (door.frame == 13) {door.play("pulse 1");}
 						else if (14 <= door.frame && door.frame <= 17) {door.play("pulse 2");}
-					}*/
+					}*//*
 				} else if (button.frame == BUTTON_PRESSED && !hand.overlaps(button) && buttonState) { // should change this to make it only recognize the space where the button is visually
 					button.frame = BUTTON_INIT;
 					buttonStateArray[mm] = false;
 				}
-			}
+			}*/
 			
 			// Bring midground to life
 				
@@ -2268,7 +2338,7 @@ package {
 			bodyMarkerGroup.setAll("color", 0xffffff);
 		}
 		
-		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap,_hide:Boolean=true):FlxGroup {
+		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap):FlxGroup {
 			var _group:FlxGroup = new FlxGroup();
 			for (var i:uint = 0; i <_spawn.length; i++) {
 				var _array:Array = _map.getTileInstances(_spawn[i]);
@@ -2276,9 +2346,6 @@ package {
 					for (var j:uint = 0; j < _array.length; j++) {
 						var _point:FlxPoint = pointForTile(_array[j],_map);
 						_group.add(new _class(_point.x,_point.y));
-						if (_hide) {
-							_map.setTileByIndex(_array[j],0);
-						}
 					}
 				}
 			}
@@ -2324,6 +2391,33 @@ package {
 				return d1;
 			}
 			return d2;
+		}
+		
+		private function checkIfButtonPressedByHand():void {
+			
+			var tmpShouldToggleAll:Boolean;
+			var i:uint;
+			var tmpBtn:SprButton;
+			
+			for (i = 0; i < buttonGroup.length; i++) {
+				tmpBtn = buttonGroup.members[i];
+				if (tmpBtn.canBePressed() && hand.overlaps(tmpBtn)) {
+					tmpBtn.press();
+					tmpShouldToggleAll = true;
+				} else if (!tmpBtn.canBePressed() && !hand.overlaps(tmpBtn)) {
+					tmpBtn.unpress();
+				}
+			}
+			
+			if (tmpShouldToggleAll) {
+				for (i = 0; i < buttonGroup.length; i++) {
+					tmpBtn = buttonGroup.members[i];
+					tmpBtn.toggleColor();
+					if (!hand.overlaps(tmpBtn)) {
+						tmpBtn.unpress();
+					}
+				}
+			}
 		}
 	}
 }
