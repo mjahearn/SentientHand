@@ -3,10 +3,12 @@ package {
 	import org.flixel.*;
 	
 	public class Registry {
-		[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
-		[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
-		public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
+		public static function log(tmpData:Object):void {FlxG.log(tmpData);}
+		//[Embed("assets/SentientHandTrackA.mp3")] public static const musicBackgroundA:Class;
+		//[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
+		
+		//public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
 		public static var music1:FlxSound = new FlxSound();
 		public static var music2:FlxSound = new FlxSound();
 		public static var musicSwitch:Boolean = true;
@@ -33,7 +35,7 @@ package {
 		}
 		
 		public static function update():void {
-			FlxG.log(":: MUSIC PLAYING BROKEN TEMPORARILY ::");
+			//FlxG.log(":: MUSIC PLAYING BROKEN TEMPORARILY ::");
 			if (SOUND_ON) {
 				/*				
 				if (stupid && levelNum < soundOrder.length) {
@@ -68,5 +70,16 @@ package {
 		}
 		
 		[Embed("assets/hand.png")] public static const kHandSheet:Class;
+		[Embed("assets/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;
+		[Embed("assets/spr_hint.png")] public static const kHintSheet:Class;
+		[Embed("assets/spr_drip.png")] public static const kDripSheet:Class;
+		[Embed("assets/spr_roach.png")] public static const kRoachSheet:Class;
+		[Embed("assets/button_d.png")] public static const kButtonDSheet:Class;
+		[Embed("assets/button_l.png")] public static const kButtonLSheet:Class;
+		[Embed("assets/button_u.png")] public static const kButtonUSheet:Class;
+		[Embed("assets/button_r.png")] public static const kButtonRSheet:Class;
+		
+		[Embed("assets/ButtonPress.mp3")] private static const kButtonPressSFX:Class;
+		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
 	}
 }

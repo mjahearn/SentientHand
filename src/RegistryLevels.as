@@ -1,19 +1,29 @@
 package
 {
+	import org.flixel.FlxSound;
 	import org.flixel.FlxTilemap;
 	
 	public class RegistryLevels
 	{
 		// FUNCTIONAL SPAWNS
-		public static const kSpawnEmpty:Array = [0];
+		public static const kSpawnEmpty:Array = [0,3,4,5,6,7,8,9,10,11,12];
 		public static const kSpawnWood:Array = [1];
 		public static const kSpawnMetal:Array = [2];
 		public static const kSpawnHand:Array = [3];
 		public static const kSpawnGrappler:Array = [4];
 		public static const kSpawnLauncher:Array = [5];
-		public static const kSpawnButton:Array = [6,7,8,9];
+		//public static const kSpawnButton:Array = [6,7,8,9];
+		public static const kSpawnButtonD:Array = [6];
+		public static const kSpawnButtonU:Array = [7];
+		public static const kSpawnButtonL:Array = [8];
+		public static const kSpawnButtonR:Array = [9];
 		public static const kSpawnDoor:Array = [10,11];
 		public static const kSpawnExitArrow:Array = [12];
+		
+		// COSMETIC SPAWNS
+		public static const kSpawnHintArrowKeys:Array = [293];
+		public static const kSpawnDrip:Array = [294];
+		public static const kSpawnRoaches:Array = [295];
 		
 		/**
 		 * The current functional tilemap.
@@ -95,35 +105,52 @@ package
 		[Embed("assets/mapCSV_cosmetic_004_back.csv",mimeType="application/octet-stream")] private static const kCosm004BackSheet:Class;
 		[Embed("assets/mapCSV_cosmetic_005_back.csv",mimeType="application/octet-stream")] private static const kCosm005BackSheet:Class;
 		[Embed("assets/mapCSV_cosmetic_006_back.csv",mimeType="application/octet-stream")] private static const kCosm006BackSheet:Class;
+		// MUSIC
+		// MUSIC
+		[Embed("assets/SentientHandTrackA.mp3")] private static const kMusicAFile:Class;
+		private static const kMusicA:FlxSound = new FlxSound().loadEmbedded(kMusicAFile,true);
+		[Embed("assets/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
+		private static const kMusicB:FlxSound = new FlxSound().loadEmbedded(kMusicBFile,true);
 		
 		protected static var _num:uint = 0;
 		public static function get num():uint {
 			return _num;
 		}
 		public static function set num(setNum:uint):void {
-			_num = (setNum < funcCsvs.length) ? setNum : funcCsvs.length;
+			_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
 		}
 		public static function reset():void {
 			_num = 0;
 		}
 		
-		private static const funcCsvs:Array = [kFunc001Sheet,kFunc002Sheet,kFunc003Sheet,kFunc004Sheet,kFunc005Sheet,kFunc006Sheet];
-		private static const cosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet];
-		private static const cosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosm006MidSheet];
-		private static const cosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,kCosm006BackSheet];
+		private static const kFuncCsvs:Array = [kFunc001Sheet,kFunc002Sheet,kFunc003Sheet,kFunc004Sheet,kFunc005Sheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosm006MidSheet];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,kCosm006BackSheet];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
-			return funcCsvs[num];
+			return kFuncCsvs[num];
 		}
 		private static function get currentCosmCSVFront():Class {
-			return cosmCsvsFront[num];
+			return kCosmCsvsFront[num];
 		}
 		private static function get currentCosmCSVMid():Class {
-			return cosmCsvsMid[num];
+			return kCosmCsvsMid[num];
 		}
 		private static function get currentCosmCSVBack():Class {
-			return cosmCsvsBack[num];
+			return kCosmCsvsBack[num];
+		}
+		
+		public static function get currentMusic():FlxSound {
+			return kMusic[num];
+		}
+		public static function get previousMusic():FlxSound {
+			if (num-1 >= 0) {
+				return kMusic[num-1];
+			}
+			return null;
 		}
 	}
 }
