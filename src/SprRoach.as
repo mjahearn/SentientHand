@@ -8,9 +8,19 @@ package
 		private const kMoveAccel:Number = 1600;
 		private const kMaxVel:Number = 160;
 		
+		private const kAnimIdle:String = "kAnimIdle";
+		private const kAnimScuttle:String = "kAnimScuttle"
+		
 		public function SprRoach(X:Number=0, Y:Number=0, SimpleGraphic:Class=null)
 		{
-			super(X, Y, Registry.kRoachSheet);
+			super(X, Y);
+			loadGraphic(Registry.kRoachSheet,true,false,8,8);
+			
+			addAnimation(kAnimIdle,[Math.random()*2,Math.random()*2,Math.random()*2,Math.random()*2,Math.random()*2,Math.random()*2,Math.random()*2],Math.random()*5 + 3,true);
+			play(kAnimIdle);
+			addAnimation(kAnimScuttle,[3,4],22,true);
+			
+			angle = Math.random()*360;
 			
 			maxVelocity.x = kMaxVel;
 			maxVelocity.y = kMaxVel;
@@ -18,6 +28,7 @@ package
 		
 		public function goAwayFromSprite(tmpSprite:FlxSprite):void {
 			if (tooCloseTo(tmpSprite)) {
+				angle = 0;
 				if (tmpSprite.x < x) {
 					acceleration.x = kMoveAccel;
 				}
@@ -31,6 +42,10 @@ package
 				else if (tmpSprite.y > y) {
 					acceleration.y = kMoveAccel;
 				}
+				
+				//angle = Math.atan(velocity.y/velocity.x); something something angle
+				
+				play(kAnimScuttle);
 			}
 		}
 		

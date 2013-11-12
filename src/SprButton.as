@@ -72,6 +72,7 @@ package
 		public function press():void {
 			isPressed = true;
 			play(kAnimPress);
+			Registry.kButtonPressSound.play();
 			reaction();
 		}
 		

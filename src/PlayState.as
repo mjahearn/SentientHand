@@ -126,8 +126,8 @@ package {
 		public var buttonGroup:FlxGroup = new FlxGroup();
 		//public var buttonStateArray:Array = new Array();
 		//public var buttonReactionArray:Array = new Array();
-		public var buttonMode:uint;
-		public var buttonBangGroup:FlxGroup = new FlxGroup();
+		//public var buttonMode:uint;
+		//public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
 		
@@ -198,7 +198,6 @@ package {
 		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
-		[Embed("assets/ButtonPress.mp3")] public var buttonPressSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
 		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
 		//[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
@@ -217,7 +216,6 @@ package {
 		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
-		public var buttonPressSound:FlxSound = new FlxSound().loadEmbedded(buttonPressSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
 		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(/*doorOpenSFX);*/ambientSteamSFX,true);
 		//public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
@@ -253,6 +251,17 @@ package {
 			if (!Registry.SOUND_ON) {
 				SoundMixer.soundTransform = new SoundTransform(0);	
 			}
+			
+			var tmpCurMus:FlxSound = RegistryLevels.currentMusic;
+			var tmpPreMus:FlxSound = RegistryLevels.previousMusic;
+			//add(tmpCurMus);
+			if (tmpPreMus && tmpCurMus != tmpPreMus) {
+				add(tmpPreMus);
+				tmpPreMus.fadeOut(2.2);
+				//tmpPreMus.stop();
+			}
+			tmpCurMus.play();
+			
 			ambientSteamSound.volume = 0.5;
 			
 			/*

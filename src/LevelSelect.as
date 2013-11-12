@@ -43,32 +43,33 @@ package
 			
 			if (FlxG.keys.justPressed("A")) {
 				RegistryLevels.num = 0;
-				FlxG.switchState(new PlayState);
+				//FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			if (FlxG.keys.justPressed("B")) {
 				RegistryLevels.num = 1;
-				FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			if (FlxG.keys.justPressed("C")) {
 				RegistryLevels.num = 2;
-				FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			if (FlxG.keys.justPressed("D")) {
 				RegistryLevels.num = 3;
-				FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			if (FlxG.keys.justPressed("E")) {
 				RegistryLevels.num = 4;
-				FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			if (FlxG.keys.justPressed("F")) {
 				RegistryLevels.num = 5;
-				FlxG.switchState(new PlayState);
+				FlxG.switchState(new SplashState);
 			}
 			
 			

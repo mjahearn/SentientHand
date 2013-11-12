@@ -10,18 +10,11 @@ package
 		public function SentientHand()
 		{
 			
-			var startClass:Class;
-			if (Registry.DEBUG_ON) {
-				startClass = LevelSelect;
-			} else {
-				startClass = PlayState;
-			}
+			var startClass:Class = (Registry.DEBUG_ON) ? LevelSelect : SplashState;
 			
 			super(640,640,startClass,1,60,60,true);
 			
-			//if (Registry.DEBUG_ON) {
-				forceDebugger = true;
-			//}
+			forceDebugger = Registry.DEBUG_ON;
 		}
 	}
 }
