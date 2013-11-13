@@ -272,7 +272,7 @@ package {
 			}
 			
 			*/
-						
+			
 			levelFunctional = RegistryLevels.lvlFunc();
 			level = RegistryLevels.lvlCosmFront();
 			midground = RegistryLevels.lvlCosmMid();
@@ -292,7 +292,7 @@ package {
 			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
-			if (RegistryLevels.num >= 5) {
+			if (RegistryLevels.num == 5) { //formerly >=
 			//if (Registry.levelNum >= 5) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
@@ -380,7 +380,7 @@ package {
 			//level = new FlxTilemap();
 			//level.loadMap(new levelMap,tileset,8,8);
 			add(level);
-			FlxG.worldBounds = new FlxRect(0, 0, level.width,level.height);
+			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
 			if (Registry.extendedCamera) {
 				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, level.width+FlxG.width, level.height+FlxG.height);
 			} else {
@@ -863,7 +863,7 @@ package {
 				bodyMarkerTimer -= 1;
 			}
 				
-			if (RegistryLevels.num) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+			if (RegistryLevels.num == 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if (hand.isAttachedToBody() && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {

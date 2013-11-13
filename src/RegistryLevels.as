@@ -41,7 +41,9 @@ package
 		 */
 		public static function lvlCosmFront():FlxTilemap {
 			var map:FlxTilemap = new FlxTilemap();
-			map.loadMap(new currentCosmCSVFront,kTilesCosmFront,tileWidth,tileHeight);
+			if (currentCosmCSVFront != null) {
+				map.loadMap(new currentCosmCSVFront,kTilesCosmFront,tileWidth,tileHeight);
+			}
 			return map;
 		}
 		
@@ -51,7 +53,9 @@ package
 		 */
 		public static function lvlCosmMid():FlxTilemap {
 			var map:FlxTilemap = new FlxTilemap();
-			map.loadMap(new currentCosmCSVMid,kTilesCosmMid,tileWidth,tileHeight);
+			if (currentCosmCSVMid != null) {
+				map.loadMap(new currentCosmCSVMid,kTilesCosmMid,tileWidth,tileHeight);
+			}
 			return map;
 		}
 		
@@ -61,7 +65,9 @@ package
 		 */
 		public static function lvlCosmBack():FlxTilemap {
 			var map:FlxTilemap = new FlxTilemap();
-			map.loadMap(new currentCosmCSVBack,kTilesCosmBack,tileWidth,tileHeight);
+			if (currentCosmCSVBack != null) {
+				map.loadMap(new currentCosmCSVBack,kTilesCosmBack,tileWidth,tileHeight);
+			}
 			return map;
 		}
 		
@@ -79,6 +85,7 @@ package
 		[Embed("assets/mapCSV_functional_004.csv",mimeType="application/octet-stream")] private static const kFunc004Sheet:Class;
 		[Embed("assets/mapCSV_functional_005.csv",mimeType="application/octet-stream")] private static const kFunc005Sheet:Class;
 		[Embed("assets/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
+		[Embed("assets/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
 		// COSMETIC TILES
 		[Embed("assets/level-tiles.png")] public static const kTilesCosmFront:Class;
 		[Embed("assets/midground-tiles.png")] public static const kTilesCosmMid:Class;
@@ -123,11 +130,11 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFunc001Sheet,kFunc002Sheet,kFunc003Sheet,kFunc004Sheet,kFunc005Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosm006MidSheet];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,kCosm006BackSheet];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA];
+		private static const kFuncCsvs:Array = [kFunc001Sheet,kFunc002Sheet,kFunc003Sheet,kFunc004Sheet,kFunc005Sheet,kFunc006Sheet, kFuncm01Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet, kCosm006FrontSheet];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosm006MidSheet, kCosm006MidSheet];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,kCosm006BackSheet, kCosm006BackSheet];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA,kMusicA];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {

@@ -20,6 +20,7 @@ package
 			text.text += "\nD -> mapCSV_functional_004.csv";
 			text.text += "\nE -> mapCSV_functional_005.csv";
 			text.text += "\nF -> mapCSV_functional_006.csv";
+			text.text += "\nG -> mapCSV_functional_m01.csv";
 			add(text);
 			
 			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
@@ -69,6 +70,11 @@ package
 			
 			if (FlxG.keys.justPressed("F")) {
 				RegistryLevels.num = 5;
+				FlxG.switchState(new SplashState);
+			}
+			
+			if (FlxG.keys.justPressed("G")) {
+				RegistryLevels.num = 6;
 				FlxG.switchState(new SplashState);
 			}
 			
