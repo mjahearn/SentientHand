@@ -78,6 +78,8 @@ package {
 		[Embed("assets/button_l.png")] public static const kButtonLSheet:Class;
 		[Embed("assets/button_u.png")] public static const kButtonUSheet:Class;
 		[Embed("assets/button_r.png")] public static const kButtonRSheet:Class;
+		[Embed("assets/splash.png")] public static const kSplashSheet:Class;
+		[Embed("assets/prompt.png")] public static const kSplashPromptSheet:Class;
 		
 		[Embed("assets/ButtonPress.mp3")] private static const kButtonPressSFX:Class;
 		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
