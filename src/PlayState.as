@@ -882,9 +882,6 @@ package {
 				time = 0;
 			}
 			
-			//if (SOUND_ON) {Registry.update();}
-			Registry.update();
-			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE") && Registry.DEBUG_ON) {
 				FlxG.switchState(new LevelSelect);
@@ -1673,6 +1670,7 @@ package {
 						//if (bodyMode) {
 							lastTouchedWood = false;
 							hand.detachFromGrappler();
+							addHeartSad();
 						} else if (hand.isAttachedToCannon()) {
 							hand.detachFromCannon();
 						}
@@ -1728,6 +1726,7 @@ package {
 					if (enteringBody) {
 						controlDirs = new Array();
 						hand.attachToGrappler();
+						addHeartHappy();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -2427,6 +2426,18 @@ package {
 					}
 				}
 			}
+		}
+		
+		private function addHeartHappy():void {
+			var $heart:SprHeart = new SprHeart(hand);
+			add($heart);
+			$heart.makeHappy();
+		}
+		
+		private function addHeartSad():void {
+			var $Heart:SprHeart = new SprHeart(hand);
+			add($Heart);
+			$Heart.makeSad();
 		}
 	}
 }

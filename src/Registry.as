@@ -34,41 +34,6 @@ package {
 			return music2;
 		}
 		
-		public static function update():void {
-			//FlxG.log(":: MUSIC PLAYING BROKEN TEMPORARILY ::");
-			if (SOUND_ON) {
-				/*				
-				if (stupid && levelNum < soundOrder.length) {
-					stupid = false;
-					Registry.music().loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-				}
-				if (levelNum != levelNumPrevious && soundOrder[levelNum] != soundOrder[levelNumPrevious]) {
-					dumb = true;
-					musicSwitch = !musicSwitch;
-					Registry.music().loadEmbedded(Registry.soundOrder[Registry.levelNum],false);
-				}
-				if (dumb) {
-					if (musicSwitch) {
-						Registry.music2.volume -= 0.0022;
-					} else {
-						Registry.music1.volume -= 0.0022;
-					}
-				}
-				if (!dumb && Registry.music().volume != 1) {
-					if (musicSwitch) {
-						Registry.music2.volume += 0.0022;
-					} else {
-						Registry.music1.volume += 0.0022;
-					}
-				}
-				
-				levelNumPrevious = levelNum;
-				
-				Registry.music().play();
-				*/
-			}
-		}
-		
 		[Embed("assets/hand.png")] public static const kHandSheet:Class;
 		[Embed("assets/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;
 		[Embed("assets/spr_hint.png")] public static const kHintSheet:Class;
@@ -80,6 +45,7 @@ package {
 		[Embed("assets/button_r.png")] public static const kButtonRSheet:Class;
 		[Embed("assets/splash.png")] public static const kSplashSheet:Class;
 		[Embed("assets/prompt.png")] public static const kSplashPromptSheet:Class;
+		[Embed("assets/spr_heart.png")] public static const kHeartSheet:Class;
 		
 		[Embed("assets/ButtonPress.mp3")] private static const kButtonPressSFX:Class;
 		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
