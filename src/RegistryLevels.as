@@ -136,7 +136,7 @@ package
 		}
 		
 		private static const kFuncCsvs:Array = [kFunc001Sheet,kFunc002Sheet,kFunc003Sheet,kFunc004Sheet,kFunc005Sheet,kFunc006Sheet, kFuncm01Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet, null];
+		private static const kCosmCsvsFront:Array = [null,null,null,null,null,/*kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,*/kCosm006FrontSheet, null];
 		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosm006MidSheet, null];
 		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,kCosm006BackSheet, null];
 		private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA,kMusicA];
