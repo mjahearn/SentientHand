@@ -79,12 +79,17 @@ package
 		// FUNCTIONAL TILES
 		[Embed("assets/tiles_functional.png")] public static const kTilesFunc:Class;
 		// FUNCTIONAL LEVELS
-		[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
+		/*[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
 		[Embed("assets/mapCSV_functional_002.csv",mimeType="application/octet-stream")] private static const kFunc002Sheet:Class;
 		[Embed("assets/mapCSV_functional_003.csv",mimeType="application/octet-stream")] private static const kFunc003Sheet:Class;
 		[Embed("assets/mapCSV_functional_004.csv",mimeType="application/octet-stream")] private static const kFunc004Sheet:Class;
-		[Embed("assets/mapCSV_functional_005.csv",mimeType="application/octet-stream")] private static const kFunc005Sheet:Class;
-		[Embed("assets/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
+		[Embed("assets/mapCSV_functional_005.csv",mimeType="application/octet-stream")] private static const kFunc005Sheet:Class;*/
+		[Embed("assets/mapCSV_Group1_Map1.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
+		[Embed("assets/mapCSV_Group1_Map2.csv",mimeType="application/octet-stream")] private static const kFunc002Sheet:Class;
+		[Embed("assets/mapCSV_Group1_Map3.csv",mimeType="application/octet-stream")] private static const kFunc003Sheet:Class;
+		[Embed("assets/mapCSV_Group1_Map4.csv",mimeType="application/octet-stream")] private static const kFunc004Sheet:Class;
+		[Embed("assets/mapCSV_Group1_Map5.csv",mimeType="application/octet-stream")] private static const kFunc005Sheet:Class;
+		[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
 		[Embed("assets/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
 		// COSMETIC TILES
 		[Embed("assets/level-tiles.png")] public static const kTilesCosmFront:Class;

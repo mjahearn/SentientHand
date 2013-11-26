@@ -135,7 +135,7 @@ package {
 		
 		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
-		public var exitArrow:FlxSprite = new FlxSprite();
+		//public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
 		//public var exitOn:Boolean;
 		public var col:uint; //pulse color
@@ -391,11 +391,13 @@ package {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
 			
+			/*
 			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional).members[0];
 			// Exit arrow
 			exitPoint = new FlxPoint();
 			exitPoint.x = exitSprite.x;
 			exitPoint.y = exitSprite.y;
+			*/
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			
@@ -631,6 +633,7 @@ package {
 			}
 			add(arms);
 			
+			/*
 			exitArrow.loadGraphic(arrowSheet,true,false,32,32,true);
 			exitArrow.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
 			exitArrow.play("excite");
@@ -639,6 +642,7 @@ package {
 			add(exitArrow);
 			exitRad = FlxG.height/2 - exitArrow.width;
 			//exitOn = false;
+			*/
 			
 			bodyMarkerGroup = new FlxGroup();
 			bodyMarkerTimer = 0;
@@ -1321,7 +1325,7 @@ package {
 			}
 			
 			// make arrow pulse
-			exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;
+			/*exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;*/
 			
 			/*
 			// Press Buttons!
