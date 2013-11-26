@@ -14,13 +14,13 @@ package
 			//var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv \n I -> tsh_level06.csv");
 			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0);
 			text.text = "Press one of the following:";
-			text.text += "\nA -> mapCSV_functional_001.csv";
-			text.text += "\nB -> mapCSV_functional_002.csv";
-			text.text += "\nC -> mapCSV_functional_003.csv";
-			text.text += "\nD -> mapCSV_functional_004.csv";
-			text.text += "\nE -> mapCSV_functional_005.csv";
-			text.text += "\nF -> mapCSV_functional_006.csv";
-			text.text += "\nG -> mapCSV_functional_m01.csv";
+			text.text += "\nA -> mapCSV_functional_m01.csv";
+			text.text += "\nB -> mapCSV_functional_001.csv";
+			text.text += "\nC -> mapCSV_functional_002.csv";
+			text.text += "\nD -> mapCSV_functional_003.csv";
+			text.text += "\nE -> mapCSV_functional_004.csv";
+			text.text += "\nF -> mapCSV_functional_005.csv";
+			text.text += "\nG -> mapCSV_functional_006.csv";
 			add(text);
 			
 			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");

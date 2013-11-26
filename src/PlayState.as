@@ -292,8 +292,7 @@ package {
 			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
-			if (RegistryLevels.num == 5) { //formerly >=
-			//if (Registry.levelNum >= 5) {
+			if (RegistryLevels.isLastLevel) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
@@ -865,7 +864,7 @@ package {
 				bodyMarkerTimer -= 1;
 			}
 				
-			if (RegistryLevels.num == 5) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
+			if (RegistryLevels.isLastLevel) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if (hand.isAttachedToBody() && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
@@ -894,7 +893,7 @@ package {
 			
 			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
-				//if (doorsDead || RegistryLevels.num == 5) {
+				//if (doorsDead || RegistryLevels.isLastLevel) {
 				//maybe replace the old doorsDead check with a check to see if the hand is in the right place?
 					goToNextLevel();
 				/*} else {
