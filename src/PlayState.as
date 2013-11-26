@@ -305,7 +305,9 @@ package {
 			/* Background */
 			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			background.scrollFactor = new FlxPoint(0.5, 0.5);
-			add(background);
+			if (background.totalTiles > 0) { // check if null
+				add(background);
+			}
 			
 			/* Midground */
 			//var midground:FlxTilemap = new FlxTilemap();
@@ -364,8 +366,8 @@ package {
 			add(trashGroup);
 			
 			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
-			midground.setTileProperties(JUMP_HINT_SPAWN,FlxObject.NONE);
 			if (jumpHintArray) {
+				midground.setTileProperties(JUMP_HINT_SPAWN,FlxObject.NONE);
 				for (j = 0; j < jumpHintArray.length; j++) {
 					midground.setTileByIndex(jumpHintArray[j],0);
 					var jumpHintPoint:FlxPoint = pointForTile(jumpHintArray[j],midground);
@@ -379,10 +381,12 @@ package {
 			
 			//level = new FlxTilemap();
 			//level.loadMap(new levelMap,tileset,8,8);
-			add(level);
+			if (level.totalTiles > 0) { // check if null
+				add(level);
+			}
 			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
 			if (Registry.extendedCamera) {
-				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, level.width+FlxG.width, level.height+FlxG.height);
+				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
 			} else {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
@@ -392,7 +396,6 @@ package {
 			exitPoint = new FlxPoint();
 			exitPoint.x = exitSprite.x;
 			exitPoint.y = exitSprite.y;
-			
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			
@@ -517,7 +520,6 @@ package {
 			add(buttonBangGroup);
 			*/
 			addButtons();
-			
 			
 			bodyGearGroup = new FlxGroup();
 			bodyHeadGroup = new FlxGroup();
@@ -663,9 +665,9 @@ package {
 			camTag = new FlxSprite(hand.x,hand.y);
 			
 			// sign
-			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
 			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
 			if (signArray) {
+				midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
 				for (j = 0; j < signArray.length; j++) {
 					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
 					midground.setTileByIndex(signArray[j],0);
@@ -732,9 +734,10 @@ package {
 			
 			addRoaches();
 			
-			overlay.makeGraphic(level.width,level.height,0xff000000);
-			overlay.alpha = 0;
-			add(overlay);
+			overlay.makeGraphic(FlxG.width,FlxG.height,0xff000000);
+			//overlay.scrollFactor = new FlxPoint(0, 0);
+			//overlay.alpha = 0;
+			//add(overlay);
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 		}
@@ -845,7 +848,6 @@ package {
 		}
 		
 		override public function update():void {
-			
 			pulseTimer += pulseDir*FlxG.elapsed;
 			if (pulseTimer >= pulseTimeMax) {pulseTimer = pulseTimeMax;}
 			if (pulseTimer <= 0) {pulseTimer = 0;}
@@ -863,7 +865,7 @@ package {
 				bodyMarkerTimer -= 1;
 			}
 				
-			if (RegistryLevels.num == 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
+			if (RegistryLevels.num == 5) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if (hand.isAttachedToBody() && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
@@ -1855,10 +1857,11 @@ package {
 				lastVel.y = hand.velocity.y;
 			}
 			
-	for (var mmmmm:uint = 0; mmmmm < roachGroup.length; mmmmm++) {
-		var tmpRoach:SprRoach = roachGroup.members[mmmmm];
-	tmpRoach.goAwayFromSprite(hand);
-}
+			for (var mmmmm:uint = 0; mmmmm < roachGroup.length; mmmmm++) {
+				var tmpRoach:SprRoach = roachGroup.members[mmmmm];
+				tmpRoach.goAwayFromSprite(hand);
+			}
+			
 			handMetalFlag = uint.MAX_VALUE;
 			handWoodFlag = uint.MAX_VALUE;
 	
