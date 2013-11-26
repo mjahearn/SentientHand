@@ -23,6 +23,8 @@ package
 		protected var _isLeft:Boolean;
 		protected var _isRight:Boolean;
 		
+		//protected var _heart:FlxSprite;
+		
 		public function SprHand(X:Number=0, Y:Number=0, SimpleGraphic:Class=null)
 		{
 			super(X, Y);
@@ -39,13 +41,38 @@ package
 			addAnimation(kAnimExtendRight,[35,36],22,false);
 			addAnimation(kAnimExtendLeft,[40,41],22,false);
 			
-			play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
+			//play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
+			play(kAnimFallRight);
 			maxVelocity = kMaxVel;
 			drag = kDrag;
+			
+			/*
+			_heart = new FlxSprite().loadGraphic(Registry.kHeartSheet,true,false,32,32);
+			hideHeart();
+			*/
 			
 			_isInGrappler = false;
 			_isInCannon = false;
 		}
+		
+		/*
+		private function hideHeart():void {
+			_heart.visible = false;
+		}
+		
+		private function showHeart():void {
+			_heart.visible = true;
+		}
+		
+		override public function draw():void {
+			super.draw();
+			if (_heart.visible) {
+				_heart.x = x;
+				_heart.y = y;
+				_heart.draw();
+			}
+		}
+		*/
 		
 		override public function update():void {
 			super.update();

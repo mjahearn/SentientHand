@@ -135,7 +135,7 @@ package {
 		
 		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
-		public var exitArrow:FlxSprite = new FlxSprite();
+		//public var exitArrow:FlxSprite = new FlxSprite();
 		public var exitRad:Number;
 		//public var exitOn:Boolean;
 		public var col:uint; //pulse color
@@ -292,7 +292,7 @@ package {
 			reversePolarity = false;
 			
 			FlxG.bgColor = 0xff000000;
-			if (RegistryLevels.isLastLevel) {
+			if (RegistryLevels.isLastLevel()) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
 				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
@@ -390,11 +390,13 @@ package {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
 			
+			/*
 			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional).members[0];
 			// Exit arrow
 			exitPoint = new FlxPoint();
 			exitPoint.x = exitSprite.x;
 			exitPoint.y = exitSprite.y;
+			*/
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			
@@ -630,6 +632,7 @@ package {
 			}
 			add(arms);
 			
+			/*
 			exitArrow.loadGraphic(arrowSheet,true,false,32,32,true);
 			exitArrow.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
 			exitArrow.play("excite");
@@ -638,6 +641,7 @@ package {
 			add(exitArrow);
 			exitRad = FlxG.height/2 - exitArrow.width;
 			//exitOn = false;
+			*/
 			
 			bodyMarkerGroup = new FlxGroup();
 			bodyMarkerTimer = 0;
@@ -864,7 +868,7 @@ package {
 				bodyMarkerTimer -= 1;
 			}
 				
-			if (RegistryLevels.isLastLevel) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
+			if (RegistryLevels.isLastLevel()) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
 			
 			if (hand.isAttachedToBody() && !handOut && (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)) {
@@ -883,9 +887,6 @@ package {
 				time = 0;
 			}
 			
-			//if (SOUND_ON) {Registry.update();}
-			Registry.update();
-			
 			// escape for debugging (should remove later)
 			if (FlxG.keys.justPressed("ESCAPE") && Registry.DEBUG_ON) {
 				FlxG.switchState(new LevelSelect);
@@ -893,7 +894,7 @@ package {
 			
 			if (hand.x > FlxG.worldBounds.right || hand.x < FlxG.worldBounds.left ||
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
-				//if (doorsDead || RegistryLevels.isLastLevel) {
+				//if (doorsDead || RegistryLevels.isLastLevel()) {
 				//maybe replace the old doorsDead check with a check to see if the hand is in the right place?
 					goToNextLevel();
 				/*} else {
@@ -1323,7 +1324,7 @@ package {
 			}
 			
 			// make arrow pulse
-			exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;
+			/*exitArrow.alpha = (6.0 - exitArrow.frame)/6.0 + 0.22;*/
 			
 			/*
 			// Press Buttons!
@@ -1674,6 +1675,7 @@ package {
 						//if (bodyMode) {
 							lastTouchedWood = false;
 							hand.detachFromGrappler();
+							addHeartSad();
 						} else if (hand.isAttachedToCannon()) {
 							hand.detachFromCannon();
 						}
@@ -1729,6 +1731,7 @@ package {
 					if (enteringBody) {
 						controlDirs = new Array();
 						hand.attachToGrappler();
+						addHeartHappy();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -2429,6 +2432,18 @@ package {
 					}
 				}
 			}
+		}
+		
+		private function addHeartHappy():void {
+			var $heart:SprHeart = new SprHeart(hand);
+			add($heart);
+			$heart.makeHappy();
+		}
+		
+		private function addHeartSad():void {
+			var $Heart:SprHeart = new SprHeart(hand);
+			add($Heart);
+			$Heart.makeSad();
 		}
 	}
 }
