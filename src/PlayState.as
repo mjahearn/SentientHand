@@ -827,11 +827,35 @@ package {
 			for (i = 0; i < hintArrowKeysGroup.length; i++) {
 				tmpHint = hintArrowKeysGroup.members[i];
 				tmpHint.text = "SCRAP is incapable of pressing ARROW KEYS to MOVE.";
+				tmpHint.angle = 30;
 			}
 			add(hintArrowKeysGroup);
 		}
 		
 		private function addDripperEvent():void {
+			
+			/*
+			dripGroup = new FlxGroup();
+			
+			var $dripMarkerGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,FlxSprite,level);
+			for (var i:uint = 0; i < $dripMarkerGroup.length; i++) {
+				var $spr:FlxSprite = $dripMarkerGroup.members[i];
+				
+				var $drip:SprDrip = new SprDrip($spr.x,$spr.y);
+				dripGroup.add($drip);
+				
+				var $maybeDrip:Function = function():void {
+					//if (!$drip.alive && maybe()) {
+						$drip.x = $spr.x;
+						$drip.y = $spr.y;
+						add($drip);
+					//}
+				};
+				
+				var $dripperTimer:EventTimer = new EventTimer(1.1 + Math.random()*2.2,$maybeDrip);
+				add($dripperTimer);
+			}*/
+			
 			
 			dripGroup = new FlxGroup();
 			var tmpMaybeDrip:Function = function():void {
@@ -849,6 +873,7 @@ package {
 			
 			dripperEvent = new EventTimer(2.2,tmpMaybeDrip);
 			add(dripperEvent);
+			
 		}
 		
 		private function maybe():Boolean {
