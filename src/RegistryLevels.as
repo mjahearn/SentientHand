@@ -126,9 +126,9 @@ package
 		private static const kMusicB:FlxSound = new FlxSound().loadEmbedded(kMusicBFile,true);
 		
 		[Embed("assets/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
-		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile);
-		[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
-		private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile);
+		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile,true);
+		//[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
+		//private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile,true);
 		
 		protected static var _num:uint = 0;
 		public static function get num():uint {

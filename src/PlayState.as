@@ -270,7 +270,7 @@ package {
 			}
 			$curMus.play();
 			$curMusOverlay.play();
-			hideMusicOverlay();
+			hideMusicOverlayInstantly();
 			
 			ambientSteamSound.volume = 0.5;
 			
@@ -2479,12 +2479,42 @@ package {
 			$Heart.makeSad();
 		}
 		
-		private function hideMusicOverlay():void {
+		private function hideMusicOverlayInstantly():void {
 			musOverlay.volume = 0;
 		}
 		
-		private function showMusicOverlay():void {
+		private function hideMusicOverlay():void {
+			//musOverlay.volume = 0;
+			
+			var $timer:EventTimer;
+			
 			musOverlay.volume = 1;
+			var $event:Function = function():void {
+				remove($timer);
+				musOverlay.volume = 0;
+			};
+			var $pulse:Function = function():void {
+				musOverlay.volume -= 0.05;
+			};
+			$timer = new EventTimer(0.22,$event,false,true,$pulse);
+			add($timer);
+		}
+		
+		private function showMusicOverlay():void {
+			//musOverlay.volume = 1;
+			
+			var $timer:EventTimer;
+			
+			musOverlay.volume = 0;
+			var $event:Function = function():void {
+				remove($timer);
+				musOverlay.volume = 1;
+			};
+			var $pulse:Function = function():void {
+				musOverlay.volume += 0.05;
+			};
+			$timer = new EventTimer(0.22,$event,false,true,$pulse);
+			add($timer);
 		}
 	}
 }
