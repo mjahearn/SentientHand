@@ -941,7 +941,7 @@ package {
 				else if (curCannon < uint.MAX_VALUE) {enteringCannon = true;}
 			}
 			
-			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing, 4)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
+			var touchingMetal:Boolean = (onGround && isMetalInDir(hand, hand.facing/*, 4*/)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
 			if (enteringBody || hand.isAttachedToGrappler()) {
 			//if (enteringBody || bodyMode) {
@@ -1923,7 +1923,7 @@ package {
 					} else {
 						setDir(hand,FlxObject.DOWN,true);
 					}
-				} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand, hand.facing, 4)) { //replacing || lastTouchedWood
+				} else if (hand.facing != FlxObject.DOWN && !isMetalInDir(hand, hand.facing/*, 4*/)) { //replacing || lastTouchedWood
 					setDir(hand,FlxObject.DOWN,true);
 				}
 			}
@@ -2020,13 +2020,13 @@ package {
 			if (hand.isTouching(FlxObject.DOWN)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.DOWN);
-			} else if (hand.isTouching(FlxObject.UP) && isMetalInDir(hand,FlxObject.UP,4)) { //max was originally 3, but I think that was a typo from back when there were corners
+			} else if (hand.isTouching(FlxObject.UP) && isMetalInDir(hand,FlxObject.UP/*, 4*/)) { //max was originally 3, but I think that was a typo from back when there were corners
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.UP);
-			} else if (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand,FlxObject.LEFT,4)) {
+			} else if (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand,FlxObject.LEFT/*, 4*/)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.LEFT);
-			} else if (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand,FlxObject.RIGHT,4)) {
+			} else if (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand,FlxObject.RIGHT/*, 4*/)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.RIGHT);
 			}
@@ -2240,37 +2240,58 @@ package {
 			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
 				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
 				of the hand against the surface, we must do this check for the other corner to compensate */
-				if ((hand.isTouching(FlxObject.UP) && isMetalInDir(hand, FlxObject.UP, 4)) 
-				 || (hand.isTouching(FlxObject.DOWN) && isMetalInDir(hand, FlxObject.DOWN, 4))
-				 || (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand, FlxObject.LEFT, 4))
-				 || (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand, FlxObject.RIGHT, 4))) {
+				if ((hand.isTouching(FlxObject.UP) && isMetalInDir(hand, FlxObject.UP/*, 4*/)) 
+				 || (hand.isTouching(FlxObject.DOWN) && isMetalInDir(hand, FlxObject.DOWN/*, 4*/))
+				 || (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand, FlxObject.LEFT/*, 4*/))
+				 || (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand, FlxObject.RIGHT/*, 4*/))) {
 					metalStuff(1, hand);
 				}
 			}
 		}
 		
-		public function isMetalInDir(spr:FlxSprite, dir:uint, max:uint):Boolean {
+		public function isMetalInDir(spr:FlxSprite, dir:uint):Boolean {
 			var indX:uint = int(spr.x/8);
 			var indY:uint = int(spr.y/8);
+			var max:int;
 			if (dir == FlxObject.LEFT) {
+				if (spr.y % 8 == 0) {
+					max = 3;
+				} else {
+					max = 4;
+				}
 				for (var a:uint = 0; a <= max; a++) {
 					if (indY < levelFunctional.heightInTiles - a && isMetal(levelFunctional.getTile(indX-1, indY+a))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.RIGHT) {
+				if (spr.y % 8 == 0) {
+					max = 3;
+				} else {
+					max = 4;
+				}
 				for (var b:uint = 0; b <= max; b++) {
 					if (indY < levelFunctional.heightInTiles - b && isMetal(levelFunctional.getTile(indX+4, indY+b))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.UP) {
+				if (spr.x % 8 == 0) {
+					max = 3;
+				} else {
+					max = 4;
+				}
 				for (var c:uint = 0; c <= max; c++) {
 					if (indX < levelFunctional.widthInTiles - c && isMetal(levelFunctional.getTile(indX+c, indY-1))) {
 						return true;
 					}
 				}
 			} else if (dir == FlxObject.DOWN) {
+				if (spr.x % 8 == 0) {
+					max = 3;
+				} else {
+					max = 4;
+				}
 				for (var d:uint = 0; d <= max; d++) {
 					if (indX < levelFunctional.widthInTiles - d && isMetal(levelFunctional.getTile(indX+d, indY+4))) {
 						return true;
@@ -2327,7 +2348,7 @@ package {
 						break;
 					}
 				}
-				if (FlxG.overlap(markerEnd, buttonGroup) || (markerEnd.touching != 0 && isMetalInDir(markerEnd, markerEnd.touching,4))) {
+				if (FlxG.overlap(markerEnd, buttonGroup) || (markerEnd.touching != 0 && isMetalInDir(markerEnd, markerEnd.touching/*, 4*/))) {
 					setGrappleOkay();
 				}
 				markerEnd.velocity.x = 0;
