@@ -2496,7 +2496,7 @@ package {
 			var $pulse:Function = function():void {
 				musOverlay.volume -= 0.05;
 			};
-			$timer = new EventTimer(0.22,$event,false,true,$pulse);
+			$timer = new EventTimer(0.5,$event,false,true,$pulse);
 			add($timer);
 		}
 		
@@ -2513,7 +2513,7 @@ package {
 			var $pulse:Function = function():void {
 				musOverlay.volume += 0.05;
 			};
-			$timer = new EventTimer(0.22,$event,false,true,$pulse);
+			$timer = new EventTimer(0.5,$event,false,true,$pulse);
 			add($timer);
 		}
 	}
