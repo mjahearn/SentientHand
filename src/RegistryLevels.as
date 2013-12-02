@@ -125,6 +125,11 @@ package
 		[Embed("assets/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
 		private static const kMusicB:FlxSound = new FlxSound().loadEmbedded(kMusicBFile,true);
 		
+		[Embed("assets/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
+		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile);
+		[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
+		private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile);
+		
 		protected static var _num:uint = 0;
 		public static function get num():uint {
 			return _num;
@@ -140,7 +145,9 @@ package
 		private static const kCosmCsvsFront:Array = [null,null,null,null,null,null,kCosm001FrontSheet,kCosm006FrontSheet];
 		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,null,kCosm001MidSheet,kCosm006MidSheet];
 		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,null,kCosm001BackSheet,kCosm006BackSheet];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA,kMusicA,kMusicA];
+		//private static const kMusic:Array = [kMusicA,kMusicA,kMusicB,kMusicB,kMusicB,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kMusicMain:Array = [kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
@@ -157,11 +164,21 @@ package
 		}
 		
 		public static function get currentMusic():FlxSound {
-			return kMusic[num];
+			return kMusicMain[num];
 		}
 		public static function get previousMusic():FlxSound {
 			if (num-1 >= 0) {
-				return kMusic[num-1];
+				return kMusicMain[num-1];
+			}
+			return null;
+		}
+		
+		public static function get currentMusicOverlay():FlxSound {
+			return kMusicOverlay[num];
+		}
+		public static function get previousMusicOverlay():FlxSound {
+			if (num-1 >= 0) {
+				return kMusicOverlay[num-1];
 			}
 			return null;
 		}

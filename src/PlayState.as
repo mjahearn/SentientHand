@@ -247,20 +247,30 @@ package {
 		private var dripGroup:FlxGroup;
 		private var roachGroup:FlxGroup;
 		
+		private var musOverlay:FlxSound;
+		
 		override public function create():void {
 			if (!Registry.SOUND_ON) {
 				SoundMixer.soundTransform = new SoundTransform(0);	
 			}
 			
-			var tmpCurMus:FlxSound = RegistryLevels.currentMusic;
-			var tmpPreMus:FlxSound = RegistryLevels.previousMusic;
-			//add(tmpCurMus);
-			if (tmpPreMus && tmpCurMus != tmpPreMus) {
-				add(tmpPreMus);
-				tmpPreMus.fadeOut(2.2);
-				//tmpPreMus.stop();
+			var $curMus:FlxSound = RegistryLevels.currentMusic;
+			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
+			
+			var $preMus:FlxSound = RegistryLevels.previousMusic;
+			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
+			
+			musOverlay = $curMusOverlay;
+			
+			if ($preMus && $curMus != $preMus) {
+				add($preMus);
+				add($preMusOverlay);
+				$preMus.fadeOut(2.2);
+				$preMusOverlay.fadeOut(2.2);
 			}
-			tmpCurMus.play();
+			$curMus.play();
+			$curMusOverlay.play();
+			hideMusicOverlay();
 			
 			ambientSteamSound.volume = 0.5;
 			
@@ -1676,6 +1686,7 @@ package {
 							lastTouchedWood = false;
 							hand.detachFromGrappler();
 							addHeartSad();
+							hideMusicOverlay();
 						} else if (hand.isAttachedToCannon()) {
 							hand.detachFromCannon();
 						}
@@ -1732,6 +1743,7 @@ package {
 						controlDirs = new Array();
 						hand.attachToGrappler();
 						addHeartHappy();
+						showMusicOverlay();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -2465,6 +2477,14 @@ package {
 			var $Heart:SprHeart = new SprHeart(hand);
 			add($Heart);
 			$Heart.makeSad();
+		}
+		
+		private function hideMusicOverlay():void {
+			musOverlay.volume = 0;
+		}
+		
+		private function showMusicOverlay():void {
+			musOverlay.volume = 1;
 		}
 	}
 }
