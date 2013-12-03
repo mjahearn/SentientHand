@@ -1067,7 +1067,7 @@ package {
 			//hint.angle = hand.angle;
 			
 			// marker glow (for hand overlapping)
-			hand.color = 0xffffff;
+			hand.color = reversePolarity?0xff0000:0xffffff;
 			for (var mmm:String in bodyGroup.members) {
 				bodyGroup.members[mmm].color = 0xaaaaaa;
 				bodyArmBaseGroup.members[mmm].color = 0xffffff;
@@ -1089,7 +1089,8 @@ package {
 			var pulseNum:Number = int((pulseTimer/pulseTimeMax)*5) + 7;
 			if (pulseNum >= 15) {pulseNum = 15;}
 			if (pulseNum <= 7) {pulseNum = 7;}
-			col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
+			//col = pulseNum*Math.pow(16,4) + pulseNum*Math.pow(16,5);
+			col = pulseNum*Math.pow(16,2) + pulseNum*Math.pow(16,3);
 			
 			if (!hand.isAttachedToBody()) {
 			//if (!hand.isAttachedToCannon() && !bodyMode) {
@@ -2340,7 +2341,7 @@ package {
 				markerEnd.y = hand.y;
 				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
 				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
-				markerEnd.color = Math.min(col*2, 0xff0000);
+				markerEnd.color = 0; //Math.min(col*2, 0x00ff00/*0xff0000*/);
 				bodyMarkerGroup.setAll("color", 0xff0000);
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
