@@ -91,11 +91,15 @@ package
 		public function attachToGrappler():void {
 			// any stuff we want here, like sfx etc
 			_isInGrappler = true;
+			//Registry.kAttachHappySound.play();
+			FlxG.play(Registry.kAttachHappySFX);
 		}
 		
 		public function detachFromGrappler():void {
 			// sfx etc
 			_isInGrappler = false;
+			//Registry.kAttachSadSound.play();
+			FlxG.play(Registry.kAttachSadSFX);
 		}
 		
 		public function attachToCannon():void {

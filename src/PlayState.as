@@ -247,20 +247,30 @@ package {
 		private var dripGroup:FlxGroup;
 		private var roachGroup:FlxGroup;
 		
+		private var musOverlay:FlxSound;
+		
 		override public function create():void {
 			if (!Registry.SOUND_ON) {
 				SoundMixer.soundTransform = new SoundTransform(0);	
 			}
 			
-			var tmpCurMus:FlxSound = RegistryLevels.currentMusic;
-			var tmpPreMus:FlxSound = RegistryLevels.previousMusic;
-			//add(tmpCurMus);
-			if (tmpPreMus && tmpCurMus != tmpPreMus) {
-				add(tmpPreMus);
-				tmpPreMus.fadeOut(2.2);
-				//tmpPreMus.stop();
+			var $curMus:FlxSound = RegistryLevels.currentMusic;
+			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
+			
+			var $preMus:FlxSound = RegistryLevels.previousMusic;
+			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
+			
+			musOverlay = $curMusOverlay;
+			
+			if ($preMus && $curMus != $preMus) {
+				add($preMus);
+				add($preMusOverlay);
+				$preMus.fadeOut(2.2);
+				$preMusOverlay.fadeOut(2.2);
 			}
-			tmpCurMus.play();
+			$curMus.play();
+			$curMusOverlay.play();
+			hideMusicOverlayInstantly();
 			
 			ambientSteamSound.volume = 0.5;
 			
@@ -817,11 +827,35 @@ package {
 			for (i = 0; i < hintArrowKeysGroup.length; i++) {
 				tmpHint = hintArrowKeysGroup.members[i];
 				tmpHint.text = "SCRAP is incapable of pressing ARROW KEYS to MOVE.";
+				tmpHint.angle = 30;
 			}
 			add(hintArrowKeysGroup);
 		}
 		
 		private function addDripperEvent():void {
+			
+			/*
+			dripGroup = new FlxGroup();
+			
+			var $dripMarkerGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,FlxSprite,level);
+			for (var i:uint = 0; i < $dripMarkerGroup.length; i++) {
+				var $spr:FlxSprite = $dripMarkerGroup.members[i];
+				
+				var $drip:SprDrip = new SprDrip($spr.x,$spr.y);
+				dripGroup.add($drip);
+				
+				var $maybeDrip:Function = function():void {
+					//if (!$drip.alive && maybe()) {
+						$drip.x = $spr.x;
+						$drip.y = $spr.y;
+						add($drip);
+					//}
+				};
+				
+				var $dripperTimer:EventTimer = new EventTimer(1.1 + Math.random()*2.2,$maybeDrip);
+				add($dripperTimer);
+			}*/
+			
 			
 			dripGroup = new FlxGroup();
 			var tmpMaybeDrip:Function = function():void {
@@ -839,6 +873,7 @@ package {
 			
 			dripperEvent = new EventTimer(2.2,tmpMaybeDrip);
 			add(dripperEvent);
+			
 		}
 		
 		private function maybe():Boolean {
@@ -1067,7 +1102,9 @@ package {
 			//hint.angle = hand.angle;
 			
 			// marker glow (for hand overlapping)
-			hand.color = reversePolarity?0xff0000:0xffffff;
+			var poleCol:uint = reversePolarity?0xff0000:0xffffff;
+			hand.color = poleCol;
+			electricity.color = poleCol;
 			for (var mmm:String in bodyGroup.members) {
 				bodyGroup.members[mmm].color = 0xaaaaaa;
 				bodyArmBaseGroup.members[mmm].color = 0xffffff;
@@ -1138,6 +1175,15 @@ package {
 					hint.play("left X right");
 				} else {
 					hint.play("idle");
+				}
+				if (hand.isAttachedToCannon()) {
+					body.color = poleCol;
+					armBase.color = poleCol;
+				} else if (hand.isAttachedToGrappler()) {
+					body.color = poleCol;
+					armBase.color = poleCol;
+					bodyGear.color = poleCol;
+					bodyHead.color = poleCol;
 				}
 			}
 			if (FlxG.paused) {
@@ -1677,6 +1723,7 @@ package {
 							lastTouchedWood = false;
 							hand.detachFromGrappler();
 							addHeartSad();
+							hideMusicOverlay();
 						} else if (hand.isAttachedToCannon()) {
 							hand.detachFromCannon();
 						}
@@ -1733,6 +1780,7 @@ package {
 						controlDirs = new Array();
 						hand.attachToGrappler();
 						addHeartHappy();
+						showMusicOverlay();
 						lastTouchedWood = false;
 						handFalling = false;
 						onGround = true;
@@ -1827,6 +1875,9 @@ package {
 				for (var n:int = 0; n <= dotNum; n++) {
 					if (bodyMarkerGroup.length <= n) {
 						bodyMarkerGroup.add(new FlxSprite().makeGraphic(2, 2, 0xffffffff));
+						if (bodyMarkerGroup.length == 1) {
+							updateRaytrace(arrow.angle);
+						}
 					}
 					if (n > 0) {
 						bodyMarkerGroup.members[n].color = bodyMarkerGroup.members[n-1].color;
@@ -2341,8 +2392,10 @@ package {
 				markerEnd.y = hand.y;
 				markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(theta);
 				markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(theta);
-				markerEnd.color = 0; //Math.min(col*2, 0x00ff00/*0xff0000*/);
+				//markerEnd.color = Math.min(col*2, 0x00ff00/*0xff0000*/);
+				markerEnd.visible = false;
 				bodyMarkerGroup.setAll("color", 0xff0000);
+				FlxG.log("cool1");
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
 					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback)/* || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)*/) {
@@ -2370,7 +2423,8 @@ package {
 		}
 		
 		public function setGrappleOkay():void {
-			markerEnd.color = 0xffffff;
+			markerEnd.visible = true;
+			//markerEnd.color = 0xffffff;
 			bodyMarkerGroup.setAll("color", 0xffffff);
 		}
 		
@@ -2466,6 +2520,44 @@ package {
 			var $Heart:SprHeart = new SprHeart(hand);
 			add($Heart);
 			$Heart.makeSad();
+		}
+		
+		private function hideMusicOverlayInstantly():void {
+			musOverlay.volume = 0;
+		}
+		
+		private function hideMusicOverlay():void {
+			//musOverlay.volume = 0;
+			
+			var $timer:EventTimer;
+			
+			musOverlay.volume = 1;
+			var $event:Function = function():void {
+				remove($timer);
+				musOverlay.volume = 0;
+			};
+			var $pulse:Function = function():void {
+				musOverlay.volume -= 0.05;
+			};
+			$timer = new EventTimer(0.5,$event,false,true,$pulse);
+			add($timer);
+		}
+		
+		private function showMusicOverlay():void {
+			//musOverlay.volume = 1;
+			
+			var $timer:EventTimer;
+			
+			musOverlay.volume = 0;
+			var $event:Function = function():void {
+				remove($timer);
+				musOverlay.volume = 1;
+			};
+			var $pulse:Function = function():void {
+				musOverlay.volume += 0.05;
+			};
+			$timer = new EventTimer(0.5,$event,false,true,$pulse);
+			add($timer);
 		}
 	}
 }

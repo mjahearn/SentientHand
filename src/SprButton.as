@@ -1,5 +1,6 @@
 package
 {
+	import org.flixel.FlxG;
 	import org.flixel.FlxSprite;
 	
 	public class SprButton extends FlxSprite
@@ -72,7 +73,8 @@ package
 		public function press():void {
 			isPressed = true;
 			play(kAnimPress);
-			Registry.kButtonPressSound.play();
+			//Registry.kButtonPressSound.play();
+			FlxG.play(Registry.kButtonPressSFX);
 			reaction();
 		}
 		
