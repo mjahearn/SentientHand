@@ -79,16 +79,15 @@ package
 		// FUNCTIONAL TILES
 		[Embed("assets/tiles_functional.png")] public static const kTilesFunc:Class;
 		// FUNCTIONAL LEVELS
-		/*[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
-		[Embed("assets/mapCSV_functional_002.csv",mimeType="application/octet-stream")] private static const kFunc002Sheet:Class;
-		[Embed("assets/mapCSV_functional_003.csv",mimeType="application/octet-stream")] private static const kFunc003Sheet:Class;
-		[Embed("assets/mapCSV_functional_004.csv",mimeType="application/octet-stream")] private static const kFunc004Sheet:Class;
-		[Embed("assets/mapCSV_functional_005.csv",mimeType="application/octet-stream")] private static const kFunc005Sheet:Class;*/
-		[Embed("assets/mapCSV_functional_b01.csv",mimeType="application/octet-stream")] private static const kFuncb01Sheet:Class;
-		[Embed("assets/mapCSV_functional_b02.csv",mimeType="application/octet-stream")] private static const kFuncb02Sheet:Class;
-		[Embed("assets/mapCSV_functional_b03.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
-		[Embed("assets/mapCSV_functional_b04.csv",mimeType="application/octet-stream")] private static const kFuncb04Sheet:Class;
-		[Embed("assets/mapCSV_functional_b05.csv",mimeType="application/octet-stream")] private static const kFuncb05Sheet:Class;
+		[Embed("assets/mapCSV_functional_tutorial1.csv",mimeType="application/octet-stream")] private static const kFunct01Sheet:Class;
+		[Embed("assets/mapCSV_functional_tutorial2.csv",mimeType="application/octet-stream")] private static const kFunct02Sheet:Class;
+		[Embed("assets/mapCSV_functional_tutorial3.csv",mimeType="application/octet-stream")] private static const kFunct03Sheet:Class;
+		[Embed("assets/mapCSV_functional_tutorial4.csv",mimeType="application/octet-stream")] private static const kFunct04Sheet:Class;
+		[Embed("assets/mapCSV_functional_cannon1.csv",mimeType="application/octet-stream")] private static const kFuncb01Sheet:Class;
+		[Embed("assets/mapCSV_functional_plain1.csv",mimeType="application/octet-stream")] private static const kFuncb02Sheet:Class;
+		[Embed("assets/mapCSV_functional_grapple1.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
+		[Embed("assets/mapCSV_functional_cannon2.csv",mimeType="application/octet-stream")] private static const kFuncb04Sheet:Class;
+		[Embed("assets/mapCSV_functional_grapple2.csv",mimeType="application/octet-stream")] private static const kFuncb05Sheet:Class;
 		[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
 		[Embed("assets/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
 		[Embed("assets/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
@@ -141,12 +140,12 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncm01Sheet,kFunc001Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [null,null,null,null,null,null,kCosm001FrontSheet,kCosm006FrontSheet];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,null,kCosm001MidSheet,kCosm006MidSheet];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,null,kCosm001BackSheet,kCosm006BackSheet];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncm01Sheet,kFunc001Sheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [null,null,null,null,null,null,null,null,null,null,kCosm001FrontSheet,kCosm006FrontSheet];
+		private static const kCosmCsvsMid:Array = [null,null,null,null,kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,null,kCosm001MidSheet,kCosm006MidSheet];
+		private static const kCosmCsvsBack:Array = [null,null,null,null,kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,null,kCosm001BackSheet,kCosm006BackSheet];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		//private static const kMusicMain:Array = [kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain];
 		
 		// GET CSVS
@@ -185,6 +184,10 @@ package
 		
 		public static function isLastLevel():Boolean {
 			return (num >= kFuncCsvs.length-1);
+		}
+		
+		public static function get numLevels():int {
+			return kFuncCsvs.length;
 		}
 	}
 }
