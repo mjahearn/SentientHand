@@ -27,9 +27,10 @@ package
 			text.text += "\nI -> grapple2";
 			text.text += "\n\nMike's unsorted levels:\n";
 			text.text += "\nJ -> m01";
+			text.text += "\nK -> m02";
 			text.text += "\n\nOld levels:\n";
-			text.text += "\nK -> 001";
-			text.text += "\nL -> 006";
+			text.text += "\nL -> 001";
+			text.text += "\nM -> 006";
 			add(text);
 			
 			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
