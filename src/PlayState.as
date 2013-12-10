@@ -660,7 +660,7 @@ package {
 			markerEnd = new FlxSprite(0,0);
 			markerEnd.loadGraphic(/*handSheet*/Registry.kHandSheet,true,false,32,32);
 			markerEnd.frame = 21;
-			markerEnd.alpha = 0.5;
+			markerEnd.alpha = 0.75;
 			markerEnd.visible = false;
 			markerEndGroup = new FlxGroup();
 			add(bodyMarkerGroup);
@@ -1104,8 +1104,7 @@ package {
 			*/
 			
 			// marker glow (for hand overlapping)
-			var poleCol:uint = reversePolarity?0xff0000:0xffffff;
-			hand.color = poleCol;
+			hand.color = poleCol; //retrieved through get function below
 			electricity.color = poleCol;
 			for (var mmm:String in bodyGroup.members) {
 				bodyGroup.members[mmm].color = 0xaaaaaa;
@@ -1116,6 +1115,9 @@ package {
 			for (mmm in cannonGroup.members) {
 				cannonGroup.members[mmm].color = 0xaaaaaa;
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
+			}
+			for (mmm in arms.members) {
+				arms.members[mmm].color = poleCol;
 			}
 			
 			var handOnJumpGroup:Boolean = false;/*
@@ -2429,6 +2431,7 @@ package {
 		
 		public function setGrappleOkay():void {
 			markerEnd.visible = true;
+			markerEnd.color = poleCol;
 			//markerEnd.color = 0xffffff;
 			bodyMarkerGroup.setAll("color", 0xffffff);
 		}
@@ -2563,6 +2566,10 @@ package {
 			};
 			$timer = new EventTimer(0.5,$event,false,true,$pulse);
 			add($timer);
+		}
+		
+		private function get poleCol():uint {
+			return reversePolarity?0xff0000:0xffffff;
 		}
 	}
 }
