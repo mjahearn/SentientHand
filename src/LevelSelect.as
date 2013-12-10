@@ -14,17 +14,22 @@ package
 			//var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv \n I -> tsh_level06.csv");
 			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0);
 			text.text = "Press one of the following:";
+			text.text += "\n\nTutorial levels:\n";
+			text.text += "\nA -> tutorial1";
+			text.text += "\nB -> tutorial2";
+			text.text += "\nC -> tutorial3";
+			text.text += "\nD -> tutorial4";
 			text.text += "\n\nBen's unsorted levels:\n";
-			text.text += "\nA -> mapCSV_functional_b01.csv";
-			text.text += "\nB -> mapCSV_functional_b02.csv";
-			text.text += "\nC -> mapCSV_functional_b03.csv";
-			text.text += "\nD -> mapCSV_functional_b04.csv";
-			text.text += "\nE -> mapCSV_functional_b05.csv";
+			text.text += "\nE -> cannon1";
+			text.text += "\nF -> plain1";
+			text.text += "\nG -> grapple1";
+			text.text += "\nH -> cannon2";
+			text.text += "\nI -> grapple2";
 			text.text += "\n\nMike's unsorted levels:\n";
-			text.text += "\nF -> mapCSV_functional_m01.csv";
+			text.text += "\nJ -> m01";
 			text.text += "\n\nOld levels:\n";
-			text.text += "\nG -> mapCSV_functional_001.csv";
-			text.text += "\nH -> mapCSV_functional_006.csv";
+			text.text += "\nK -> 001";
+			text.text += "\nL -> 006";
 			add(text);
 			
 			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
@@ -46,7 +51,15 @@ package
 		
 		override public function update():void {
 			
-			if (FlxG.keys.justPressed("A")) {
+			for (var a:Number = 0; a < RegistryLevels.numLevels; a++) {
+				if (FlxG.keys.justPressed(String.fromCharCode(65+a))) { // works until 26
+					RegistryLevels.num = a;
+					FlxG.switchState(new SplashState);
+					break;
+				}
+			}
+			
+			/*if (FlxG.keys.justPressed("A")) {
 				RegistryLevels.num = 0;
 				//FlxG.switchState(new PlayState);
 				FlxG.switchState(new SplashState);
@@ -85,7 +98,7 @@ package
 			if (FlxG.keys.justPressed("H")) {
 				RegistryLevels.num = 7;
 				FlxG.switchState(new SplashState);
-			}
+			}*/
 			
 			
 			/*
