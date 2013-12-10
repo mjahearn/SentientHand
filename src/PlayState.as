@@ -57,8 +57,8 @@ package {
 		//public const BUTTON_PRESSED:uint = 0;
 		//public const BUTTON_INIT:uint = 1;
 		
-		public const ACTION_KEY:String = "SPACE";
-		public const BODY_KEY:String = "CONTROL";
+		public const ACTION_KEY:String = Registry.jumpSpace?"SPACE":"UP";
+		public const BODY_KEY:String = "DOWN";
 		
 		public var pause:PauseState;
 		
@@ -944,11 +944,23 @@ package {
 			if (FlxG.keys.justPressed("LEFT") && controlDirs.indexOf(FlxObject.LEFT) == -1) {
 				controlDirs.push(FlxObject.LEFT);
 			}
+			if (FlxG.keys.justPressed(ACTION_KEY) && controlDirs.indexOf(FlxObject.UP) == -1) {
+				controlDirs.push(FlxObject.UP);
+			}
+			if (FlxG.keys.justPressed(BODY_KEY) && controlDirs.indexOf(FlxObject.DOWN) == -1) {
+				controlDirs.push(FlxObject.DOWN);
+			}
 			if (FlxG.keys.justReleased("RIGHT")) {
 				controlDirsRemove(FlxObject.RIGHT);
 			}
 			if (FlxG.keys.justReleased("LEFT")) {
 				controlDirsRemove(FlxObject.LEFT);
+			}
+			if (FlxG.keys.justReleased(ACTION_KEY)) {
+				controlDirsRemove(FlxObject.UP);
+			}
+			if (FlxG.keys.justReleased(BODY_KEY)) {
+				controlDirsRemove(FlxObject.DOWN);
 			}
 			
 			//time += FlxG.elapsed;
@@ -1559,7 +1571,6 @@ package {
 				// The hand is extended
 				else if (handOut || handIn) {
 					
-					
 					if (/*FlxG.keys.SPACE*/handOut && /*!hand.touching*/ !touchingMetal) {
 						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimExtendLeft);}
 						else {hand.play(SprHand.kAnimExtendRight);} // maybe there should be an animation for extending?
@@ -1724,7 +1735,8 @@ package {
 						}
 						updateRaytrace(arrow.angle);
 					}
-					if (FlxG.keys.justPressed(BODY_KEY)) {
+					if (playerIsPressing(FlxObject.DOWN)) {
+						controlDirs = new Array();
 						if (hand.isAttachedToGrappler()) {
 						//if (bodyMode) {
 							lastTouchedWood = false;
@@ -1734,14 +1746,14 @@ package {
 						} else if (hand.isAttachedToCannon()) {
 							hand.detachFromCannon();
 						}
-						controlDirs = new Array();
 						//bodyMode = false;
 						markerEnd.visible = false;
 						setDir(hand, body.facing);
 					}
 					rad = Math.PI*arrow.angle/180;
-					if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToGrappler()) {
+					if (playerIsPressing(FlxObject.UP) && hand.isAttachedToGrappler()) {
 					//if (FlxG.keys.justPressed(ACTION_KEY) && bodyMode) {
+						controlDirsRemove(FlxObject.UP);
 						shootAngle = arrow.angle;
 						handOut = true;
 						markerEnd.visible = false;
@@ -1767,7 +1779,8 @@ package {
 							Registry.neverFiredBodyOrCannon = false;
 						}
 						
-					} else if (FlxG.keys.justPressed(ACTION_KEY) && hand.isAttachedToCannon()) {
+					} else if (playerIsPressing(FlxObject.UP) && hand.isAttachedToCannon()) {
+						controlDirsRemove(FlxObject.UP);
 						hand.detachFromCannon(); //change to fireCannon method
 						//rad = Math.PI*arrow.angle/180;
 						
@@ -1782,7 +1795,8 @@ package {
 					}
 				}
 			} else {
-				if (FlxG.keys.justPressed(BODY_KEY)) {
+				if (playerIsPressing(FlxObject.DOWN)) {
+					controlDirsRemove(FlxObject.DOWN);
 					if (enteringBody) {
 						controlDirs = new Array();
 						hand.attachToGrappler();
@@ -1860,7 +1874,8 @@ package {
 							} else if (handIsFacing(FlxObject.LEFT)) {
 								hand.acceleration.y = MOVE_ACCEL;
 							}
-						} if (FlxG.keys.justPressed(ACTION_KEY)) {
+						} if (playerIsPressing(FlxObject.UP)) {
+							controlDirsRemove(FlxObject.UP)
 							if (handIsFacing(FlxObject.UP)) {
 								jumpStuff();
 								hand.velocity.y = CEIL_JUMP_VEL;
@@ -2262,6 +2277,10 @@ package {
 				return controlDirs.indexOf(FlxObject.LEFT) > controlDirs.indexOf(FlxObject.RIGHT);
 			} else if (dir == FlxObject.RIGHT) {
 				return controlDirs.indexOf(FlxObject.LEFT) < controlDirs.indexOf(FlxObject.RIGHT);
+			} else if (dir == FlxObject.UP) {
+				return controlDirs.indexOf(FlxObject.UP) > -1;
+			} else if (dir == FlxObject.DOWN) {
+				return controlDirs.indexOf(FlxObject.DOWN) > -1;
 			}
 			return false;
 		}
@@ -2402,7 +2421,6 @@ package {
 				//markerEnd.color = Math.min(col*2, 0x00ff00/*0xff0000*/);
 				markerEnd.visible = false;
 				bodyMarkerGroup.setAll("color", 0xff0000);
-				FlxG.log("cool1");
 				while (Math.sqrt(Math.pow(markerEnd.x-hand.x, 2) + Math.pow(markerEnd.y-hand.y, 2)) < GRAPPLE_LENGTH) {
 					markerEndGroup.update();
 					if (FlxG.collide(markerEnd, /*level*/levelFunctional, raytraceCallback)/* || FlxG.collide(markerEnd, doorGroup, raytraceDoorCallback)*/) {

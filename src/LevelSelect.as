@@ -6,6 +6,7 @@ package
 	{	
 		public var camera:FlxButton;
 		public var range:FlxButton;
+		public var jump:FlxButton;
 		override public function create():void {
 			
 			//Registry.midground = Registry.midgroundMap;
@@ -48,6 +49,14 @@ package
 			}
 			add(rangeText);
 			add(range);
+			
+			var jumpText:FlxText = new FlxText(100, 300, 400, "Jump Button:");
+			jump = new FlxButton(100, 330, "Up Arrow", changeJump);
+			if (Registry.jumpSpace) {
+				jump.label.text = "Spacebar";
+			}
+			add(jumpText);
+			add(jump);
 		}
 		
 		override public function update():void {
@@ -78,6 +87,15 @@ package
 				range.label.text = "Extended";
 			} else {
 				range.label.text = "Level Bounds";
+			}
+		}
+		
+		public function changeJump():void {
+			Registry.jumpSpace = !Registry.jumpSpace;
+			if (Registry.jumpSpace) {
+				jump.label.text = "Spacebar";
+			} else {
+				jump.label.text = "Up Arrow";
 			}
 		}
 	}

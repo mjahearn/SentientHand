@@ -16,6 +16,7 @@ package {
 		public static var dumb:Boolean = false;
 		public static var cameraFollowsHand:Boolean = false;
 		public static var extendedCamera:Boolean = true;
+		public static var jumpSpace:Boolean = false;
 		
 		public static const SOUND_ON:Boolean = true;
 		public static const DEBUG_ON:Boolean = true;
