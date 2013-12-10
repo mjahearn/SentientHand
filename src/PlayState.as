@@ -50,8 +50,8 @@ package {
 		public const STEAM_MIN:uint = 19;
 		public const STEAM_MAX:uint = 30;
 		public const TRASH_SPAWN:uint = 31;
-		public const JUMP_HINT_SPAWN:uint = 32;
-		public const SIGN_SPAWN:uint = 33;
+		//public const JUMP_HINT_SPAWN:uint = 32;
+		//public const SIGN_SPAWN:uint = 33;
 		
 		//button animation frames
 		//public const BUTTON_PRESSED:uint = 0;
@@ -75,7 +75,7 @@ package {
 		public var rad:Number;
 		public var controlDirs:Array;
 		
-		public var jumpHintGroup:FlxGroup = new FlxGroup();
+		//public var jumpHintGroup:FlxGroup = new FlxGroup();
 		
 		public var electricityNum:int = 1;
 		
@@ -86,7 +86,7 @@ package {
 		//public var levelBack:FlxTilemap;
 		//public var hand:FlxSprite;
 		public var hand:SprHand;
-		public var hint:FlxSprite;
+		//public var hint:FlxSprite;
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
 		public var curCannon:uint;
@@ -163,7 +163,7 @@ package {
 		
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		//[Embed("assets/hand.png")] public var handSheet:Class;
-		[Embed("assets/hint.png")] public var hintSheet:Class;
+		//[Embed("assets/hint.png")] public var hintSheet:Class;
 		[Embed("assets/arm.png")] public var armSheet:Class;
 		[Embed("assets/body.png")] public var bodySheet:Class;
 		
@@ -374,6 +374,7 @@ package {
 			}
 			add(trashGroup);
 			
+			/*
 			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
 			if (jumpHintArray) {
 				midground.setTileProperties(JUMP_HINT_SPAWN,FlxObject.NONE);
@@ -382,7 +383,7 @@ package {
 					var jumpHintPoint:FlxPoint = pointForTile(jumpHintArray[j],midground);
 					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
 				}
-			}
+			}*/
 			
 			addHints();
 			
@@ -676,7 +677,7 @@ package {
 			setDir(hand, FlxObject.DOWN, true);
 			
 			camTag = new FlxSprite(hand.x,hand.y);
-			
+			/*
 			// sign
 			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
 			if (signArray) {
@@ -686,8 +687,8 @@ package {
 					midground.setTileByIndex(signArray[j],0);
 					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
 				}
-			}
-			
+			}*/
+			/*
 			hint = new FlxSprite(0,0);
 			hint.loadGraphic(hintSheet,true,false,64,64,true);
 			hint.addAnimation("idle",[0]);
@@ -700,7 +701,7 @@ package {
 			hint.addAnimation("left X right",[10,11,12],10,true);
 			hint.addAnimation("enter",[13,14,15],10,true);
 			hint.play("idle");
-			add(hint);
+			add(hint);*/
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
@@ -821,13 +822,13 @@ package {
 		private function addHints():void {
 			
 			var i:uint;
-			var tmpHint:SprHint;
+			var $hint:SprHint;
 			
 			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level);
 			for (i = 0; i < hintArrowKeysGroup.length; i++) {
-				tmpHint = hintArrowKeysGroup.members[i];
-				tmpHint.text = "SCRAP is incapable of pressing ARROW KEYS to MOVE.";
-				tmpHint.angle = 30;
+				$hint = hintArrowKeysGroup.members[i];
+				$hint.text = "SCRAP cannot press the LEFT or RIGHT ARROW KEYS to MOVE.";
+				$hint.angle = 0;
 			}
 			add(hintArrowKeysGroup);
 		}
@@ -1096,10 +1097,11 @@ package {
 			
 			// hint system
 			//theta = (hand.angle)*Math.PI/180.0;
-			
+			/*
 			hint.x = hand.x + hand.width - hint.width/2.0;// + (hint.width/2.0)*Math.sin(theta);
 			hint.y = hand.y + hand.height - hint.height;// - (hint.height/2.0)*Math.cos(theta);
 			//hint.angle = hand.angle;
+			*/
 			
 			// marker glow (for hand overlapping)
 			var poleCol:uint = reversePolarity?0xff0000:0xffffff;
@@ -1116,12 +1118,12 @@ package {
 				cannonArmBaseGroup.members[mmm].color = 0xffffff;
 			}
 			
-			var handOnJumpGroup:Boolean = false;
+			var handOnJumpGroup:Boolean = false;/*
 			for (var tt:uint = 0; tt < jumpHintGroup.length; tt++) {
 				if (hand.overlaps(jumpHintGroup.members[tt])) {
 					handOnJumpGroup = true;
 				}
-			}
+			}*/
 			
 			var pulseNum:Number = int((pulseTimer/pulseTimeMax)*5) + 7;
 			if (pulseNum >= 15) {pulseNum = 15;}
@@ -1131,12 +1133,12 @@ package {
 			
 			if (!hand.isAttachedToBody()) {
 			//if (!hand.isAttachedToCannon() && !bodyMode) {
-				
+				/*
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
 				} else if ((enteringBody || enteringCannon ) && Registry.neverEnteredBodyOrCannon) {
 					hint.play("Z");
-				}
+				}*/
 				// arrow hint (uncomment if you want it, I think it's kind of ugly though...)
 				/*
 				else if (Registry.neverCrawled) {
@@ -1148,12 +1150,13 @@ package {
 				}
 				*/
 				//
+				/*
 				else if (Registry.neverJumped && handOnJumpGroup && hand.angle == 90) {
 					hint.play("X");
 				} else {
 					hint.play("idle");
 				}
-				
+				*/
 				if (enteringBody) {
 					hand.color = col;
 					body.color = col;
@@ -1167,6 +1170,7 @@ package {
 				}
 			} else if (hand.isAttachedToBody()) {
 			//} else if (hand.isAttachedToCannon() || bodyMode) {
+				/*
 				if (time >= IDLE_TIME) {
 					hint.play("enter");
 				} else if (Registry.neverAimedBodyOrCannon) {
@@ -1175,7 +1179,7 @@ package {
 					hint.play("left X right");
 				} else {
 					hint.play("idle");
-				}
+				}*/
 				if (hand.isAttachedToCannon()) {
 					body.color = poleCol;
 					armBase.color = poleCol;
@@ -1186,10 +1190,11 @@ package {
 					bodyHead.color = poleCol;
 				}
 			}
+			/*
 			if (FlxG.paused) {
 				hint.play("idle");
 			}
-			
+			*/
 			/* Begin Audio */
 			// Something's not quite right here...
 			// The hand jumped
