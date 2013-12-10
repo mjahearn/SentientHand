@@ -52,99 +52,12 @@ package
 		override public function update():void {
 			
 			for (var a:Number = 0; a < RegistryLevels.numLevels; a++) {
-				if (FlxG.keys.justPressed(String.fromCharCode(65+a))) { // works until 26
+				if (FlxG.keys.justPressed(String.fromCharCode(65+a))) { // works until letter Z (26)
 					RegistryLevels.num = a;
 					FlxG.switchState(new SplashState);
 					break;
 				}
 			}
-			
-			/*if (FlxG.keys.justPressed("A")) {
-				RegistryLevels.num = 0;
-				//FlxG.switchState(new PlayState);
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("B")) {
-				RegistryLevels.num = 1;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("C")) {
-				RegistryLevels.num = 2;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("D")) {
-				RegistryLevels.num = 3;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("E")) {
-				RegistryLevels.num = 4;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("F")) {
-				RegistryLevels.num = 5;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("G")) {
-				RegistryLevels.num = 6;
-				FlxG.switchState(new SplashState);
-			}
-			
-			if (FlxG.keys.justPressed("H")) {
-				RegistryLevels.num = 7;
-				FlxG.switchState(new SplashState);
-			}*/
-			
-			
-			/*
-			if (FlxG.keys.justPressed("A")) {
-				Registry.level = Registry.level01;
-				Registry.background = Registry.back01;
-				Registry.midground = Registry.mid01;
-				FlxG.switchState(new PlayState);//(Registry.level01,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("B")) {
-				Registry.background = Registry.back02;
-				Registry.level = Registry.level02;
-				Registry.midground = Registry.mid02;
-				FlxG.switchState(new PlayState);//(Registry.level02,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("C")) {
-				Registry.level = Registry.level03;
-				Registry.background = Registry.back03;
-				Registry.midground = Registry.mid03;
-				FlxG.switchState(new PlayState);//(Registry.level03,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("D")) {
-				Registry.level = Registry.testMap;
-				FlxG.switchState(new PlayState);//(Registry.testMap,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("E")) {
-				Registry.level = Registry.factoryDemoMap;
-				FlxG.switchState(new PlayState);//(Registry.factoryDemoMap,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("F")) {
-				Registry.level = Registry.tallMap;
-				FlxG.switchState(new PlayState);//(Registry.tallMap,Registry.midgroundMap,Registry.backgroundMap));
-			} else if (FlxG.keys.justPressed("G")) {
-				Registry.level = Registry.level04;
-				Registry.midground = Registry.mid04;
-				Registry.background = Registry.back04;
-				FlxG.switchState(new PlayState);
-			} else if (FlxG.keys.justPressed("H")) {
-				Registry.level = Registry.level05;
-				Registry.midground = Registry.mid05;
-				Registry.background = Registry.back05;
-				FlxG.switchState(new PlayState);
-			} else if (FlxG.keys.justPressed("I")) {
-				
-				Registry.level = Registry.level06;
-				Registry.background = Registry.back06;
-				Registry.midground = Registry.mid06;
-				
-				Registry.levelNum = 5;
-				FlxG.switchState(new PlayState);
-			}*/
 			
 			super.update();
 		}
