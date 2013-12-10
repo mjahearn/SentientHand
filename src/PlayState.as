@@ -411,7 +411,9 @@ package {
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			
-			this.setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
+			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
+			
+			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
 			
 			if (Registry.DEBUG_ON) {add(levelFunctional);}
 			
@@ -2066,6 +2068,10 @@ package {
 					fixGravity(spr);
 				}
 			}
+		}
+		
+		public function neutralCallback(tile:FlxTile, spr:FlxSprite):void {
+			woodStuff(tile.mapIndex, spr);
 		}
 		
 		public function dirtCallback(tile:FlxTile, spr:FlxSprite):void {

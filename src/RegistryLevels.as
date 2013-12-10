@@ -9,6 +9,7 @@ package
 		public static const kSpawnEmpty:Array = [0,3,4,5,6,7,8,9,10,11,12];
 		public static const kSpawnWood:Array = [1];
 		public static const kSpawnMetal:Array = [2];
+		public static const kSpawnNeutral:Array = [13];
 		public static const kSpawnHand:Array = [3];
 		public static const kSpawnGrappler:Array = [4];
 		public static const kSpawnLauncher:Array = [5];
