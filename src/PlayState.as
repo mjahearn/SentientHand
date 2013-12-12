@@ -79,9 +79,9 @@ package {
 		
 		public var electricityNum:int = 1;
 		
-		public var level:FlxTilemap;
-		public var midground:FlxTilemap;
-		public var background:FlxTilemap;
+		public var levelCosmeticFront:FlxTilemap;
+		//public var midground:FlxTilemap;
+		//public var background:FlxTilemap;
 		//public var levelMid:FlxTilemap;
 		//public var levelBack:FlxTilemap;
 		//public var hand:FlxSprite;
@@ -173,18 +173,18 @@ package {
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
 		
-		[Embed("assets/sign.png")] public var signSheet:Class;
+		//[Embed("assets/sign.png")] public var signSheet:Class;
 		
-		public static var levelMap:Class;
-		public static var midgroundMap:Class;
-		public static var backgroundMap:Class;
+		//public static var levelMap:Class;
+		//public static var midgroundMap:Class;
+		//public static var backgroundMap:Class;
 		
 		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
-		[Embed("assets/!.png")] public var bangSheet:Class;
+		//[Embed("assets/!.png")] public var bangSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
@@ -250,6 +250,7 @@ package {
 		private var musOverlay:FlxSound;
 		
 		override public function create():void {
+			
 			if (!Registry.SOUND_ON) {
 				SoundMixer.soundTransform = new SoundTransform(0);	
 			}
@@ -284,15 +285,7 @@ package {
 			*/
 			
 			levelFunctional = RegistryLevels.lvlFunc();
-			level = RegistryLevels.lvlCosmFront();
-			midground = RegistryLevels.lvlCosmMid();
-			background = RegistryLevels.lvlCosmBack();
 			
-			/*
-			levelMap = Registry.level;
-			midgroundMap = Registry.midground;
-			backgroundMap = Registry.background;
-			*/
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
@@ -311,68 +304,21 @@ package {
 				
 			}
 			
-			/* Background */
-			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
-			background.scrollFactor = new FlxPoint(0.5, 0.5);
-			if (background.totalTiles > 0) { // check if null
-				add(background);
-			}
+			addLevelCosmeticBack();
+			addLevelCosmeticMid();
+			addLevelCosmeticFront();
 			
-			/* Midground */
-			//var midground:FlxTilemap = new FlxTilemap();
-			//midground.loadMap(new midgroundMap,midgroundset,8,8);
+			/*
+			level = RegistryLevels.lvlCosmFront();
+			midground = RegistryLevels.lvlCosmMid();
+			background = RegistryLevels.lvlCosmBack();
+			*/
 			
-			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
-				var gearArray:Array = midground.getTileInstances(i);
-				if (gearArray) {
-					for (var j:int = 0; j < gearArray.length; j++) {
-						
-						// Decide gear spin (In or Out)
-						// n.b. Every other gear in the sheet is In or Out
-						var gearGroup:FlxGroup;
-						if (i%2 == 0) {gearGroup = gearInGroup;}
-						else {gearGroup = gearOutGroup;}
-						
-						// Decide gear size
-						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
-						var gearSheet:Class;
-						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
-						if (gearGaugeNumber < 2) {gearSheet = gear64x64Sheet;}
-						else if (gearGaugeNumber < 4) {gearSheet = gear32x32Sheet;}
-						else {gearSheet = gear16x16Sheet;}
-						
-						// do something for gear speed...?  Do we need gears to spin at different speeds?  Maybe not...
-						
-						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
-						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
-						gearGroup.add(gear);
-					}
-				}
-			}
-			add(gearInGroup);
-			add(gearOutGroup);
-			
-			// Trash
-			var trashArray:Array = midground.getTileInstances(TRASH_SPAWN);
-			if (trashArray) {
-				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
-				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
-				for (j = 0; j < trashArray.length; j++) {
-					var trashPoint:FlxPoint = pointForTile(trashArray[j],midground);
-					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
-					trash.loadGraphic(trashSheet,true,false,32,32,true);
-					//trash.color = (0xffff0000 & Math.random()*0xffffffff)
-					trash.color = 0xff555555;
-					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
-					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
-					//trash.acceleration.y = MAX_GRAV_VEL;
-					//trash.acceleration.x = -MAX_GRAV_VEL;
-					trash.immovable = true;
-					//FlxG.collide(hand,trash,woodCallback);
-					trashGroup.add(trash);
-				}
-			}
-			add(trashGroup);
+			/*
+			levelMap = Registry.level;
+			midgroundMap = Registry.midground;
+			backgroundMap = Registry.background;
+			*/
 			
 			/*
 			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
@@ -388,12 +334,12 @@ package {
 			addHints();
 			
 			/* Level */
-			
+			/*
 			//level = new FlxTilemap();
 			//level.loadMap(new levelMap,tileset,8,8);
 			if (level.totalTiles > 0) { // check if null
 				add(level);
-			}
+			}*/
 			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
 			if (Registry.extendedCamera) {
 				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
@@ -473,7 +419,7 @@ package {
 				}
 			}*/
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional);
-			for (i = 0; i < cannonGroup.length; i++) {
+			for (var i:uint = 0; i < cannonGroup.length; i++) {
 				var cannon:FlxSprite = cannonGroup.members[i];
 				cannon.loadGraphic(cannonSheet);
 				cannon.facing = FlxObject.DOWN;
@@ -570,10 +516,10 @@ package {
 			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 			for (var b:uint = 0; b < STEAM.length; b++) {
 				i = STEAM[b];
-				var steamArray:Array = level.getTileInstances(i);
+				var steamArray:Array = levelCosmeticFront.getTileInstances(i);
 				if (steamArray) {
-					for (j = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],level);
+					for (var j:uint = 0; j < steamArray.length; j++) {
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],levelCosmeticFront);
 						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
 						//steam.alpha = 0.5;
 						steam.loadGraphic(steamSheet,true,false,32,32,true);
@@ -769,6 +715,90 @@ package {
 			}
 		}
 		
+		private function addLevelCosmeticBack():void {
+			var $lvlCosmBack:FlxTilemap = RegistryLevels.lvlCosmBack();
+			if ($lvlCosmBack.totalTiles <= 0) {return;}
+			
+			/* Background */
+			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
+			$lvlCosmBack.scrollFactor = new FlxPoint(0.5, 0.5);
+			/*
+			if (background.totalTiles > 0) { // check if null
+				add(background);
+			}*/
+			
+			add($lvlCosmBack);
+		}
+		
+		private function addLevelCosmeticMid():void {
+			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
+			if ($lvlCosmMid.totalTiles <= 0) {return;}
+			
+			/* Midground */
+			//var midground:FlxTilemap = new FlxTilemap();
+			//midground.loadMap(new midgroundMap,midgroundset,8,8);
+			
+			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
+				var gearArray:Array = $lvlCosmMid.getTileInstances(i);
+				if (gearArray) {
+					for (var j:int = 0; j < gearArray.length; j++) {
+						
+						// Decide gear spin (In or Out)
+						// n.b. Every other gear in the sheet is In or Out
+						var gearGroup:FlxGroup;
+						if (i%2 == 0) {gearGroup = gearInGroup;}
+						else {gearGroup = gearOutGroup;}
+						
+						// Decide gear size
+						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
+						var gearSheet:Class;
+						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
+						if (gearGaugeNumber < 2) {gearSheet = gear64x64Sheet;}
+						else if (gearGaugeNumber < 4) {gearSheet = gear32x32Sheet;}
+						else {gearSheet = gear16x16Sheet;}
+						
+						// do something for gear speed...?  Do we need gears to spin at different speeds?  Maybe not...
+						
+						var gearPoint:FlxPoint = pointForTile(gearArray[j],$lvlCosmMid);
+						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
+						gearGroup.add(gear);
+					}
+				}
+			}
+			add(gearInGroup);
+			add(gearOutGroup);
+			
+			// Trash
+			var trashArray:Array = $lvlCosmMid.getTileInstances(TRASH_SPAWN);
+			if (trashArray) {
+				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
+				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
+				for (j = 0; j < trashArray.length; j++) {
+					var trashPoint:FlxPoint = pointForTile(trashArray[j],$lvlCosmMid);
+					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
+					trash.loadGraphic(trashSheet,true,false,32,32,true);
+					//trash.color = (0xffff0000 & Math.random()*0xffffffff)
+					trash.color = 0xff555555;
+					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
+					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
+					//trash.acceleration.y = MAX_GRAV_VEL;
+					//trash.acceleration.x = -MAX_GRAV_VEL;
+					trash.immovable = true;
+					//FlxG.collide(hand,trash,woodCallback);
+					trashGroup.add(trash);
+				}
+			}
+			add(trashGroup);
+			
+			//add($lvlCosmMid);
+		}
+		
+		private function addLevelCosmeticFront():void {
+			levelCosmeticFront = RegistryLevels.lvlCosmFront();
+			if (levelCosmeticFront.totalTiles <= 0) {return;}
+			add(levelCosmeticFront);
+		}
+		
 		private function addButtons():void {
 			buttonGroup = new FlxGroup();
 			
@@ -826,7 +856,7 @@ package {
 			var i:uint;
 			var $hint:SprHint;
 			
-			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level);
+			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,levelCosmeticFront);
 			for (i = 0; i < hintArrowKeysGroup.length; i++) {
 				$hint = hintArrowKeysGroup.members[i];
 				$hint.text = "SCRAP cannot press the LEFT or RIGHT ARROW KEYS to MOVE.";
@@ -863,7 +893,7 @@ package {
 			dripGroup = new FlxGroup();
 			var tmpMaybeDrip:Function = function():void {
 				
-				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,level);
+				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,levelCosmeticFront);
 				
 				for (var i:uint = 0; i < tmpDripGroup.length; i++) {
 					var tmpDrip:SprDrip = tmpDripGroup.members[i];
@@ -884,7 +914,7 @@ package {
 		}
 		
 		private function addRoaches():void {
-			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,level);
+			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,levelCosmeticFront);
 			add(roachGroup);
 		}
 		
