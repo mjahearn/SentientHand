@@ -173,7 +173,7 @@ package {
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
 		
-		//[Embed("assets/sign.png")] public var signSheet:Class;
+		[Embed("assets/sign.png")] public var signSheet:Class;
 		
 		//public static var levelMap:Class;
 		//public static var midgroundMap:Class;
@@ -251,29 +251,7 @@ package {
 		
 		override public function create():void {
 			
-			if (!Registry.SOUND_ON) {
-				SoundMixer.soundTransform = new SoundTransform(0);	
-			}
-			
-			var $curMus:FlxSound = RegistryLevels.currentMusic;
-			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
-			
-			var $preMus:FlxSound = RegistryLevels.previousMusic;
-			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
-			
-			musOverlay = $curMusOverlay;
-			
-			if ($preMus && $curMus != $preMus) {
-				add($preMus);
-				add($preMusOverlay);
-				$preMus.fadeOut(2.2);
-				$preMusOverlay.fadeOut(2.2);
-			}
-			$curMus.play();
-			$curMusOverlay.play();
-			hideMusicOverlayInstantly();
-			
-			ambientSteamSound.volume = 0.5;
+			setUpAudio();
 			
 			/*
 			if (!Registry.DEBUG_ON) {
@@ -283,8 +261,6 @@ package {
 			}
 			
 			*/
-			
-			levelFunctional = RegistryLevels.lvlFunc();
 			
 			
 			dbg = 0;
@@ -304,9 +280,13 @@ package {
 				
 			}
 			
+			levelFunctional = RegistryLevels.lvlFunc();
+			
 			addLevelCosmeticBack();
 			addLevelCosmeticMid();
 			addLevelCosmeticFront();
+			
+			if (Registry.DEBUG_ON && levelCosmeticFront.totalTiles <= 0) {add(levelFunctional);}
 			
 			/*
 			level = RegistryLevels.lvlCosmFront();
@@ -360,8 +340,6 @@ package {
 			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
-			
-			if (Registry.DEBUG_ON) {add(levelFunctional);}
 			
 			/*
 			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
@@ -625,31 +603,6 @@ package {
 			setDir(hand, FlxObject.DOWN, true);
 			
 			camTag = new FlxSprite(hand.x,hand.y);
-			/*
-			// sign
-			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
-			if (signArray) {
-				midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
-				for (j = 0; j < signArray.length; j++) {
-					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
-					midground.setTileByIndex(signArray[j],0);
-					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
-				}
-			}*/
-			/*
-			hint = new FlxSprite(0,0);
-			hint.loadGraphic(hintSheet,true,false,64,64,true);
-			hint.addAnimation("idle",[0]);
-			//hint.addAnimation("think",[1,2,3,4],10,false);
-			//hint.addAnimation("thinking up",[4]);
-			//hint.addAnimation("thinking space",[5]);
-			hint.addAnimation("X",[1,2,3],10,true);
-			hint.addAnimation("Z",[4,5,6],10,true);
-			hint.addAnimation("arrows",[7,8,9],10,true);
-			hint.addAnimation("left X right",[10,11,12],10,true);
-			hint.addAnimation("enter",[13,14,15],10,true);
-			hint.play("idle");
-			add(hint);*/
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
@@ -685,21 +638,9 @@ package {
 			
 			FlxG.camera.follow(camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
 			
-			/*
-			// TEST HINT
-			testHint = new SprHint();
-			testHint.y -= testHint.width;
-			testHint.angle = 30;
-			testHint.text = "Press the #M key to do something. No fucking clue what."
-			add(testHint);
-			*/
-			
 			addRoaches();
 			
 			overlay.makeGraphic(FlxG.width,FlxG.height,0xff000000);
-			//overlay.scrollFactor = new FlxPoint(0, 0);
-			//overlay.alpha = 0;
-			//add(overlay);
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 		}
@@ -715,17 +656,37 @@ package {
 			}
 		}
 		
+		private function setUpAudio():void {
+			if (!Registry.SOUND_ON) {
+				SoundMixer.soundTransform = new SoundTransform(0);	
+			}
+			
+			var $curMus:FlxSound = RegistryLevels.currentMusic;
+			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
+			
+			var $preMus:FlxSound = RegistryLevels.previousMusic;
+			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
+			
+			musOverlay = $curMusOverlay;
+			
+			if ($preMus && $curMus != $preMus) {
+				add($preMus);
+				add($preMusOverlay);
+				$preMus.fadeOut(2.2);
+				$preMusOverlay.fadeOut(2.2);
+			}
+			$curMus.play();
+			$curMusOverlay.play();
+			hideMusicOverlayInstantly();
+			
+			ambientSteamSound.volume = 0.5;
+		}
+		
 		private function addLevelCosmeticBack():void {
 			var $lvlCosmBack:FlxTilemap = RegistryLevels.lvlCosmBack();
 			if ($lvlCosmBack.totalTiles <= 0) {return;}
 			
-			/* Background */
-			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
 			$lvlCosmBack.scrollFactor = new FlxPoint(0.5, 0.5);
-			/*
-			if (background.totalTiles > 0) { // check if null
-				add(background);
-			}*/
 			
 			add($lvlCosmBack);
 		}
@@ -734,10 +695,7 @@ package {
 			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
 			if ($lvlCosmMid.totalTiles <= 0) {return;}
 			
-			/* Midground */
-			//var midground:FlxTilemap = new FlxTilemap();
-			//midground.loadMap(new midgroundMap,midgroundset,8,8);
-			
+			// GEARS
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
 				var gearArray:Array = $lvlCosmMid.getTileInstances(i);
 				if (gearArray) {
@@ -768,7 +726,7 @@ package {
 			add(gearInGroup);
 			add(gearOutGroup);
 			
-			// Trash
+			// TRASH
 			var trashArray:Array = $lvlCosmMid.getTileInstances(TRASH_SPAWN);
 			if (trashArray) {
 				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
@@ -777,25 +735,32 @@ package {
 					var trashPoint:FlxPoint = pointForTile(trashArray[j],$lvlCosmMid);
 					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
 					trash.loadGraphic(trashSheet,true,false,32,32,true);
-					//trash.color = (0xffff0000 & Math.random()*0xffffffff)
 					trash.color = 0xff555555;
 					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
 					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
-					//trash.acceleration.y = MAX_GRAV_VEL;
-					//trash.acceleration.x = -MAX_GRAV_VEL;
 					trash.immovable = true;
-					//FlxG.collide(hand,trash,woodCallback);
 					trashGroup.add(trash);
 				}
 			}
 			add(trashGroup);
-			
-			//add($lvlCosmMid);
 		}
 		
 		private function addLevelCosmeticFront():void {
 			levelCosmeticFront = RegistryLevels.lvlCosmFront();
 			if (levelCosmeticFront.totalTiles <= 0) {return;}
+			
+			/*
+			// sign
+			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
+			if (signArray) {
+			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
+			for (j = 0; j < signArray.length; j++) {
+			var signPoint:FlxPoint = pointForTile(signArray[j],midground);
+			midground.setTileByIndex(signArray[j],0);
+			add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
+			}
+			}*/
+			
 			add(levelCosmeticFront);
 		}
 		
