@@ -253,16 +253,6 @@ package {
 			
 			setUpAudio();
 			
-			/*
-			if (!Registry.DEBUG_ON) {
-				Registry.level = Registry.levelOrder[Registry.levelNum];
-				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
-				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
-			}
-			
-			*/
-			
-			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			lastTouchedDirt = false; //ditto
@@ -341,61 +331,7 @@ package {
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
 			
-			/*
-			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = WOOD_OVERFLOW_MIN; i <= WOOD_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = WOOD_OVERFLOW_OVERFLOW_MIN; i <= WOOD_OVERFLOW_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = METAL_MIN; i <= METAL_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, metalCallback);
-			}
-			
-			for (i = UNTOUCHABLE_MIN; i <= UNTOUCHABLE_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			for (i = UNTOUCHABLE_OVERFLOW_MIN; i <= UNTOUCHABLE_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			
-			for (i = UNTOUCHABLE_GRASS_MIN; i <= UNTOUCHABLE_GRASS_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			
-			// do we need a grass sound?
-			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, dirtCallback);
-			}*/
-			
-			
-			
-			
-			// Cannons
-			/*level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
-			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
-			if (cannonArray) {
-				for (j = 0; j < cannonArray.length; j++) {
-					level.setTileByIndex(cannonArray[j],0);
-					var cannonPoint:FlxPoint = pointForTile(cannonArray[j],level);
-					var cannon:FlxSprite = new FlxSprite(cannonPoint.x,cannonPoint.y,cannonSheet);
-					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
-					cannon.angle = 0;
-					cannonGroup.add(cannon);
-					
-					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
-					cannon.facing = FlxObject.DOWN;
-				}
-			}*/
+			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional);
 			for (var i:uint = 0; i < cannonGroup.length; i++) {
 				var cannon:FlxSprite = cannonGroup.members[i];
@@ -412,51 +348,6 @@ package {
 			}
 			add(cannonArmBaseGroup);
 			
-			/*
-			// Buttons
-			for (var m:uint = 0; m < RegistryLevels.kSpawnButton.length; m++) {
-				i = RegistryLevels.kSpawnButton[m];
-				levelFunctional.setTileProperties(i,FlxObject.NONE);
-				var buttonArray:Array = levelFunctional.getTileInstances(i);
-				if (buttonArray) {
-					for (j = 0; j < buttonArray.length; j++) {
-						levelFunctional.setTileByIndex(buttonArray[j],0);
-						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],levelFunctional);
-						
-						// Decide button graphic
-						var buttonSheet:Class;
-						var w:Number;
-						var h:Number;
-						var buttonGaugeNumber:Number = i;//(i-BUTTON_MIN)%4;
-						var bangAngle:Number;
-						var bangDX:Number = 0;
-						var bangDY:Number = 0;
-						if (buttonGaugeNumber == 8) {buttonSheet = buttonLSheet; w = 8; h = 32; bangAngle = 90; bangDX = 8;}
-						else if (buttonGaugeNumber == 7) {buttonSheet = buttonUSheet; w = 32; h = 8; bangAngle = 180; bangDY = 8;}
-						else if (buttonGaugeNumber == 9) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32; bangAngle = -90; bangDX = -32;}
-						else if (buttonGaugeNumber == 6) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8; bangAngle = 0; bangDY = -32;}
-						
-						
-						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
-						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.frame = BUTTON_INIT;
-						
-						buttonGroup.add(button);
-						buttonStateArray.push(false);
-						
-						var bang:FlxSprite = new FlxSprite(button.x+bangDX,button.y+bangDY);
-						bang.loadGraphic(bangSheet,true,false,32,32,true);
-						bang.angle = bangAngle;
-						bang.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
-						bang.play("excite");
-						buttonBangGroup.add(bang);
-						buttonReactionArray.push(buttonReaction);
-					}
-				}
-			}
-			add(buttonGroup);
-			add(buttonBangGroup);
-			*/
 			addButtons();
 			
 			bodyGearGroup = new FlxGroup();
@@ -695,6 +586,7 @@ package {
 			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
 			if ($lvlCosmMid.totalTiles <= 0) {return;}
 			
+			/*
 			// GEARS
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
 				var gearArray:Array = $lvlCosmMid.getTileInstances(i);
@@ -743,6 +635,9 @@ package {
 				}
 			}
 			add(trashGroup);
+			*/
+			
+			add($lvlCosmMid);
 		}
 		
 		private function addLevelCosmeticFront():void {
@@ -867,10 +762,43 @@ package {
 						dripGroup.add(tmpDrip);
 					}
 				}
-			}
+			};
 			
 			dripperEvent = new EventTimer(2.2,tmpMaybeDrip);
 			add(dripperEvent);
+			
+			
+			
+			/*
+			dripGroup = new FlxGroup();
+			
+			var $dripSpriteGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,levelCosmeticFront);
+			var $dripSprite:SprDrip;
+			var $maybeDrip:Function;
+			var $dripEvent:EventTimer;
+			
+			for (var i:uint = 0; i < $dripSpriteGroup.length; i++) {
+				$dripSprite = $dripSpriteGroup.members[i];
+				
+				var $x:Number = $dripSprite.x;
+				Registry.log($x);
+				
+				$maybeDrip = function():void {
+					if (maybe()) {
+						var $newDripSprite:SprDrip = $dripSprite.refreshedCopy();
+						add($newDripSprite);
+						dripGroup.add($newDripSprite);
+						
+						Registry.log($x);
+					}
+				};
+				
+				$dripEvent = new EventTimer(2.2 + Math.random()*2.2,$maybeDrip);
+				add($dripEvent);
+			}
+			*/
+			
+			
 			
 		}
 		
