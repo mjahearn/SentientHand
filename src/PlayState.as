@@ -301,7 +301,7 @@ package {
 				}
 			}*/
 			
-			addHints();
+			//addHints();
 			
 			/* Level */
 			/*
@@ -586,6 +586,8 @@ package {
 			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
 			if ($lvlCosmMid.totalTiles <= 0) {return;}
 			
+			add($lvlCosmMid);
+			addHints($lvlCosmMid);
 			/*
 			// GEARS
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
@@ -636,8 +638,6 @@ package {
 			}
 			add(trashGroup);
 			*/
-			
-			add($lvlCosmMid);
 		}
 		
 		private function addLevelCosmeticFront():void {
@@ -711,18 +711,96 @@ package {
 			}
 		}
 		
-		private function addHints():void {
+		private function addHints($lvl:FlxTilemap):void {
+			
+			var $hintGroup:FlxGroup = new FlxGroup();
 			
 			var i:uint;
 			var $hint:SprHint;
 			
-			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,levelCosmeticFront);
-			for (i = 0; i < hintArrowKeysGroup.length; i++) {
-				$hint = hintArrowKeysGroup.members[i];
+			var $debugCounter:uint = 0;
+			
+			// HINT 0
+			var $hint0Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint0,SprHint,$lvl);
+			for (i = 0; i < $hint0Group.length; i++) {
+				$hint = $hint0Group.members[i];
 				$hint.text = "SCRAP cannot press the LEFT or RIGHT ARROW KEYS to MOVE.";
 				$hint.angle = 0;
+				$hintGroup.add($hint);
 			}
-			add(hintArrowKeysGroup);
+			$debugCounter++;
+			// HINT 1
+			var $hint1Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint1,SprHint,$lvl);
+			for (i = 0; i < $hint1Group.length; i++) {
+				$hint = $hint1Group.members[i];
+				$hint.text = "Do NOT push the button. It's very bad. Very, very bad.";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 2
+			var $hint2Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint2,SprHint,$lvl);
+			for (i = 0; i < $hint2Group.length; i++) {
+				$hint = $hint2Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 3
+			var $hint3Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint3,SprHint,$lvl);
+			for (i = 0; i < $hint3Group.length; i++) {
+				$hint = $hint3Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 4
+			var $hint4Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint4,SprHint,$lvl);
+			for (i = 0; i < $hint4Group.length; i++) {
+				$hint = $hint4Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 5
+			var $hint5Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint5,SprHint,$lvl);
+			for (i = 0; i < $hint5Group.length; i++) {
+				$hint = $hint5Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 6
+			var $hint6Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint6,SprHint,$lvl);
+			for (i = 0; i < $hint6Group.length; i++) {
+				$hint = $hint6Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 7
+			var $hint7Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint7,SprHint,$lvl);
+			for (i = 0; i < $hint7Group.length; i++) {
+				$hint = $hint7Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			
+			for (i = 0; i < $hintGroup.length; i++) {
+				$hint = $hintGroup.members[i];
+				$hint.x += Number($lvl.width/$lvl.widthInTiles)/2.0 - $hint.width/2.0;
+				$hint.y += Number($lvl.height/$lvl.heightInTiles)/2.0 - $hint.height/2.0;
+			}
+			
+			add($hintGroup);
+			
 		}
 		
 		private function addDripperEvent():void {

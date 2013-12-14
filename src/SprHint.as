@@ -26,7 +26,7 @@ package
 			_flxText = new FlxText(0,0,width-$xBuffer*2);
 			_flxText.size = 11;
 			_flxText.alignment = "center";
-			_flxText.color = 0x221c1c;
+			_flxText.color = 0x110c0c;//0x221c1c;
 			_flxText.x += width/2.0 - _flxText.width/2.0;
 			_flxText.y += height/2.0 - _flxText.height/2.0 + $yBuffer;
 			_flxTextXLocal = _flxText.x;

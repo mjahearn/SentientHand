@@ -26,6 +26,15 @@ package
 		public static const kSpawnDrip:Array = [45,77];
 		public static const kSpawnRoaches:Array = [295]; // update this
 		
+		public static const kSpawnMidHint0:Array = [48];
+		public static const kSpawnMidHint1:Array = [49];
+		public static const kSpawnMidHint2:Array = [50];
+		public static const kSpawnMidHint3:Array = [51];
+		public static const kSpawnMidHint4:Array = [52];
+		public static const kSpawnMidHint5:Array = [53];
+		public static const kSpawnMidHint6:Array = [54];
+		public static const kSpawnMidHint7:Array = [55];
+		
 		/**
 		 * The current functional tilemap.
 		 * Calls <code>currentFuncCSV</code> to determine the specific tilemap to load.
