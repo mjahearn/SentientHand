@@ -4,6 +4,9 @@ package
 	
 	public class SprDrip extends FlxSprite
 	{
+		private var xRefresh:Number;
+		private var yRefresh:Number;
+		
 		private const kGravVelMax:Number = 400; //terminal velocity (in pixels per second) when the hand is falling
 		private const kGravAccel:Number = 1600; //acceleration (in pixels per second per second) due to gravity
 		
@@ -24,6 +27,21 @@ package
 			
 			acceleration.y = kGravAccel;
 			maxVelocity.y = kGravVelMax;
+			
+			xRefresh = x;
+			yRefresh = y;
+		}
+		
+		public function refresh():void {
+			x = xRefresh;
+			y = yRefresh;
+			play(kAnimIdle);
+		}
+		
+		public function refreshedCopy():SprDrip {
+			
+			var $copy:SprDrip = new SprDrip(xRefresh,yRefresh);
+			return $copy;
 		}
 		
 		override public function update():void {

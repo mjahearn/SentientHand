@@ -79,9 +79,9 @@ package {
 		
 		public var electricityNum:int = 1;
 		
-		public var level:FlxTilemap;
-		public var midground:FlxTilemap;
-		public var background:FlxTilemap;
+		public var levelCosmeticFront:FlxTilemap;
+		//public var midground:FlxTilemap;
+		//public var background:FlxTilemap;
 		//public var levelMid:FlxTilemap;
 		//public var levelBack:FlxTilemap;
 		//public var hand:FlxSprite;
@@ -175,16 +175,16 @@ package {
 		
 		[Embed("assets/sign.png")] public var signSheet:Class;
 		
-		public static var levelMap:Class;
-		public static var midgroundMap:Class;
-		public static var backgroundMap:Class;
+		//public static var levelMap:Class;
+		//public static var midgroundMap:Class;
+		//public static var backgroundMap:Class;
 		
 		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
 		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
 		
-		[Embed("assets/!.png")] public var bangSheet:Class;
+		//[Embed("assets/!.png")] public var bangSheet:Class;
 		
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
@@ -250,49 +250,8 @@ package {
 		private var musOverlay:FlxSound;
 		
 		override public function create():void {
-			if (!Registry.SOUND_ON) {
-				SoundMixer.soundTransform = new SoundTransform(0);	
-			}
 			
-			var $curMus:FlxSound = RegistryLevels.currentMusic;
-			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
-			
-			var $preMus:FlxSound = RegistryLevels.previousMusic;
-			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
-			
-			musOverlay = $curMusOverlay;
-			
-			if ($preMus && $curMus != $preMus) {
-				add($preMus);
-				add($preMusOverlay);
-				$preMus.fadeOut(2.2);
-				$preMusOverlay.fadeOut(2.2);
-			}
-			$curMus.play();
-			$curMusOverlay.play();
-			hideMusicOverlayInstantly();
-			
-			ambientSteamSound.volume = 0.5;
-			
-			/*
-			if (!Registry.DEBUG_ON) {
-				Registry.level = Registry.levelOrder[Registry.levelNum];
-				Registry.midground = Registry.midOrder[Registry.levelNum];//Registry.midgroundMap;
-				Registry.background = Registry.backOrder[Registry.levelNum];//Registry.backgroundMap;
-			}
-			
-			*/
-			
-			levelFunctional = RegistryLevels.lvlFunc();
-			level = RegistryLevels.lvlCosmFront();
-			midground = RegistryLevels.lvlCosmMid();
-			background = RegistryLevels.lvlCosmBack();
-			
-			/*
-			levelMap = Registry.level;
-			midgroundMap = Registry.midground;
-			backgroundMap = Registry.background;
-			*/
+			setUpAudio();
 			
 			dbg = 0;
 			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
@@ -311,68 +270,25 @@ package {
 				
 			}
 			
-			/* Background */
-			//var background:FlxTilemap = new FlxTilemap().loadMap(new backgroundMap,backgroundset,8,8);
-			background.scrollFactor = new FlxPoint(0.5, 0.5);
-			if (background.totalTiles > 0) { // check if null
-				add(background);
-			}
+			levelFunctional = RegistryLevels.lvlFunc();
 			
-			/* Midground */
-			//var midground:FlxTilemap = new FlxTilemap();
-			//midground.loadMap(new midgroundMap,midgroundset,8,8);
+			addLevelCosmeticBack();
+			addLevelCosmeticMid();
+			addLevelCosmeticFront();
 			
-			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
-				var gearArray:Array = midground.getTileInstances(i);
-				if (gearArray) {
-					for (var j:int = 0; j < gearArray.length; j++) {
-						
-						// Decide gear spin (In or Out)
-						// n.b. Every other gear in the sheet is In or Out
-						var gearGroup:FlxGroup;
-						if (i%2 == 0) {gearGroup = gearInGroup;}
-						else {gearGroup = gearOutGroup;}
-						
-						// Decide gear size
-						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
-						var gearSheet:Class;
-						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
-						if (gearGaugeNumber < 2) {gearSheet = gear64x64Sheet;}
-						else if (gearGaugeNumber < 4) {gearSheet = gear32x32Sheet;}
-						else {gearSheet = gear16x16Sheet;}
-						
-						// do something for gear speed...?  Do we need gears to spin at different speeds?  Maybe not...
-						
-						var gearPoint:FlxPoint = pointForTile(gearArray[j],midground);
-						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
-						gearGroup.add(gear);
-					}
-				}
-			}
-			add(gearInGroup);
-			add(gearOutGroup);
+			if (Registry.DEBUG_ON && levelCosmeticFront.totalTiles <= 0) {add(levelFunctional);}
 			
-			// Trash
-			var trashArray:Array = midground.getTileInstances(TRASH_SPAWN);
-			if (trashArray) {
-				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
-				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
-				for (j = 0; j < trashArray.length; j++) {
-					var trashPoint:FlxPoint = pointForTile(trashArray[j],midground);
-					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
-					trash.loadGraphic(trashSheet,true,false,32,32,true);
-					//trash.color = (0xffff0000 & Math.random()*0xffffffff)
-					trash.color = 0xff555555;
-					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
-					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
-					//trash.acceleration.y = MAX_GRAV_VEL;
-					//trash.acceleration.x = -MAX_GRAV_VEL;
-					trash.immovable = true;
-					//FlxG.collide(hand,trash,woodCallback);
-					trashGroup.add(trash);
-				}
-			}
-			add(trashGroup);
+			/*
+			level = RegistryLevels.lvlCosmFront();
+			midground = RegistryLevels.lvlCosmMid();
+			background = RegistryLevels.lvlCosmBack();
+			*/
+			
+			/*
+			levelMap = Registry.level;
+			midgroundMap = Registry.midground;
+			backgroundMap = Registry.background;
+			*/
 			
 			/*
 			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
@@ -385,15 +301,15 @@ package {
 				}
 			}*/
 			
-			addHints();
+			//addHints();
 			
 			/* Level */
-			
+			/*
 			//level = new FlxTilemap();
 			//level.loadMap(new levelMap,tileset,8,8);
 			if (level.totalTiles > 0) { // check if null
 				add(level);
-			}
+			}*/
 			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
 			if (Registry.extendedCamera) {
 				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
@@ -415,65 +331,9 @@ package {
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
 			
-			if (Registry.DEBUG_ON) {add(levelFunctional);}
-			
-			/*
-			for (i = WOOD_MIN; i <= WOOD_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = WOOD_OVERFLOW_MIN; i <= WOOD_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = WOOD_OVERFLOW_OVERFLOW_MIN; i <= WOOD_OVERFLOW_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, woodCallback);
-			}
-			
-			for (i = METAL_MIN; i <= METAL_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, metalCallback);
-			}
-			
-			for (i = UNTOUCHABLE_MIN; i <= UNTOUCHABLE_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			for (i = UNTOUCHABLE_OVERFLOW_MIN; i <= UNTOUCHABLE_OVERFLOW_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			
-			for (i = UNTOUCHABLE_GRASS_MIN; i <= UNTOUCHABLE_GRASS_MAX; i++) {
-				level.setTileProperties(i, FlxObject.NONE);
-			}
-			
-			
-			// do we need a grass sound?
-			for (i = GRASS_MIN; i <= GRASS_MAX; i++) {
-				level.setTileProperties(i, FlxObject.ANY, dirtCallback);
-			}*/
-			
-			
-			
-			
-			// Cannons
-			/*level.setTileProperties(CANNON_SPAWN,FlxObject.NONE);
-			var cannonArray:Array = level.getTileInstances(CANNON_SPAWN);
-			if (cannonArray) {
-				for (j = 0; j < cannonArray.length; j++) {
-					level.setTileByIndex(cannonArray[j],0);
-					var cannonPoint:FlxPoint = pointForTile(cannonArray[j],level);
-					var cannon:FlxSprite = new FlxSprite(cannonPoint.x,cannonPoint.y,cannonSheet);
-					cannon.facing = FlxObject.DOWN; // this might need to change if they're mounted on walls?
-					cannon.angle = 0;
-					cannonGroup.add(cannon);
-					
-					cannonArmBaseGroup.add(new FlxSprite(cannon.x,cannon.y,armBaseSheet));
-					cannon.facing = FlxObject.DOWN;
-				}
-			}*/
+			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,FlxSprite,levelFunctional);
-			for (i = 0; i < cannonGroup.length; i++) {
+			for (var i:uint = 0; i < cannonGroup.length; i++) {
 				var cannon:FlxSprite = cannonGroup.members[i];
 				cannon.loadGraphic(cannonSheet);
 				cannon.facing = FlxObject.DOWN;
@@ -488,51 +348,6 @@ package {
 			}
 			add(cannonArmBaseGroup);
 			
-			/*
-			// Buttons
-			for (var m:uint = 0; m < RegistryLevels.kSpawnButton.length; m++) {
-				i = RegistryLevels.kSpawnButton[m];
-				levelFunctional.setTileProperties(i,FlxObject.NONE);
-				var buttonArray:Array = levelFunctional.getTileInstances(i);
-				if (buttonArray) {
-					for (j = 0; j < buttonArray.length; j++) {
-						levelFunctional.setTileByIndex(buttonArray[j],0);
-						var buttonPoint:FlxPoint = pointForTile(buttonArray[j],levelFunctional);
-						
-						// Decide button graphic
-						var buttonSheet:Class;
-						var w:Number;
-						var h:Number;
-						var buttonGaugeNumber:Number = i;//(i-BUTTON_MIN)%4;
-						var bangAngle:Number;
-						var bangDX:Number = 0;
-						var bangDY:Number = 0;
-						if (buttonGaugeNumber == 8) {buttonSheet = buttonLSheet; w = 8; h = 32; bangAngle = 90; bangDX = 8;}
-						else if (buttonGaugeNumber == 7) {buttonSheet = buttonUSheet; w = 32; h = 8; bangAngle = 180; bangDY = 8;}
-						else if (buttonGaugeNumber == 9) {buttonSheet = buttonRSheet; buttonPoint.x; w = 8; h = 32; bangAngle = -90; bangDX = -32;}
-						else if (buttonGaugeNumber == 6) {buttonSheet = buttonDSheet; buttonPoint.y; w = 32; h = 8; bangAngle = 0; bangDY = -32;}
-						
-						
-						var button:FlxSprite = new FlxSprite(buttonPoint.x,buttonPoint.y);
-						button.loadGraphic(buttonSheet,true,false,w,h,true);
-						button.frame = BUTTON_INIT;
-						
-						buttonGroup.add(button);
-						buttonStateArray.push(false);
-						
-						var bang:FlxSprite = new FlxSprite(button.x+bangDX,button.y+bangDY);
-						bang.loadGraphic(bangSheet,true,false,32,32,true);
-						bang.angle = bangAngle;
-						bang.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
-						bang.play("excite");
-						buttonBangGroup.add(bang);
-						buttonReactionArray.push(buttonReaction);
-					}
-				}
-			}
-			add(buttonGroup);
-			add(buttonBangGroup);
-			*/
 			addButtons();
 			
 			bodyGearGroup = new FlxGroup();
@@ -570,10 +385,10 @@ package {
 			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 			for (var b:uint = 0; b < STEAM.length; b++) {
 				i = STEAM[b];
-				var steamArray:Array = level.getTileInstances(i);
+				var steamArray:Array = levelCosmeticFront.getTileInstances(i);
 				if (steamArray) {
-					for (j = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],level);
+					for (var j:uint = 0; j < steamArray.length; j++) {
+						var steamPoint:FlxPoint = pointForTile(steamArray[j],levelCosmeticFront);
 						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
 						//steam.alpha = 0.5;
 						steam.loadGraphic(steamSheet,true,false,32,32,true);
@@ -679,31 +494,6 @@ package {
 			setDir(hand, FlxObject.DOWN, true);
 			
 			camTag = new FlxSprite(hand.x,hand.y);
-			/*
-			// sign
-			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
-			if (signArray) {
-				midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
-				for (j = 0; j < signArray.length; j++) {
-					var signPoint:FlxPoint = pointForTile(signArray[j],midground);
-					midground.setTileByIndex(signArray[j],0);
-					add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
-				}
-			}*/
-			/*
-			hint = new FlxSprite(0,0);
-			hint.loadGraphic(hintSheet,true,false,64,64,true);
-			hint.addAnimation("idle",[0]);
-			//hint.addAnimation("think",[1,2,3,4],10,false);
-			//hint.addAnimation("thinking up",[4]);
-			//hint.addAnimation("thinking space",[5]);
-			hint.addAnimation("X",[1,2,3],10,true);
-			hint.addAnimation("Z",[4,5,6],10,true);
-			hint.addAnimation("arrows",[7,8,9],10,true);
-			hint.addAnimation("left X right",[10,11,12],10,true);
-			hint.addAnimation("enter",[13,14,15],10,true);
-			hint.play("idle");
-			add(hint);*/
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
@@ -739,21 +529,9 @@ package {
 			
 			FlxG.camera.follow(camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
 			
-			/*
-			// TEST HINT
-			testHint = new SprHint();
-			testHint.y -= testHint.width;
-			testHint.angle = 30;
-			testHint.text = "Press the #M key to do something. No fucking clue what."
-			add(testHint);
-			*/
-			
 			addRoaches();
 			
 			overlay.makeGraphic(FlxG.width,FlxG.height,0xff000000);
-			//overlay.scrollFactor = new FlxPoint(0, 0);
-			//overlay.alpha = 0;
-			//add(overlay);
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 		}
@@ -767,6 +545,118 @@ package {
 					}
 				}
 			}
+		}
+		
+		private function setUpAudio():void {
+			if (!Registry.SOUND_ON) {
+				SoundMixer.soundTransform = new SoundTransform(0);	
+			}
+			
+			var $curMus:FlxSound = RegistryLevels.currentMusic;
+			var $curMusOverlay:FlxSound = RegistryLevels.currentMusicOverlay;
+			
+			var $preMus:FlxSound = RegistryLevels.previousMusic;
+			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
+			
+			musOverlay = $curMusOverlay;
+			
+			if ($preMus && $curMus != $preMus) {
+				add($preMus);
+				add($preMusOverlay);
+				$preMus.fadeOut(2.2);
+				$preMusOverlay.fadeOut(2.2);
+			}
+			$curMus.play();
+			$curMusOverlay.play();
+			hideMusicOverlayInstantly();
+			
+			ambientSteamSound.volume = 0.5;
+		}
+		
+		private function addLevelCosmeticBack():void {
+			var $lvlCosmBack:FlxTilemap = RegistryLevels.lvlCosmBack();
+			if ($lvlCosmBack.totalTiles <= 0) {return;}
+			
+			$lvlCosmBack.scrollFactor = new FlxPoint(0.5, 0.5);
+			
+			add($lvlCosmBack);
+		}
+		
+		private function addLevelCosmeticMid():void {
+			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
+			if ($lvlCosmMid.totalTiles <= 0) {return;}
+			
+			add($lvlCosmMid);
+			addHints($lvlCosmMid);
+			/*
+			// GEARS
+			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
+				var gearArray:Array = $lvlCosmMid.getTileInstances(i);
+				if (gearArray) {
+					for (var j:int = 0; j < gearArray.length; j++) {
+						
+						// Decide gear spin (In or Out)
+						// n.b. Every other gear in the sheet is In or Out
+						var gearGroup:FlxGroup;
+						if (i%2 == 0) {gearGroup = gearInGroup;}
+						else {gearGroup = gearOutGroup;}
+						
+						// Decide gear size
+						// n.b. Gears are grouped by 3 speeds, then by 2 sizes, then 2 spins
+						var gearSheet:Class;
+						var gearGaugeNumber:Number = (i-GEAR_MIN)%6;
+						if (gearGaugeNumber < 2) {gearSheet = gear64x64Sheet;}
+						else if (gearGaugeNumber < 4) {gearSheet = gear32x32Sheet;}
+						else {gearSheet = gear16x16Sheet;}
+						
+						// do something for gear speed...?  Do we need gears to spin at different speeds?  Maybe not...
+						
+						var gearPoint:FlxPoint = pointForTile(gearArray[j],$lvlCosmMid);
+						var gear:FlxSprite = new FlxSprite(gearPoint.x,gearPoint.y,gearSheet);
+						gearGroup.add(gear);
+					}
+				}
+			}
+			add(gearInGroup);
+			add(gearOutGroup);
+			
+			// TRASH
+			var trashArray:Array = $lvlCosmMid.getTileInstances(TRASH_SPAWN);
+			if (trashArray) {
+				var trashValidFrames:Array = [0,1,2,3,4,5,6,7];//,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,33,34];
+				var trashValidAngles:Array = [90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270];
+				for (j = 0; j < trashArray.length; j++) {
+					var trashPoint:FlxPoint = pointForTile(trashArray[j],$lvlCosmMid);
+					var trash:FlxSprite = new FlxSprite(trashPoint.x,trashPoint.y);
+					trash.loadGraphic(trashSheet,true,false,32,32,true);
+					trash.color = 0xff555555;
+					trash.frame = trashValidFrames[int(Math.random()*(trashValidFrames.length-1))];
+					trash.angle = trashValidAngles[int(Math.random()*(trashValidAngles.length-1))];
+					trash.immovable = true;
+					trashGroup.add(trash);
+				}
+			}
+			add(trashGroup);
+			*/
+		}
+		
+		private function addLevelCosmeticFront():void {
+			levelCosmeticFront = RegistryLevels.lvlCosmFront();
+			if (levelCosmeticFront.totalTiles <= 0) {return;}
+			
+			/*
+			// sign
+			var signArray:Array = midground.getTileInstances(SIGN_SPAWN);
+			if (signArray) {
+			midground.setTileProperties(SIGN_SPAWN,FlxObject.NONE);
+			for (j = 0; j < signArray.length; j++) {
+			var signPoint:FlxPoint = pointForTile(signArray[j],midground);
+			midground.setTileByIndex(signArray[j],0);
+			add(new FlxSprite(signPoint.x, signPoint.y, signSheet));
+			}
+			}*/
+			
+			add(levelCosmeticFront);
 		}
 		
 		private function addButtons():void {
@@ -821,18 +711,96 @@ package {
 			}
 		}
 		
-		private function addHints():void {
+		private function addHints($lvl:FlxTilemap):void {
+			
+			var $hintGroup:FlxGroup = new FlxGroup();
 			
 			var i:uint;
 			var $hint:SprHint;
 			
-			hintArrowKeysGroup = groupFromSpawn(RegistryLevels.kSpawnHintArrowKeys,SprHint,level);
-			for (i = 0; i < hintArrowKeysGroup.length; i++) {
-				$hint = hintArrowKeysGroup.members[i];
+			var $debugCounter:uint = 0;
+			
+			// HINT 0
+			var $hint0Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint0,SprHint,$lvl);
+			for (i = 0; i < $hint0Group.length; i++) {
+				$hint = $hint0Group.members[i];
 				$hint.text = "SCRAP cannot press the LEFT or RIGHT ARROW KEYS to MOVE.";
 				$hint.angle = 0;
+				$hintGroup.add($hint);
 			}
-			add(hintArrowKeysGroup);
+			$debugCounter++;
+			// HINT 1
+			var $hint1Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint1,SprHint,$lvl);
+			for (i = 0; i < $hint1Group.length; i++) {
+				$hint = $hint1Group.members[i];
+				$hint.text = "Do NOT push the button. It's very bad. Very, very bad.";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 2
+			var $hint2Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint2,SprHint,$lvl);
+			for (i = 0; i < $hint2Group.length; i++) {
+				$hint = $hint2Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 3
+			var $hint3Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint3,SprHint,$lvl);
+			for (i = 0; i < $hint3Group.length; i++) {
+				$hint = $hint3Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 4
+			var $hint4Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint4,SprHint,$lvl);
+			for (i = 0; i < $hint4Group.length; i++) {
+				$hint = $hint4Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 5
+			var $hint5Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint5,SprHint,$lvl);
+			for (i = 0; i < $hint5Group.length; i++) {
+				$hint = $hint5Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 6
+			var $hint6Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint6,SprHint,$lvl);
+			for (i = 0; i < $hint6Group.length; i++) {
+				$hint = $hint6Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			// HINT 7
+			var $hint7Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint7,SprHint,$lvl);
+			for (i = 0; i < $hint7Group.length; i++) {
+				$hint = $hint7Group.members[i];
+				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.angle = 0;
+				$hintGroup.add($hint);
+			}
+			$debugCounter++;
+			
+			for (i = 0; i < $hintGroup.length; i++) {
+				$hint = $hintGroup.members[i];
+				$hint.x += Number($lvl.width/$lvl.widthInTiles)/2.0 - $hint.width/2.0;
+				$hint.y += Number($lvl.height/$lvl.heightInTiles)/2.0 - $hint.height/2.0;
+			}
+			
+			add($hintGroup);
+			
 		}
 		
 		private function addDripperEvent():void {
@@ -863,7 +831,7 @@ package {
 			dripGroup = new FlxGroup();
 			var tmpMaybeDrip:Function = function():void {
 				
-				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,level);
+				var tmpDripGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,levelCosmeticFront);
 				
 				for (var i:uint = 0; i < tmpDripGroup.length; i++) {
 					var tmpDrip:SprDrip = tmpDripGroup.members[i];
@@ -872,10 +840,43 @@ package {
 						dripGroup.add(tmpDrip);
 					}
 				}
-			}
+			};
 			
 			dripperEvent = new EventTimer(2.2,tmpMaybeDrip);
 			add(dripperEvent);
+			
+			
+			
+			/*
+			dripGroup = new FlxGroup();
+			
+			var $dripSpriteGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnDrip,SprDrip,levelCosmeticFront);
+			var $dripSprite:SprDrip;
+			var $maybeDrip:Function;
+			var $dripEvent:EventTimer;
+			
+			for (var i:uint = 0; i < $dripSpriteGroup.length; i++) {
+				$dripSprite = $dripSpriteGroup.members[i];
+				
+				var $x:Number = $dripSprite.x;
+				Registry.log($x);
+				
+				$maybeDrip = function():void {
+					if (maybe()) {
+						var $newDripSprite:SprDrip = $dripSprite.refreshedCopy();
+						add($newDripSprite);
+						dripGroup.add($newDripSprite);
+						
+						Registry.log($x);
+					}
+				};
+				
+				$dripEvent = new EventTimer(2.2 + Math.random()*2.2,$maybeDrip);
+				add($dripEvent);
+			}
+			*/
+			
+			
 			
 		}
 		
@@ -884,7 +885,7 @@ package {
 		}
 		
 		private function addRoaches():void {
-			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,level);
+			roachGroup = groupFromSpawn(RegistryLevels.kSpawnRoaches,SprRoach,levelCosmeticFront);
 			add(roachGroup);
 		}
 		
