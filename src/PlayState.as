@@ -2433,7 +2433,9 @@ package {
 						break;
 					}
 				}
-				if (FlxG.overlap(markerEnd, buttonGroup) || (markerEnd.touching != 0 && isMetalInDir(markerEnd, markerEnd.touching/*, 4*/))) {
+				if (FlxG.overlap(markerEnd, buttonGroup)) {
+					setGrappleButton();
+				} else if (markerEnd.touching != 0 && isMetalInDir(markerEnd, markerEnd.touching/*, 4*/)) {
 					setGrappleOkay();
 				}
 				markerEnd.velocity.x = 0;
@@ -2458,6 +2460,13 @@ package {
 			markerEnd.color = poleCol;
 			//markerEnd.color = 0xffffff;
 			bodyMarkerGroup.setAll("color", 0xffffff);
+		}
+		
+		public function setGrappleButton():void {
+			markerEnd.visible = true;
+			markerEnd.color = col;
+			//markerEnd.color = 0xffffff;
+			bodyMarkerGroup.setAll("color", col);
 		}
 		
 		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap):FlxGroup {
