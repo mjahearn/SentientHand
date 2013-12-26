@@ -149,11 +149,11 @@ package {
 		
 		public var reversePolarity:Boolean;
 		
-		[Embed("assets/cannon.png")] public var cannonSheet:Class;
+		[Embed("assets/spr_cannon.png")] public var cannonSheet:Class;
 		
 		[Embed("assets/trash.png")] public var trashSheet:Class;
 		
-		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
+		[Embed("assets/spr_arm_base.png")] public var armBaseSheet:Class;
 		
 		/*
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
@@ -164,8 +164,8 @@ package {
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		//[Embed("assets/hand.png")] public var handSheet:Class;
 		//[Embed("assets/hint.png")] public var hintSheet:Class;
-		[Embed("assets/arm.png")] public var armSheet:Class;
-		[Embed("assets/body.png")] public var bodySheet:Class;
+		[Embed("assets/spr_arm.png")] public var armSheet:Class;
+		[Embed("assets/spr_body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/electricity.png")] public var electricitySheet:Class;
 		
@@ -182,7 +182,7 @@ package {
 		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
+		[Embed("assets/spr_bodygear.png")] public var bodyGearSheet:Class;
 		
 		//[Embed("assets/!.png")] public var bangSheet:Class;
 		
@@ -224,7 +224,7 @@ package {
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
-		[Embed("assets/head.png")] public var headSheet:Class;
+		[Embed("assets/spr_head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
 		[Embed("assets/factory.png")] public var factorySheet:Class;
 		
