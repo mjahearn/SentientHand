@@ -1052,7 +1052,7 @@ package {
 			}
 			
 			if (hand.isAttachedToGrappler()) {
-				if (!handOut && !handIn) {
+				if (!handOut && !handIn && !handFalling) {
 					/*rad = arrow.angle*Math.PI/180;
 					var startX:Number = hand.x+hand.width/2.0;
 					var startY:Number = hand.y+hand.height/2.0;
@@ -1259,7 +1259,7 @@ package {
 				dirtFootstepsSound.stop();
 			}
 			// The hand is in the body, aiming
-			if (hand.isAttachedToBody() && !handOut && !handIn) {
+			if (hand.isAttachedToBody() && !handOut && !handIn && !handFalling) {
 			//if ((bodyMode || hand.isAttachedToCannon()) && !handOut && !handIn) {
 				grappleExtendSound.stop();
 				if ((FlxG.keys.RIGHT || FlxG.keys.LEFT) && -270 < hand.angle - body.angle && hand.angle - body.angle < -90) {
@@ -1552,7 +1552,7 @@ package {
 			else if (hand.isAttachedToBody()) {
 			//else if (bodyMode || hand.isAttachedToCannon()) {
 				// The hand is idling in the body
-				if (!handOut && !handIn) {
+				if (!handOut && !handIn && !handFalling) {
 					hand.angle = arrow.angle - 90;
 					body.angle = bodyTargetAngle;
 					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
@@ -1665,10 +1665,12 @@ package {
 					}*/
 				}
 				
-				body.velocity.x = 0;
-				body.velocity.y = 0;
-				hand.velocity.x = 0;
-				hand.velocity.y = 0;
+				if (body.acceleration.y == 0) {
+					body.velocity.x = 0;
+					body.velocity.y = 0;
+					hand.velocity.x = 0;
+					hand.velocity.y = 0;
+				}
 				var diffX:Number = hand.x + hand.width/2.0 - body.x - body.width/2.0;
 				var diffY:Number = hand.y + hand.width/2.0 - body.y - body.height/2.0;
 				if (handOut) {
@@ -1716,11 +1718,17 @@ package {
 							setDir(body,hand.facing);
 							showArrow();
 						}
-						markerEnd.visible = true;
-						updateRaytrace(arrow.angle);
 						hand.allowCollisions = FlxObject.ANY;
+						if (isMetalInDir(body, body.facing)) {
+							markerEnd.visible = true;
+							updateRaytrace(arrow.angle);
+						} else {
+							setDir(body,FlxObject.DOWN,true);
+							setDir(hand,FlxObject.DOWN,true);
+							handFalling = true;
+						}
 					}
-				} if (!handOut && !handIn) {
+				} if (!handOut && !handIn && !handFalling) {
 					if (playerIsPressing(FlxObject.LEFT)) {
 						arrow.angle -= ROTATE_RATE;
 						if (arrow.angle < arrowStartAngle - 90) {arrow.angle = arrowStartAngle - 90;}
@@ -1894,7 +1902,7 @@ package {
 				}
 			}
 			
-			if (hand.isAttachedToGrappler() && !handOut && !handIn) {
+			if (hand.isAttachedToGrappler() && !handOut && !handIn && !handFalling) {
 				theta = (arrow.angle)*Math.PI/180.0;
 				var dotNum:int = int(Math.sqrt(Math.pow(markerEnd.x-body.x, 2) + Math.pow(markerEnd.y-body.y, 2)))/DOT_SPACING;
 				for (var n:int = 0; n <= dotNum; n++) {
@@ -2068,6 +2076,8 @@ package {
 				//if (!bodyMode) {
 					fixGravity(spr);
 				}
+			} else if (spr in bodyGroup.members) {
+				fixGravity(spr);
 			}
 		}
 		
