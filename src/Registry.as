@@ -35,7 +35,7 @@ package {
 			return music2;
 		}
 		
-		[Embed("assets/hand.png")] public static const kHandSheet:Class;
+		[Embed("assets/spr_hand.png")] public static const kHandSheet:Class;
 		[Embed("assets/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;
 		[Embed("assets/spr_hint.png")] public static const kHintSheet:Class;
 		[Embed("assets/spr_drip.png")] public static const kDripSheet:Class;

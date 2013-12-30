@@ -149,11 +149,11 @@ package {
 		
 		public var reversePolarity:Boolean;
 		
-		[Embed("assets/cannon.png")] public var cannonSheet:Class;
+		[Embed("assets/spr_cannon.png")] public var cannonSheet:Class;
 		
 		[Embed("assets/trash.png")] public var trashSheet:Class;
 		
-		[Embed("assets/arm_base.png")] public var armBaseSheet:Class;
+		[Embed("assets/spr_arm_base.png")] public var armBaseSheet:Class;
 		
 		/*
 		[Embed("assets/level-tiles.png")] public var tileset:Class;
@@ -164,8 +164,8 @@ package {
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
 		//[Embed("assets/hand.png")] public var handSheet:Class;
 		//[Embed("assets/hint.png")] public var hintSheet:Class;
-		[Embed("assets/arm.png")] public var armSheet:Class;
-		[Embed("assets/body.png")] public var bodySheet:Class;
+		[Embed("assets/spr_arm.png")] public var armSheet:Class;
+		[Embed("assets/spr_body.png")] public var bodySheet:Class;
 		
 		[Embed("assets/electricity.png")] public var electricitySheet:Class;
 		
@@ -182,7 +182,7 @@ package {
 		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
 		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
 		
-		[Embed("assets/bodygear.png")] public var bodyGearSheet:Class;
+		[Embed("assets/spr_bodygear.png")] public var bodyGearSheet:Class;
 		
 		//[Embed("assets/!.png")] public var bangSheet:Class;
 		
@@ -224,7 +224,7 @@ package {
 		
 		[Embed("assets/steam.png")] public var steamSheet:Class;
 		
-		[Embed("assets/head.png")] public var headSheet:Class;
+		[Embed("assets/spr_head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
 		[Embed("assets/factory.png")] public var factorySheet:Class;
 		
@@ -1554,11 +1554,12 @@ package {
 				// The hand is idling in the body
 				if (!handOut && !handIn && !handFalling) {
 					hand.angle = arrow.angle - 90;
-					body.angle = bodyTargetAngle;
+					/*body.angle = bodyTargetAngle;
 					if (body.angle == 0) {body.facing = FlxObject.DOWN;}
 					else if (body.angle == 270) {body.facing = FlxObject.RIGHT;}
 					else if (body.angle == 180) {body.facing = FlxObject.UP;}
-					else if (body.angle == 90) {body.facing = FlxObject.LEFT;}
+					else if (body.angle == 90) {body.facing = FlxObject.LEFT;}*/
+					adjustBody(body);
 					
 					if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimIdleBodyLeft);}
 					else {hand.play(SprHand.kAnimIdleBodyRight);}
@@ -1955,7 +1956,6 @@ package {
 	
 			FlxG.collide(dripGroup,levelFunctional);
 
-			
 			FlxG.collide(levelFunctional,hand);
 			FlxG.collide(levelFunctional,bodyGroup);
 			
@@ -2055,7 +2055,7 @@ package {
 				fixGravity(spr);
 			} else if (spr == markerEnd) {
 				setGrappleOkay();
-			} else if (spr in bodyGroup.members) {
+			} else if (isBody(spr)) {
 				fixGravity(spr);
 			}
 		}
@@ -2076,7 +2076,7 @@ package {
 				//if (!bodyMode) {
 					fixGravity(spr);
 				}
-			} else if (spr in bodyGroup.members) {
+			} else if (isBody(spr)) {
 				fixGravity(spr);
 			}
 		}
@@ -2108,16 +2108,16 @@ package {
 				
 		public function fixGravity(spr:FlxSprite):void {
 			var hitOnlyWood:Boolean = true;
-			if (hand.isTouching(FlxObject.DOWN)) {
+			if (spr.isTouching(FlxObject.DOWN)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.DOWN);
-			} else if (hand.isTouching(FlxObject.UP) && isMetalInDir(hand,FlxObject.UP/*, 4*/)) { //max was originally 3, but I think that was a typo from back when there were corners
+			} else if (spr.isTouching(FlxObject.UP) && isMetalInDir(spr,FlxObject.UP/*, 4*/)) { //max was originally 3, but I think that was a typo from back when there were corners
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.UP);
-			} else if (hand.isTouching(FlxObject.LEFT) && isMetalInDir(hand,FlxObject.LEFT/*, 4*/)) {
+			} else if (spr.isTouching(FlxObject.LEFT) && isMetalInDir(spr,FlxObject.LEFT/*, 4*/)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.LEFT);
-			} else if (hand.isTouching(FlxObject.RIGHT) && isMetalInDir(hand,FlxObject.RIGHT/*, 4*/)) {
+			} else if (spr.isTouching(FlxObject.RIGHT) && isMetalInDir(spr,FlxObject.RIGHT/*, 4*/)) {
 				hitOnlyWood = false;
 				setDir(spr, FlxObject.RIGHT);
 			}
@@ -2153,24 +2153,29 @@ package {
 				onGround = true;
 				camTag.angle = trueAngle(camTag.angle);
 			}
-			if (dir == FlxObject.DOWN) {
-				camAngle = 0;
-			} else if (dir == FlxObject.UP) {
-				if (camAngle < 0) {
-					camAngle = -180;
-				} else {
-					camAngle = 180;
+			if (spr == hand) {
+				if (dir == FlxObject.DOWN) {
+					camAngle = 0;
+				} else if (dir == FlxObject.UP) {
+					if (camAngle < 0) {
+						camAngle = -180;
+					} else {
+						camAngle = 180;
+					}
+				} else if (dir == FlxObject.LEFT) {
+					if (camAngle == -180) {
+						camTag.angle = 180;
+					}
+					camAngle = 90;
+				} else if (dir == FlxObject.RIGHT) {
+					if (camAngle == 180) {
+						camTag.angle = -180;
+					}
+					camAngle = -90;
 				}
-			} else if (dir == FlxObject.LEFT) {
-				if (camAngle == -180) {
-					camTag.angle = 180;
-				}
-				camAngle = 90;
-			} else if (dir == FlxObject.RIGHT) {
-				if (camAngle == 180) {
-					camTag.angle = -180;
-				}
-				camAngle = -90;
+			} else if (isBody(spr)) {
+				adjustBody(spr);
+				showArrow();
 			}
 		}
 		
@@ -2180,7 +2185,7 @@ package {
 		
 		// I kind of want to nix arrows and bodyTargetAngle etc
 		public function showArrow():void {
-			arrow.angle = bodyTargetAngle - 90;
+			arrow.angle = bodyGroup.members[curBody].angle - 90;
 			arrowStartAngle = arrow.angle;
 		}
 		
@@ -2613,7 +2618,18 @@ package {
 		}
 		
 		private function get poleCol():uint {
-			return reversePolarity?0xff0000:0xffffff;
+			return reversePolarity?0xff0000:0xffff00;
+		}
+		
+		private function isBody(spr:FlxSprite):Boolean {
+			return bodyGroup.members.indexOf(spr) > -1;
+		}
+		
+		private function adjustBody(spr:FlxSprite):void {
+			if (spr.facing == FlxObject.DOWN) {spr.angle = 0;}
+			else if (spr.facing == FlxObject.LEFT) {spr.angle = 90;}
+			else if (spr.facing == FlxObject.UP) {spr.angle = 180;}
+			else if (spr.facing == FlxObject.RIGHT) {spr.angle = 270;}
 		}
 	}
 }
