@@ -1672,8 +1672,8 @@ package {
 					hand.velocity.x = 0;
 					hand.velocity.y = 0;
 				}
-				var diffX:Number = hand.x + hand.width/2.0 - body.x - body.width/2.0;
-				var diffY:Number = hand.y + hand.width/2.0 - body.y - body.height/2.0;
+				var diffX:Number = hand.getMidpoint().x - body.getMidpoint().x; //hand.x + hand.width/2.0 - body.x - body.width/2.0;
+				var diffY:Number = hand.getMidpoint().y - body.getMidpoint().y; //hand.y + hand.width/2.0 - body.y - body.height/2.0;
 				if (handOut) {
 					//rad = Math.atan2(diffY, diffX);
 					//arrow.angle = 180*rad/Math.PI;
@@ -1681,6 +1681,7 @@ package {
 					if (hand.touching <= 0 && Math.pow(diffX, 2) + Math.pow(diffY, 2) < Math.pow(GRAPPLE_LENGTH,2)) {
 						hand.velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 						hand.velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+						FlxG.log(hand.velocity.x + " " + hand.velocity.y);
 					} else {
 						handOut = false;
 						handIn = true;
@@ -2072,7 +2073,7 @@ package {
 			if (spr == hand) {
 				handWoodFlag = ind;
 				lastTouchedWood = true;
-				if (!hand.isAttachedToGrappler()) {
+				if (!hand.isAttachedToGrappler() || handFalling) {
 				//if (!bodyMode) {
 					fixGravity(spr);
 				}
