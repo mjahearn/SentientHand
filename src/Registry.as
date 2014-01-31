@@ -47,6 +47,10 @@ package {
 		[Embed("assets/splash.png")] public static const kSplashSheet:Class;
 		[Embed("assets/prompt.png")] public static const kSplashPromptSheet:Class;
 		[Embed("assets/spr_heart.png")] public static const kHeartSheet:Class;
+		[Embed("assets/spr_bulb_base.png")] public static const kBulbBaseSheet:Class;
+		[Embed("assets/spr_bulb_anim.png")] public static const kBulbAnimSheet:Class;
+		[Embed("assets/spr_bulb_illumination.png")] public static const kBulbIlluminationSheet:Class;
+		[Embed("assets/spr_bulb_support.png")] public static const kBulbSupportSheet:Class;
 		
 		[Embed("assets/Reverse_Polarity1.mp3")] public static const kButtonPressSFX:Class;
 		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
