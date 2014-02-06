@@ -467,6 +467,9 @@ package {
 			overlay.makeGraphic(FlxG.width,FlxG.height,0xff000000);
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
+			
+			var $bulb:SprBulb = new SprBulb(hand.x, hand.y);
+			add($bulb);
 		}
 		
 		private function stupidCollisionThing():void {
