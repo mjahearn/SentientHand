@@ -98,6 +98,10 @@ package
 		[Embed("assets/mapCSV_functional_grapple1.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
 		[Embed("assets/mapCSV_functional_cannon2.csv",mimeType="application/octet-stream")] private static const kFuncb04Sheet:Class;
 		[Embed("assets/mapCSV_functional_grapple2.csv",mimeType="application/octet-stream")] private static const kFuncb05Sheet:Class;
+		[Embed("assets/mapCSV_functional_Map11.csv",mimeType="application/octet-stream")] private static const kFuncb06Sheet:Class;
+		[Embed("assets/mapCSV_functional_Map12.csv",mimeType="application/octet-stream")] private static const kFuncb07Sheet:Class;
+		[Embed("assets/mapCSV_functional_Map13.csv",mimeType="application/octet-stream")] private static const kFuncb08Sheet:Class;
+		[Embed("assets/mapCSV_functional_Map14.csv",mimeType="application/octet-stream")] private static const kFuncb09Sheet:Class;
 		[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
 		[Embed("assets/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
 		[Embed("assets/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
@@ -153,12 +157,12 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [null,null,null,null,null,null,null,null,null,kCosmm01FrontSheet,null,kCosm001FrontSheet,kCosm006FrontSheet];
-		private static const kCosmCsvsMid:Array = [null,null,null,null,kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,kCosmm01MidSheet,null,kCosm001MidSheet,kCosm006MidSheet];
-		private static const kCosmCsvsBack:Array = [null,null,null,null,kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,null,null,kCosm001BackSheet,kCosm006BackSheet];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [null,null,null,null,null,null,null,null,null,null,null,null,null,kCosmm01FrontSheet,null,kCosm001FrontSheet,kCosm006FrontSheet];
+		private static const kCosmCsvsMid:Array = [null,null,null,null,kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005MidSheet,null,null,null,null,kCosmm01MidSheet,null,kCosm001MidSheet,kCosm006MidSheet];
+		private static const kCosmCsvsBack:Array = [null,null,null,null,kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,kCosm005BackSheet,null,null,null,null,null,null,kCosm001BackSheet,kCosm006BackSheet];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		//private static const kMusicMain:Array = [kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain,kMusicAMain];
 		
 		// GET CSVS
