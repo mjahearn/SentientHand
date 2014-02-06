@@ -535,8 +535,12 @@ package {
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 			
+			// TEST BULB
 			var $bulb:SprBulb = new SprBulb(hand.x, hand.y);
 			add($bulb);
+			// TEST EXIT SIGN
+			var $exitSign:SprExit = new SprExit(SprExit.kL,hand.x+hand.width*2,hand.y);
+			add($exitSign);
 		}
 		
 		private function stupidCollisionThing():void {

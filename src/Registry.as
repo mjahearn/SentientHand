@@ -51,6 +51,11 @@ package {
 		[Embed("assets/spr_bulb_anim.png")] public static const kBulbAnimSheet:Class;
 		[Embed("assets/spr_bulb_illumination.png")] public static const kBulbIlluminationSheet:Class;
 		[Embed("assets/spr_bulb_support.png")] public static const kBulbSupportSheet:Class;
+		[Embed("assets/spr_exit_sign.png")] public static const kExitSignSheet:Class;
+		[Embed("assets/spr_exit_sign_on_c.png")] public static const kExitSignCSheet:Class;
+		[Embed("assets/spr_exit_sign_on_l.png")] public static const kExitSignLSheet:Class;
+		[Embed("assets/spr_exit_sign_on_r.png")] public static const kExitSignRSheet:Class;
+		
 		
 		[Embed("assets/Reverse_Polarity1.mp3")] public static const kButtonPressSFX:Class;
 		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
