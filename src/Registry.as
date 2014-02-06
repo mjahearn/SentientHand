@@ -57,13 +57,16 @@ package {
 		[Embed("assets/spr_exit_sign_on_r.png")] public static const kExitSignRSheet:Class;
 		
 		
-		[Embed("assets/Reverse_Polarity1.mp3")] public static const kButtonPressSFX:Class;
-		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
-		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
 		public static const kAttachHappySound:FlxSound = new FlxSound().loadEmbedded(kAttachHappySFX);
 		
 		[Embed("assets/Attach_Sad1.mp3")] public static const kAttachSadSFX:Class;
 		public static const kAttachSadSound:FlxSound = new FlxSound().loadEmbedded(kAttachSadSFX);
+		
+		[Embed("assets/Reverse_Polarity1.mp3")] public static const kButtonPressSFX:Class;
+		public static const kButtonPressSound:FlxSound = new FlxSound().loadEmbedded(kButtonPressSFX);
+		
+		[Embed("assets/Jump.mp3")] public static const kJumpSFX:Class;
+		public static var kJumpSound:FlxSound = new FlxSound().loadEmbedded(kJumpSFX);
 	}
 }
