@@ -477,6 +477,9 @@ package {
 			// TEST WINDOW
 			var $window:SprWindow = new SprWindow(hand.x,hand.y-hand.height*8);
 			add($window);
+			// TEST GRATE
+			var $grate:SprGrate = new SprGrate(SprGrate.kBroken0,hand.x,hand.y+hand.height*2);
+			add($grate);
 		}
 		
 		private function stupidCollisionThing():void {

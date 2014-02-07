@@ -29,7 +29,7 @@ package
 			anims.loadGraphic(Registry.kBulbAnimSheet,true,false,width,height);
 			anims.addAnimation(kAnimOn,[1,2,3],10);
 			anims.addAnimation(kAnimOff,[0]);
-			anims.alpha = 0.33;
+			anims.alpha = 0.44;
 			
 			playTurnOn();
 			

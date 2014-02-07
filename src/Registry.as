@@ -57,6 +57,7 @@ package {
 		[Embed("assets/spr_exit_sign_on_r.png")] public static const kExitSignRSheet:Class;
 		[Embed("assets/spr_window.png")] public static const kWindowSheet:Class;
 		[Embed("assets/spr_window_rain.png")] public static const kWindowRainSheet:Class;
+		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
 		
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
