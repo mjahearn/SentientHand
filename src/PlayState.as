@@ -468,6 +468,7 @@ package {
 			
 			stupidCollisionThing(); // because I took out the hiding part of spawning, but didn't want to create new groups for wood and metal collisions
 			
+			/*
 			// TEST BULB
 			var $bulb:SprBulb = new SprBulb(hand.x, hand.y);
 			add($bulb);
@@ -479,7 +480,7 @@ package {
 			add($window);
 			// TEST GRATE
 			var $grate:SprGrate = new SprGrate(SprGrate.kBroken0,hand.x,hand.y+hand.height*2);
-			add($grate);
+			add($grate);*/
 		}
 		
 		private function stupidCollisionThing():void {
