@@ -51,6 +51,14 @@ package {
 		[Embed("assets/spr_bulb_anim.png")] public static const kBulbAnimSheet:Class;
 		[Embed("assets/spr_bulb_illumination.png")] public static const kBulbIlluminationSheet:Class;
 		[Embed("assets/spr_bulb_support.png")] public static const kBulbSupportSheet:Class;
+		[Embed("assets/spr_exit_sign.png")] public static const kExitSignSheet:Class;
+		[Embed("assets/spr_exit_sign_on_c.png")] public static const kExitSignCSheet:Class;
+		[Embed("assets/spr_exit_sign_on_l.png")] public static const kExitSignLSheet:Class;
+		[Embed("assets/spr_exit_sign_on_r.png")] public static const kExitSignRSheet:Class;
+		[Embed("assets/spr_window.png")] public static const kWindowSheet:Class;
+		[Embed("assets/spr_window_rain.png")] public static const kWindowRainSheet:Class;
+		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
+		
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
 		public static const kAttachHappySound:FlxSound = new FlxSound().loadEmbedded(kAttachHappySFX);
