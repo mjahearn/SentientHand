@@ -50,7 +50,7 @@ package
 		
 		private function maybeAddDropToWindow():void {
 			
-			var $randNum:uint = Math.random()*11;			
+			var $randNum:uint = Math.random()*5;			
 			for (var i:uint = 0; i < $randNum; i++) {
 				var $randX:Number = Math.random()*(width-8);
 				var $randY:Number = Math.random()*(height-32);
