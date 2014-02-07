@@ -474,6 +474,9 @@ package {
 			// TEST EXIT SIGN
 			var $exitSign:SprExit = new SprExit(SprExit.kL,hand.x+hand.width*2,hand.y);
 			add($exitSign);
+			// TEST WINDOW
+			var $window:SprWindow = new SprWindow(hand.x,hand.y-hand.height*8);
+			add($window);
 		}
 		
 		private function stupidCollisionThing():void {
