@@ -1,6 +1,7 @@
 package
 {
 	import org.flixel.FlxSprite;
+	import org.flixel.FlxG;
 	
 	public class SprExitChute extends FlxSprite
 	{
@@ -28,7 +29,7 @@ package
 		
 		public function shut():void {door.play(kAnimShut);}
 		public function open():void {door.play(kAnimOpen);}
-		public function spit():void {door.play(kAnimSpit);}
+		public function spit():void {door.play(kAnimSpit); FlxG.play(Registry.kRustyHatchCloseSFX);}
 		
 		override public function draw():void {
 			super.draw();

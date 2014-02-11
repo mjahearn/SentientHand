@@ -1446,6 +1446,11 @@ package {
 						else {hand.play(SprHand.kAnimIdleBodyRight);}
 					}
 					
+					if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimGrabLeft);}
+						else {hand.play(SprHand.kAnimGrabRight);}
+					}
+					
 					// Properly space and rotate the arm segments
 					var deltaX:Number = -body.x + hand.x;
 					var deltaY:Number = -body.y + hand.y;
