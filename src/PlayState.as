@@ -433,9 +433,15 @@ package {
 			*/
 			
 			addDripperEvent();
-			
+
 			// Hand
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
+			
+			// TEST EXIT CHUTE
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x-16,hand.y-16);
+			add($exitChute);
+			$exitChute.spit();
+			
 			add(hand);
 			handDir = FlxObject.RIGHT;
 			

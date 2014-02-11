@@ -58,6 +58,8 @@ package {
 		[Embed("assets/spr_window.png")] public static const kWindowSheet:Class;
 		[Embed("assets/spr_window_rain.png")] public static const kWindowRainSheet:Class;
 		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
+		[Embed("assets/spr_exit_chute.png")] public static const kExitChuteSheet:Class;
+		[Embed("assets/spr_exit_chute_door.png")] public static const kExitChuteDoorSheet:Class;
 		
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
