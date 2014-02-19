@@ -1812,10 +1812,10 @@ package {
 			
 			RegistryLevels.num++;
 			//FlxG.switchState(new PlayState);
-			var $exitFunction:Function = function():void {
+			//var $exitFunction:Function = function():void {
 				FlxG.switchState(new PlayState);
-			};
-			FlxG.fade(0xff000000,1,$exitFunction);
+			//};
+			//FlxG.fade(0xff000000,1,$exitFunction);
 			
 			
 			/*
