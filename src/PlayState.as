@@ -490,6 +490,8 @@ package {
 			// TEST GRATE
 			var $grate:SprGrate = new SprGrate(SprGrate.kBroken0,hand.x,hand.y+hand.height*2);
 			add($grate);*/
+			// TEST EXIT SIGN
+			
 		}
 		
 		private function stupidCollisionThing():void {
@@ -620,8 +622,8 @@ package {
 			var $exitChuteTmpGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnExit,FlxSprite,levelFunctional);
 			for (var i:uint = 0; i < $exitChuteTmpGroup.length; i++) {
 				var $spr:FlxSprite = $exitChuteTmpGroup.members[i];
-				$spr.x += 20;
-				$spr.y += 20;
+				//$spr.x += 20;
+				//$spr.y += 20;
 				var $exitChute:SprExitChute = new SprExitChute(false,$spr.x,$spr.y);
 				exitChuteGroup.add($exitChute);
 			}
@@ -1812,10 +1814,10 @@ package {
 			
 			RegistryLevels.num++;
 			//FlxG.switchState(new PlayState);
-			//var $exitFunction:Function = function():void {
+			var $exitFunction:Function = function():void {
 				FlxG.switchState(new PlayState);
-			//};
-			//FlxG.fade(0xff000000,1,$exitFunction);
+			};
+			FlxG.fade(0xff000000,1,$exitFunction);
 			
 			
 			/*

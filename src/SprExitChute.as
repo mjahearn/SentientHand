@@ -29,7 +29,7 @@ package
 		
 		//public function shut():void {door.play(kAnimShut);}
 		//public function open():void {door.play(kAnimOpen);}
-		public function spit():void {door.play(kAnimSpit); FlxG.play(Registry.kRustyHatchCloseSFX);}
+		public function spit():void {door.play(kAnimSpit); FlxG.play(Registry.kRustyHatchOpenAndCloseSFX);}
 		
 		override public function draw():void {
 			super.draw();
