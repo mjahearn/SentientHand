@@ -208,6 +208,7 @@ package {
 		private var dripperEvent:EventTimer;
 		private var dripGroup:FlxGroup;
 		private var roachGroup:FlxGroup;
+		private var exitChuteGroup:FlxGroup;
 		
 		private var musOverlay:FlxSound;
 		
@@ -433,9 +434,17 @@ package {
 			*/
 			
 			addDripperEvent();
-			
+
 			// Hand
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
+			
+			// TEST EXIT CHUTE
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x-16,hand.y-16);
+			add($exitChute);
+			$exitChute.spit();
+			
+			addExitChutes();
+			
 			add(hand);
 			handDir = FlxObject.RIGHT;
 			
@@ -604,6 +613,19 @@ package {
 			}*/
 			
 			add(levelCosmeticFront);
+		}
+		
+		private function addExitChutes():void {
+			exitChuteGroup = new FlxGroup();
+			var $exitChuteTmpGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnExit,FlxSprite,levelFunctional);
+			for (var i:uint = 0; i < $exitChuteTmpGroup.length; i++) {
+				var $spr:FlxSprite = $exitChuteTmpGroup.members[i];
+				$spr.x += 20;
+				$spr.y += 20;
+				var $exitChute:SprExitChute = new SprExitChute(false,$spr.x,$spr.y);
+				exitChuteGroup.add($exitChute);
+			}
+			add(exitChuteGroup);
 		}
 		
 		private function addButtons():void {
@@ -836,7 +858,37 @@ package {
 			add(roachGroup);
 		}
 		
+		private function checkIfHandExitedViaChute():void {
+			// don't do this if the hand is in a body
+			if (hand.isAttachedToBody()) {return;}
+			// get the overlapped chute (can use for exit anim positioning)
+			var $exitChute:SprExitChute = overlappedChute();
+			// only continue if there's an overlap
+			if (!$exitChute) {return;}
+			// then exit on the action key press
+			if (FlxG.keys.justPressed(RegistryControls.ACTION_KEY)) {
+				// just place it in the center for now
+				hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
+				hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
+				goToNextLevel();
+			}
+		}
+		
+		private function overlappedChute():SprExitChute {
+			for (var i:uint = 0; i < exitChuteGroup.length; i++) {
+				var $exitChute:SprExitChute = exitChuteGroup.members[i];
+				if (hand.overlaps($exitChute)) {
+					return $exitChute;
+				}
+			}
+			return null;
+		}
+		
 		override public function update():void {
+			
+			
+			checkIfHandExitedViaChute();
+			
 			pulseTimer += pulseDir*FlxG.elapsed;
 			if (pulseTimer >= pulseTimeMax) {pulseTimer = pulseTimeMax;}
 			if (pulseTimer <= 0) {pulseTimer = 0;}
@@ -1440,6 +1492,11 @@ package {
 						else {hand.play(SprHand.kAnimIdleBodyRight);}
 					}
 					
+					if (hand.velocity.x == 0 && hand.velocity.y == 0) {
+						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimGrabLeft);}
+						else {hand.play(SprHand.kAnimGrabRight);}
+					}
+					
 					// Properly space and rotate the arm segments
 					var deltaX:Number = -body.x + hand.x;
 					var deltaY:Number = -body.y + hand.y;
@@ -1754,7 +1811,13 @@ package {
 			ambientElectricalHumSound.stop();
 			
 			RegistryLevels.num++;
-			FlxG.switchState(new PlayState);
+			//FlxG.switchState(new PlayState);
+			//var $exitFunction:Function = function():void {
+				FlxG.switchState(new PlayState);
+			//};
+			//FlxG.fade(0xff000000,1,$exitFunction);
+			
+			
 			/*
 			Registry.levelNum++;
 			if (Registry.levelNum < Registry.levelOrder.length) {

@@ -27,6 +27,8 @@ package
 		public static const kAnimFallLeft:String = "fall left";
 		public static const kAnimExtendRight:String = "extend right";
 		public static const kAnimExtendLeft:String = "extend left";
+		public static const kAnimGrabLeft:String = "grab left";
+		public static const kAnimGrabRight:String = "grab right";
 		
 		private const EPSILON:Number = 0.001;
 		
@@ -90,6 +92,8 @@ package
 			addAnimation(kAnimFallLeft,[33]);
 			addAnimation(kAnimExtendRight,[35,36],22,false);
 			addAnimation(kAnimExtendLeft,[40,41],22,false);
+			addAnimation(kAnimGrabLeft,[32],22,false);
+			addAnimation(kAnimGrabRight,[30],22,false);
 			
 			//play(kAnimIdleRight); //should it be kAnimFallRight? - Mike
 			play(kAnimFallRight);
@@ -130,9 +134,24 @@ package
 			
 			setDir(FlxObject.DOWN, true);
 			FlxG.camera.follow(_camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
+			
+			scale.x = 0;
+			scale.y = 0;
 		}
 		
 		override public function update():void {
+			
+			if (scale.x < 1 && scale.y < 1) {
+				scale.x += 0.03;
+				scale.y += 0.03;
+				//color = 0xff000000;
+			}
+			if (scale.x > 1 || scale.y > 1) {
+				scale.x = 1;
+				scale.y = 1;
+			}
+			
+			
 			moveCamTag();
 			
 			if (isAttachedToBody()) {

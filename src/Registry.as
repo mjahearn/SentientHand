@@ -58,6 +58,8 @@ package {
 		[Embed("assets/spr_window.png")] public static const kWindowSheet:Class;
 		[Embed("assets/spr_window_rain.png")] public static const kWindowRainSheet:Class;
 		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
+		[Embed("assets/spr_exit_chute.png")] public static const kExitChuteSheet:Class;
+		[Embed("assets/spr_exit_chute_door.png")] public static const kExitChuteDoorSheet:Class;
 		
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
@@ -71,5 +73,16 @@ package {
 		
 		[Embed("assets/Jump.mp3")] public static const kJumpSFX:Class;
 		public static var kJumpSound:FlxSound = new FlxSound().loadEmbedded(kJumpSFX);
+		
+		[Embed("assets/Neon Hum Loop 1.mp3")] public static const kNeonHumSFX:Class;
+		public static var kNeonHumSound:FlxSound = new FlxSound().loadEmbedded(kNeonHumSFX);
+		[Embed("assets/Neon Surge Off 1.mp3")] public static const kNeonSurgeOffSFX:Class;
+		public static var kNeonSurgeOffSound:FlxSound = new FlxSound().loadEmbedded(kNeonSurgeOffSFX);
+		[Embed("assets/Neon Surge On 1.mp3")] public static const kNeonSurgeOnSFX:Class;
+		public static var kNeonSurgeOnSound:FlxSound = new FlxSound().loadEmbedded(kNeonSurgeOnSFX);
+		[Embed("assets/Rusty Hatch Close 1.mp3")] public static const kRustyHatchCloseSFX:Class;
+		public static var kRustyHatchCloseSound:FlxSound = new FlxSound().loadEmbedded(kRustyHatchCloseSFX);
+		[Embed("assets/Rusty Hatch Open 1.mp3")] public static const kRustyHatchOpenSFX:Class;
+		public static var kRustyHatchOpenSound:FlxSound = new FlxSound().loadEmbedded(kRustyHatchOpenSFX);
 	}
 }

@@ -1,7 +1,7 @@
 package
 {
-	import org.flixel.FlxSprite;
 	import org.flixel.FlxG;
+	import org.flixel.FlxSprite;
 	
 	public class SprExit extends FlxSprite
 	{
@@ -45,13 +45,20 @@ package
 		}
 		
 		// controls for the light
-		public function turnOn():void {isOn = true;}
-		public function turnOff():void {isOn = false;}
+		public function turnOn():void {isOn = true; Registry.kNeonSurgeOnSound.play();}
+		public function turnOff():void {isOn = false; Registry.kNeonSurgeOffSound.play();}
 		
 		override public function update():void {
 			super.update();
+			// there's some redundancy in here with the sounds
+			Registry.kNeonSurgeOffSound.update();
+			Registry.kNeonSurgeOnSound.update();
+			if (isOn) {Registry.kNeonHumSound.update();}
 			// don't proceed if the light's not on
-			if (!isOn) {return;}
+			if (!isOn) {Registry.kNeonHumSound.stop(); return;}
+			Registry.kNeonHumSound.play();
+			Registry.kNeonHumSound.volume = lightC.alpha*4.4;
+			Registry.kNeonHumSound.amplitude = lightC.alpha*4.4;
 			brightnessTimer += FlxG.elapsed;
 			//FlxG.log(brightnessTimer);
 			if (brightnessTimer >= brightnessPeriod) {
