@@ -439,7 +439,7 @@ package {
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
 			
 			// TEST EXIT CHUTE
-			var $exitChute:SprExitChute = new SprExitChute(true,hand.x-16,hand.y-16);
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-32,hand.y+hand.height/2-48);
 			add($exitChute);
 			$exitChute.spit();
 			
@@ -862,7 +862,7 @@ package {
 		
 		private function checkIfHandExitedViaChute():void {
 			// don't do this if the hand is in a body
-			if (hand.isAttachedToBody()) {return;}
+			if (hand.isAttachedToBody() && !hand.isFalling()) {return;}
 			// get the overlapped chute (can use for exit anim positioning)
 			var $exitChute:SprExitChute = overlappedChute();
 			// only continue if there's an overlap
