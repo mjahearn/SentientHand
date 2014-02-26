@@ -16,27 +16,29 @@ package {
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
 		
+		/*
 		public var steamsNumberArray:Array = new Array();
 		public var steamsNumber:Number = 0;
 		public var steamTimer:Number = 0;
 		public var steamTimerMax:Number = 2;
 		public var steamsStartPoint:Array = new Array();
-		public var steamsDXY:Array = new Array();
+		public var steamsDXY:Array = new Array();*/
 				
 		public var levelFunctional:FlxTilemap;
 		
+		/*
 		public const STEAM:Array = [64,69,71,72,77,78,79,86,88,91,93,95,117,125,126,127,252,253,254,255,256,257,258,259,260,261,262,263,289,290,291,292];
 		public const STEAM_U:Array = [254,255,289,290,86,91,93,125];
 		public const STEAM_D:Array = [69,71,76,117,252,253,260,261];
 		public const STEAM_L:Array = [263,262,259,257,79,77,95,127];
 		public const STEAM_R:Array = [64,72,88,126,256,258,291,292];
-		public const STEAM_1:Array = [291,289,262,260,257,256,254,252,93,88,86,79,78,77,69,64];
+		public const STEAM_1:Array = [291,289,262,260,257,256,254,252,93,88,86,79,78,77,69,64];*/
 		
 		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
-		public const STEAM_MIN:uint = 19;
-		public const STEAM_MAX:uint = 30;
+		/*public const STEAM_MIN:uint = 19;
+		public const STEAM_MAX:uint = 30;*/
 		public const TRASH_SPAWN:uint = 31;
 		//public const JUMP_HINT_SPAWN:uint = 32;
 		//public const SIGN_SPAWN:uint = 33;
@@ -91,7 +93,7 @@ package {
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
-		public var steams:FlxGroup = new FlxGroup();
+		//public var steams:FlxGroup = new FlxGroup();
 		
 		//public var handReturnedToBody:Boolean = false;
 		
@@ -171,7 +173,7 @@ package {
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
-		[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
+		//[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
 		//[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
@@ -188,12 +190,12 @@ package {
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
-		public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(/*doorOpenSFX);*/ambientSteamSFX,true);
+		//public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(/*doorOpenSFX);*/ambientSteamSFX,true);
 		//public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
-		[Embed("assets/steam.png")] public var steamSheet:Class;
+		//[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		[Embed("assets/spr_head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
@@ -343,6 +345,7 @@ package {
 			add(bodyHeadGroup);
 			add(bodyArmBaseGroup);
 			
+			/*
 			// Steam
 			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
 			for (var b:uint = 0; b < STEAM.length; b++) {
@@ -399,11 +402,7 @@ package {
 						//else if (steamGaugeNumber < 8) {
 							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 							steamsNumberArray.push(1);
-						}/*
-						else                           {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0];
-							steamsNumberArray.push(2);
-						}*/
+						}
 						steam.addAnimation("puff",steamPuffFrames,11,false);
 						
 						steamsStartPoint.push(new FlxPoint(steam.x,steam.y));
@@ -412,7 +411,7 @@ package {
 					}
 				}
 			}
-			add(steams);
+			add(steams);*/
 			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
@@ -439,7 +438,7 @@ package {
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
 			
 			// TEST EXIT CHUTE
-			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-32,hand.y+hand.height/2-48);
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-40,hand.y+hand.height/2-48);
 			add($exitChute);
 			$exitChute.spit();
 			
@@ -465,11 +464,12 @@ package {
 			pause.setAll("exists", false);
 			add(pause);
 			
+			/*
 			if (Registry.DEBUG_ON) {
 				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
 				text.scrollFactor = new FlxPoint(0,0);
 				add(text);
-			}
+			}*/
 			
 			addRoaches();
 			
@@ -528,7 +528,7 @@ package {
 			$curMusOverlay.play();
 			hideMusicOverlayInstantly();
 			
-			ambientSteamSound.volume = 0.5;
+			//ambientSteamSound.volume = 0.5;
 		}
 		
 		private function addLevelCosmeticBack():void {
@@ -898,10 +898,11 @@ package {
 				pulseDir *= -1;
 			}
 			
+			/*
 			steamTimer += FlxG.elapsed;
 			if (steamTimer > steamTimerMax) {
 				steamTimer = 0;
-			}
+			}*/
 				
 			if (RegistryLevels.isLastLevel()) {overlay.alpha = 1 - Math.abs(levelFunctional.width - hand.x)/levelFunctional.width;}
 			//if (Registry.levelNum >= 5) {overlay.alpha = 1 - Math.abs(level.width - hand.x)/level.width;}
@@ -1277,12 +1278,13 @@ package {
 			
 			checkIfButtonPressedByHand();
 			
+			/*
 			for (var qq:uint = 0; qq < steams.length; qq++) {
 				if (steams.members[qq].frame == 1) {
 					ambientSteamSound.stop();
 					ambientSteamSound.play();
 				}
-			}
+			}*/
 			
 			
 			// door open
@@ -1545,6 +1547,7 @@ package {
 				electricity.alpha = 1;
 			}
 			
+			/*
 			for (var mn:uint = 0; mn < steams.length; mn++) {
 				if (steamsNumberArray[mn] < steamsNumber && int(10*steamTimer) == 10*(steamsNumberArray[mn])) {
 					steams.members[mn].play("puff");
@@ -1552,7 +1555,7 @@ package {
 					steams.members[mn].y = steamsStartPoint[mn].y - 4.4*steamsDXY[mn].y*steams.members[mn].frame;
 					steams.members[mn].alpha = 1 - steams.members[mn].frame/3.0 + 0.5;
 				}
-			}
+			}*/
 			
 			/* End Animations */
 			
@@ -1631,7 +1634,7 @@ package {
 			if (FlxG.paused && FlxG.keys.justPressed("R")) {
 				// sound stuff
 				ambientGearsSound.stop();
-				ambientSteamSound.stop();
+				//ambientSteamSound.stop();
 				ambientElectricalHumSound.stop();
 				FlxG.resetState();
 			}
@@ -1783,9 +1786,9 @@ package {
 		
 		public function buttonReaction():void {
 			
-			steamTimer = 0;
+			//steamTimer = 0;
 			
-			steamsNumber++;
+			//steamsNumber++;
 			/*
 			if (reinvigorated) {
 				reinvigorated = false;
@@ -1809,7 +1812,7 @@ package {
 			
 			// sound stuff
 			ambientGearsSound.stop();
-			ambientSteamSound.stop();
+			//ambientSteamSound.stop();
 			ambientElectricalHumSound.stop();
 			
 			RegistryLevels.num++;
