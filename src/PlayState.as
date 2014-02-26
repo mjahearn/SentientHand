@@ -199,7 +199,7 @@ package {
 		
 		[Embed("assets/spr_head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
-		[Embed("assets/factory.png")] public var factorySheet:Class;
+		//[Embed("assets/factory.png")] public var factorySheet:Class;
 		
 		//[Embed("assets/body_marker_line.png")] public var bodyMarkerLineSheet:Class;
 		//public var bodyMarkerLine:FlxSprite = new FlxSprite();
@@ -235,12 +235,12 @@ package {
 				
 			}
 			
-			levelFunctional = RegistryLevels.lvlFunc();
-			
+			setUpLevelFunctional();
 			addLevelCosmeticBack();
 			addLevelCosmeticMid();
 			addLevelCosmeticFront();
 			
+			//levelFunctional = RegistryLevels.lvlFunc();
 			if (Registry.DEBUG_ON && levelCosmeticFront.totalTiles <= 0) {add(levelFunctional);}
 			
 			/*
@@ -289,12 +289,12 @@ package {
 			exitPoint.x = exitSprite.x;
 			exitPoint.y = exitSprite.y;
 			*/
-			
+			/*
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			
 			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
 			
-			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
+			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);*/
 			
 			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,SprBody,levelFunctional);
@@ -503,6 +503,13 @@ package {
 					}
 				}
 			}
+		}
+		
+		private function setUpLevelFunctional():void {
+			levelFunctional = RegistryLevels.lvlFunc();
+			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
+			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
+			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
 		}
 		
 		private function setUpAudio():void {
@@ -1810,14 +1817,11 @@ package {
 		
 		public function goToNextLevel():void {
 			
-			// sound stuff
-			ambientGearsSound.stop();
-			//ambientSteamSound.stop();
-			ambientElectricalHumSound.stop();
-			
 			RegistryLevels.num++;
 			//FlxG.switchState(new PlayState);
 			var $exitFunction:Function = function():void {
+				ambientGearsSound.stop();
+				ambientElectricalHumSound.stop();
 				FlxG.switchState(new PlayState);
 			};
 			FlxG.fade(0xff000000,1,$exitFunction);
