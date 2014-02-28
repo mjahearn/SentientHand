@@ -236,8 +236,11 @@ package {
 			}
 			
 			setUpLevelFunctional();
+			addLevelCosmeticBackBack();
 			addLevelCosmeticBack();
+			addLevelCosmeticSemiBack();
 			addLevelCosmeticMid();
+			addExitChutes();
 			addLevelCosmeticFront();
 			
 			//levelFunctional = RegistryLevels.lvlFunc();
@@ -442,7 +445,7 @@ package {
 			add($exitChute);
 			$exitChute.spit();
 			
-			addExitChutes();
+			//addExitChutes();
 			
 			add(hand);
 			handDir = FlxObject.RIGHT;
@@ -507,6 +510,8 @@ package {
 		
 		private function setUpLevelFunctional():void {
 			levelFunctional = RegistryLevels.lvlFunc();
+			// deal with all the collision shit
+			// remember when we had wood? heh...
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
 			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
 			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
@@ -538,6 +543,15 @@ package {
 			//ambientSteamSound.volume = 0.5;
 		}
 		
+		private function addLevelCosmeticBackBack():void {
+			var $lvlCosmBackBack:FlxTilemap = RegistryLevels.lvlCosmBackBack();
+			if ($lvlCosmBackBack.totalTiles <= 0) {return;}
+			
+			$lvlCosmBackBack.scrollFactor = new FlxPoint(0.25, 0.25);
+			
+			add($lvlCosmBackBack);
+		}
+		
 		private function addLevelCosmeticBack():void {
 			var $lvlCosmBack:FlxTilemap = RegistryLevels.lvlCosmBack();
 			if ($lvlCosmBack.totalTiles <= 0) {return;}
@@ -545,6 +559,25 @@ package {
 			$lvlCosmBack.scrollFactor = new FlxPoint(0.5, 0.5);
 			
 			add($lvlCosmBack);
+		}
+		
+		private function addLevelCosmeticSemiBack():void {
+			var $lvlCosmSemiBack:FlxTilemap = RegistryLevels.lvlCosmSemiBack();
+			if ($lvlCosmSemiBack.totalTiles <= 0) {return;}
+			// set the scroll factor, which the objcets it sets will use
+			// don't add it, though, because it's all spawn points. gross.
+			$lvlCosmSemiBack.scrollFactor = new FlxPoint(0.75, 0.75);
+			// add objects from the spawn points
+			addBulbs($lvlCosmSemiBack);
+		}
+		
+		private function addBulbs($map:FlxTilemap):void {
+			var $bulbGroup:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnSemiBackBulb,SprBulb,$map);
+			add($bulbGroup);
+			for (var i:uint = 0; i < $bulbGroup.length; i++) {
+				var $bulb:SprBulb = $bulbGroup.members[i];
+				$bulb.setScrollFactor($map.scrollFactor);
+			}
 		}
 		
 		private function addLevelCosmeticMid():void {
@@ -603,6 +636,8 @@ package {
 			}
 			add(trashGroup);
 			*/
+			
+			//addBulbs($lvlCosmMid);
 		}
 		
 		private function addLevelCosmeticFront():void {

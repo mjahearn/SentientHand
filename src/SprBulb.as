@@ -19,8 +19,12 @@ package
 		private var onOffTimer:Number;
 		private var onOffPeriod:Number;
 		
+		private var sound:FlxSound;
+		
 		public function SprBulb(X:Number=0, Y:Number=0)
 		{
+			sound = new FlxSound().loadEmbedded(Registry.kFluorescentHumSFX,true);
+			
 			isOn = false;
 			
 			super(X, Y, Registry.kBulbBaseSheet);
@@ -43,8 +47,14 @@ package
 			changeScaleFactor(Math.random());
 		}
 		
-		public function playTurnOn():void {anims.play(kAnimOn); isOn = true;}
-		public function playTurnOff():void {anims.play(kAnimOff); isOn = false;}
+		public function setScrollFactor($scrollFactor:FlxPoint):void {
+			scrollFactor = $scrollFactor;
+			illumination.scrollFactor = $scrollFactor;
+			anims.scrollFactor = $scrollFactor;
+		}
+		
+		public function playTurnOn():void {anims.play(kAnimOn); sound.play(); isOn = true;}
+		public function playTurnOff():void {anims.play(kAnimOff); sound.stop(); isOn = false;}
 		
 		override public function draw():void {
 			super.draw();
@@ -56,6 +66,8 @@ package
 			super.update();
 			anims.update();
 			illumination.update();
+			sound.update();
+			sound.volume = illumination.alpha;
 			
 			maybeSwitchState();
 			
