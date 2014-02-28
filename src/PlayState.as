@@ -15,30 +15,11 @@ package {
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
 		
 		public const EMPTY_SPACE:uint = 0; // index of empty space in tilemap
-		
-		/*
-		public var steamsNumberArray:Array = new Array();
-		public var steamsNumber:Number = 0;
-		public var steamTimer:Number = 0;
-		public var steamTimerMax:Number = 2;
-		public var steamsStartPoint:Array = new Array();
-		public var steamsDXY:Array = new Array();*/
 				
 		public var levelFunctional:FlxTilemap;
 		
-		/*
-		public const STEAM:Array = [64,69,71,72,77,78,79,86,88,91,93,95,117,125,126,127,252,253,254,255,256,257,258,259,260,261,262,263,289,290,291,292];
-		public const STEAM_U:Array = [254,255,289,290,86,91,93,125];
-		public const STEAM_D:Array = [69,71,76,117,252,253,260,261];
-		public const STEAM_L:Array = [263,262,259,257,79,77,95,127];
-		public const STEAM_R:Array = [64,72,88,126,256,258,291,292];
-		public const STEAM_1:Array = [291,289,262,260,257,256,254,252,93,88,86,79,78,77,69,64];*/
-		
-		/* Midground Spawn Points */
 		public const GEAR_MIN:uint = 1;
 		public const GEAR_MAX:uint = 18;
-		/*public const STEAM_MIN:uint = 19;
-		public const STEAM_MAX:uint = 30;*/
 		public const TRASH_SPAWN:uint = 31;
 		//public const JUMP_HINT_SPAWN:uint = 32;
 		//public const SIGN_SPAWN:uint = 33;
@@ -65,13 +46,9 @@ package {
 		public var electricityNum:int = 1;
 		
 		public var levelCosmeticFront:FlxTilemap;
-		//public var midground:FlxTilemap;
-		//public var background:FlxTilemap;
-		//public var levelMid:FlxTilemap;
-		//public var levelBack:FlxTilemap;
-		//public var hand:FlxSprite;
+
 		public var hand:SprHand;
-		//public var hint:FlxSprite;
+
 		public var bodyGroup:FlxGroup;
 		public var curBody:uint;
 		public var curCannon:uint;
@@ -93,7 +70,6 @@ package {
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
 		public var gearOutGroup:FlxGroup = new FlxGroup();
-		//public var steams:FlxGroup = new FlxGroup();
 		
 		//public var handReturnedToBody:Boolean = false;
 		
@@ -130,15 +106,7 @@ package {
 		
 		[Embed("assets/spr_arm_base.png")] public var armBaseSheet:Class;
 		
-		/*
-		[Embed("assets/level-tiles.png")] public var tileset:Class;
-		[Embed("assets/background-tiles.png")] public var backgroundset:Class;
-		[Embed("assets/midground-tiles.png")] public var midgroundset:Class;
-		*/
-		
 		[Embed("assets/arrow.png")] public var arrowSheet:Class;
-		//[Embed("assets/hand.png")] public var handSheet:Class;
-		//[Embed("assets/hint.png")] public var hintSheet:Class;
 		[Embed("assets/spr_arm.png")] public var armSheet:Class;
 		[Embed("assets/spr_body.png")] public var bodySheet:Class;
 		
@@ -150,17 +118,8 @@ package {
 		
 		[Embed("assets/sign.png")] public var signSheet:Class;
 		
-		//public static var levelMap:Class;
-		//public static var midgroundMap:Class;
-		//public static var backgroundMap:Class;
-		
-		//[Embed("assets/door_h.png")] public var doorHSheet:Class;
-		//[Embed("assets/door_v.png")] public var doorVSheet:Class;
-		
 		[Embed("assets/spr_bodygear.png")] public var bodyGearSheet:Class;
-		
-		//[Embed("assets/!.png")] public var bangSheet:Class;
-		
+				
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
@@ -173,8 +132,7 @@ package {
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
-		//[Embed("assets/Ambient_Steam.mp3")] public var ambientSteamSFX:Class;
-		//[Embed("assets/Door_Open.mp3")] public var doorOpenSFX:Class;
+
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
 		
@@ -190,12 +148,10 @@ package {
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
-		//public var ambientSteamSound:FlxSound = new FlxSound().loadEmbedded(/*doorOpenSFX);*/ambientSteamSFX,true);
-		//public var doorOpenSound:FlxSound = new FlxSound().loadEmbedded(doorOpenSFX);
+		
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
-		//[Embed("assets/steam.png")] public var steamSheet:Class;
 		
 		[Embed("assets/spr_head.png")] public var headSheet:Class;
 		[Embed("assets/sky.png")] public var skySheet:Class;
@@ -203,8 +159,6 @@ package {
 		
 		//[Embed("assets/body_marker_line.png")] public var bodyMarkerLineSheet:Class;
 		//public var bodyMarkerLine:FlxSprite = new FlxSprite();
-		
-		//private var testHint:SprHint;
 		
 		private var hintArrowKeysGroup:FlxGroup;
 		private var dripperEvent:EventTimer;
@@ -236,68 +190,25 @@ package {
 			}
 			
 			setUpLevelFunctional();
+			// add cosmetic maps in order
 			addLevelCosmeticBackBack();
 			addLevelCosmeticBack();
 			addLevelCosmeticSemiBack();
 			addLevelCosmeticMid();
-			addExitChutes();
 			addLevelCosmeticFront();
+			// add chutes after front layer, so they can go over vent backings
+			addExitChutes();
 			
-			//levelFunctional = RegistryLevels.lvlFunc();
+			// if there's no cosmetic level, we'll want to see the functional level (in debug)
 			if (Registry.DEBUG_ON && levelCosmeticFront.totalTiles <= 0) {add(levelFunctional);}
 			
-			/*
-			level = RegistryLevels.lvlCosmFront();
-			midground = RegistryLevels.lvlCosmMid();
-			background = RegistryLevels.lvlCosmBack();
-			*/
-			
-			/*
-			levelMap = Registry.level;
-			midgroundMap = Registry.midground;
-			backgroundMap = Registry.background;
-			*/
-			
-			/*
-			var jumpHintArray:Array = midground.getTileInstances(JUMP_HINT_SPAWN);
-			if (jumpHintArray) {
-				midground.setTileProperties(JUMP_HINT_SPAWN,FlxObject.NONE);
-				for (j = 0; j < jumpHintArray.length; j++) {
-					midground.setTileByIndex(jumpHintArray[j],0);
-					var jumpHintPoint:FlxPoint = pointForTile(jumpHintArray[j],midground);
-					jumpHintGroup.add(new FlxSprite(jumpHintPoint.x,jumpHintPoint.y));
-				}
-			}*/
-			
-			//addHints();
-			
-			/* Level */
-			/*
-			//level = new FlxTilemap();
-			//level.loadMap(new levelMap,tileset,8,8);
-			if (level.totalTiles > 0) { // check if null
-				add(level);
-			}*/
+			// set the bounds for the camera
 			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
 			if (Registry.extendedCamera) {
 				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
 			} else {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
-			
-			/*
-			var exitSprite:FlxSprite = groupFromSpawn(RegistryLevels.kSpawnExitArrow,FlxSprite,levelFunctional).members[0];
-			// Exit arrow
-			exitPoint = new FlxPoint();
-			exitPoint.x = exitSprite.x;
-			exitPoint.y = exitSprite.y;
-			*/
-			/*
-			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
-			
-			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
-			
-			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);*/
 			
 			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,SprBody,levelFunctional);
@@ -348,74 +259,6 @@ package {
 			add(bodyHeadGroup);
 			add(bodyArmBaseGroup);
 			
-			/*
-			// Steam
-			//for (i = STEAM_MIN; i <= STEAM_MAX; i++) {
-			for (var b:uint = 0; b < STEAM.length; b++) {
-				i = STEAM[b];
-				var steamArray:Array = levelCosmeticFront.getTileInstances(i);
-				if (steamArray) {
-					for (var j:uint = 0; j < steamArray.length; j++) {
-						var steamPoint:FlxPoint = pointForTile(steamArray[j],levelCosmeticFront);
-						var steam:FlxSprite = new FlxSprite(steamPoint.x,steamPoint.y);
-						//steam.alpha = 0.5;
-						steam.loadGraphic(steamSheet,true,false,32,32,true);
-						steam.addAnimation("idle",[0]);
-						steam.play("idle");
-						
-						// Decide steam angle
-						// n.b. Steam is grouped in 3 frequencies, 4 angles
-						//var steamGaugeNumber:Number = (i-STEAM_MIN)%4
-						//if (steamGaugeNumber == 0) {
-						
-						steam.x -= steam.width/2 - 4; // the 4 is for the tile width and height
-						steam.y -= steam.height/2 - 4;
-						
-						if (STEAM_L.indexOf(i) != -1) {
-							steam.x += steam.width/2;
-							steam.angle = 90;
-							steam.facing = FlxObject.RIGHT;
-							steamsDXY.push(new FlxPoint(-1,0));
-						} else if (STEAM_U.indexOf(i) != -1) {//else if (steamGaugeNumber == 1) {
-							steam.y += steam.height/2;
-							steam.angle = 180;
-							steam.facing = FlxObject.DOWN;
-							steamsDXY.push(new FlxPoint(0,-1));
-						} else if (STEAM_R.indexOf(i) != -1) {//else if (steamGaugeNumber == 2) {
-							steam.x -= steam.width/2;
-							steam.angle = 270;
-							steam.facing = FlxObject.LEFT;
-							steamsDXY.push(new FlxPoint(1,0));
-						} else { //sGN == 3
-							steam.y -= steam.height/2;
-							steam.facing = FlxObject.UP;
-							steamsDXY.push(new FlxPoint(0,1));
-						}
-						
-						// Decide steam pattern
-						// n.b. Steam is group in 3 patterns
-						// maybe these could just be timed using FlxG.elapsed, and then each puff could be synced with sound
-						//steamGaugeNumber = (i-STEAM_MIN);
-						var steamPuffFrames:Array = [0,1,2,3,0];
-						//if (steamGaugeNumber < 4)      {
-						if (STEAM_1.indexOf(i) != -1) {
-							//steamPuffFrames = [1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(0);
-						} else {
-						//else if (steamGaugeNumber < 8) {
-							//steamPuffFrames = [0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-							steamsNumberArray.push(1);
-						}
-						steam.addAnimation("puff",steamPuffFrames,11,false);
-						
-						steamsStartPoint.push(new FlxPoint(steam.x,steam.y));
-						
-						steams.add(steam);
-					}
-				}
-			}
-			add(steams);*/
-			
 			var arm:FlxSprite;
 			for (i = 0; i < numArms; i++) {
 				arm = new FlxSprite(0,0,armSheet); //originally body.x/y
@@ -424,29 +267,16 @@ package {
 			}
 			add(arms);
 			
-			/*
-			exitArrow.loadGraphic(arrowSheet,true,false,32,32,true);
-			exitArrow.addAnimation("excite",[0,0,1,2,3,4,5,5,5,5,4,3,2,1,0,0],10,true);
-			exitArrow.play("excite");
-			exitArrow.scrollFactor = new FlxPoint();
-			exitArrow.visible = false;
-			add(exitArrow);
-			exitRad = FlxG.height/2 - exitArrow.width;
-			//exitOn = false;
-			*/
-			
 			addDripperEvent();
 
 			// Hand
 			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
 			
 			// TEST EXIT CHUTE
-			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-40,hand.y+hand.height/2-48);
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-32,hand.y+hand.height/2-48);
 			add($exitChute);
 			$exitChute.spit();
-			
-			//addExitChutes();
-			
+
 			add(hand);
 			handDir = FlxObject.RIGHT;
 			
@@ -466,13 +296,6 @@ package {
 			pause = new PauseState();
 			pause.setAll("exists", false);
 			add(pause);
-			
-			/*
-			if (Registry.DEBUG_ON) {
-				var text:FlxText = new FlxText(0,0,FlxG.width,"Press Esc to return to level select");
-				text.scrollFactor = new FlxPoint(0,0);
-				add(text);
-			}*/
 			
 			addRoaches();
 			
@@ -512,9 +335,9 @@ package {
 			levelFunctional = RegistryLevels.lvlFunc();
 			// deal with all the collision shit
 			// remember when we had wood? heh...
-			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional,false);
-			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional,false);
-			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional,false);
+			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional);
+			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional);
+			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional);
 		}
 		
 		private function setUpAudio():void {
@@ -539,8 +362,6 @@ package {
 			$curMus.play();
 			$curMusOverlay.play();
 			hideMusicOverlayInstantly();
-			
-			//ambientSteamSound.volume = 0.5;
 		}
 		
 		private function addLevelCosmeticBackBack():void {
@@ -1851,28 +1672,20 @@ package {
 		}
 		
 		public function goToNextLevel():void {
-			
+			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
-			//FlxG.switchState(new PlayState);
+			// this'll fire at the end of the fade
 			var $exitFunction:Function = function():void {
-				ambientGearsSound.stop();
-				ambientElectricalHumSound.stop();
+				stopAllSounds();
 				FlxG.switchState(new PlayState);
 			};
+			// the fade just makes things look cooler
 			FlxG.fade(0xff000000,1,$exitFunction);
-			
-			
-			/*
-			Registry.levelNum++;
-			if (Registry.levelNum < Registry.levelOrder.length) {
-				Registry.level = Registry.levelOrder[Registry.levelNum];
-				Registry.midground = Registry.midOrder[Registry.levelNum];
-				Registry.background = Registry.backOrder[Registry.levelNum];
-				FlxG.switchState(new PlayState);//(Registry.levelOrder[Registry.levelNum],Registry.midgroundMap,Registry.backgroundMap));
-			} else {
-				FlxG.switchState(new EndState());
-			}
-			*/
+		}
+		
+		private function stopAllSounds():void {
+			ambientGearsSound.stop();
+			ambientElectricalHumSound.stop();
 		}
 		
 		public function correctMetal():void {
@@ -1902,15 +1715,10 @@ package {
 			return _group;
 		}
 		
-		private function setCallbackFromSpawn(_spawn:Array,_callback:Function,_map:FlxTilemap,_hide:Boolean=true):void {
-			for (var i:uint = 0; i <_spawn.length; i++) {
-				_map.setTileProperties(_spawn[i],FlxObject.ANY,_callback);
-				var _array:Array = _map.getTileInstances(_spawn[i]);
-				if (_array && _hide) {
-					for (var j:uint = 0; j < _array.length; j++) {
-						_map.setTileByIndex(_array[j],0);
-					}
-				}
+		private function setCallbackFromSpawn($spawn:Array,$callback:Function,$map:FlxTilemap):void {
+			for (var i:uint = 0; i <$spawn.length; i++) {
+				$map.setTileProperties($spawn[i],FlxObject.ANY,$callback);
+				var _array:Array = $map.getTileInstances($spawn[i]);
 			}
 		}
 		
@@ -1965,36 +1773,42 @@ package {
 		}
 		
 		public function hideMusicOverlay():void {
-			//musOverlay.volume = 0;
-			
+			// the timer will decrement volume each frame
 			var $timer:EventTimer;
-			
+			// the set vol to the max first
 			musOverlay.volume = 1;
+			// the event ensures that the volume's down all the way by the end time
+			// (also, remove the timer so that it stops updating)
 			var $event:Function = function():void {
 				remove($timer);
 				musOverlay.volume = 0;
 			};
+			// this action's fired every frame. probably not ideal that this relies on clock speed...
 			var $pulse:Function = function():void {
 				musOverlay.volume -= 0.05;
 			};
 			$timer = new EventTimer(0.5,$event,false,true,$pulse);
+			// don't forget to add the timer so that it updates each frame
 			add($timer);
 		}
 		
 		public function showMusicOverlay():void {
-			//musOverlay.volume = 1;
-			
+			// the timer will increment volume each frame
 			var $timer:EventTimer;
-			
+			// the set vol to the min first
 			musOverlay.volume = 0;
+			// the event ensures that the volume's up all the way by the end time
+			// (also, remove the timer so that it stops updating)
 			var $event:Function = function():void {
 				remove($timer);
 				musOverlay.volume = 1;
 			};
+			// this action's fired every frame. probably not ideal that this relies on clock speed...
 			var $pulse:Function = function():void {
 				musOverlay.volume += 0.05;
 			};
 			$timer = new EventTimer(0.5,$event,false,true,$pulse);
+			// don't forget to add the timer so that it updates each frame
 			add($timer);
 		}
 		
