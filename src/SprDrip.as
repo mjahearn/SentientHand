@@ -15,6 +15,8 @@ package
 		private const kAnimIdle:String = "kAnimIdle";
 		private const kAnimBounce:String = "kAnimBounce";
 		
+		private const kDropletSounds:Array = [Registry.kDroplet1SFX,Registry.kDroplet2SFX,Registry.kDroplet3SFX];
+		
 		public function SprDrip(X:Number=0, Y:Number=0, SimpleGraphic:Class=null)
 		{
 			super(X, Y);
@@ -59,6 +61,11 @@ package
 		
 		private function bounce():void {
 			play(kAnimBounce);
+			var $index:int = Math.random()*kDropletSounds.length;
+			//FlxG.log($index);
+			var $class:Class = kDropletSounds[$index];
+			//FlxG.log($class);
+			FlxG.play($class);
 		}
 	}
 }

@@ -74,7 +74,7 @@ package {
 		[Embed("assets/Jump.mp3")] public static const kJumpSFX:Class;
 		public static var kJumpSound:FlxSound = new FlxSound().loadEmbedded(kJumpSFX);
 		
-		[Embed("assets/Neon Hum Loop 1.mp3")] public static const kNeonHumSFX:Class;
+		[Embed("assets/Neon Hum 1.mp3")] public static const kNeonHumSFX:Class;
 		public static var kNeonHumSound:FlxSound = new FlxSound().loadEmbedded(kNeonHumSFX);
 		[Embed("assets/Neon Surge Off 1.mp3")] public static const kNeonSurgeOffSFX:Class;
 		public static var kNeonSurgeOffSound:FlxSound = new FlxSound().loadEmbedded(kNeonSurgeOffSFX);
@@ -84,5 +84,18 @@ package {
 		public static var kRustyHatchCloseSound:FlxSound = new FlxSound().loadEmbedded(kRustyHatchCloseSFX);
 		[Embed("assets/Rusty Hatch Open 1.mp3")] public static const kRustyHatchOpenSFX:Class;
 		public static var kRustyHatchOpenSound:FlxSound = new FlxSound().loadEmbedded(kRustyHatchOpenSFX);
+		[Embed("assets/Hatch Open and Close 1.mp3")] public static const kRustyHatchOpenAndCloseSFX:Class;
+		public static var kRustyHatchOpenAndCloseSound:FlxSound = new FlxSound().loadEmbedded(kRustyHatchOpenAndCloseSFX);
+		
+		[Embed("assets/Flourescent Hum1.mp3")] public static const kFluorescentHumSFX:Class;
+		public static var kFluorescentHumSound:FlxSound = new FlxSound().loadEmbedded(kFluorescentHumSFX);
+		[Embed("assets/Cockroach Skitter1.mp3")] public static const kCockroachSkitterSFX:Class;
+		public static var kCockroachSkitterSound:FlxSound = new FlxSound().loadEmbedded(kCockroachSkitterSFX);
+		[Embed("assets/Droplet1.mp3")] public static const kDroplet1SFX:Class;
+		public static var kDroplet1Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet1SFX);
+		[Embed("assets/Droplet2.mp3")] public static const kDroplet2SFX:Class;
+		public static var kDroplet2Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet2SFX);
+		[Embed("assets/Droplet3.mp3")] public static const kDroplet3SFX:Class;
+		public static var kDroplet3Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet3SFX);
 	}
 }
