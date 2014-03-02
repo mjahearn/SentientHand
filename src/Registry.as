@@ -97,5 +97,8 @@ package {
 		public static var kDroplet2Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet2SFX);
 		[Embed("assets/Droplet3.mp3")] public static const kDroplet3SFX:Class;
 		public static var kDroplet3Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet3SFX);
+		
+		[Embed("assets/SplashScreen v1.mp3")] public static const kSplashScreenMus:Class;
+		public static var kSplashScreenMusic:FlxSound = new FlxSound().loadEmbedded(kSplashScreenMus);
 	}
 }

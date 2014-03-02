@@ -20,12 +20,15 @@ package
 		private var kAnimPromptIdle:String = "kAnimPromptIdle";
 		private var kAnimPromptInit:String = "kAnimPromptInit";
 		
+		private const kFadeTime:Number = 1.22; // how long it will take to transition into the game
+		
 		public function SplashState()
 		{
 			super();
 		}
 		
 		override public function create():void {
+			fixCamera();
 			/*var tmpText:FlxText = new FlxText(0,FlxG.height/2.0,FlxG.width,"SPLASH SCREEN");
 			tmpText.alignment = "center";
 			add(tmpText);*/
@@ -33,6 +36,18 @@ package
 			addPrompt();
 			resetTimerFade();
 			resetTimerMaybeTwitch();
+			addMusic();
+		}
+		
+		private function fixCamera():void {
+			FlxG.camera.x = FlxG.width/8;//(FlxG.width * FlxG.camera.zoom)/2;
+			FlxG.camera.y = FlxG.height/8;//(FlxG.height * FlxG.camera.zoom)/2;
+			FlxG.camera.zoom = 1;
+		}
+		
+		private function addMusic():void {
+			add(Registry.kSplashScreenMusic);
+			Registry.kSplashScreenMusic.fadeIn(0.22);
 		}
 		
 		private function addTitle():void {
@@ -62,7 +77,8 @@ package
 		
 		private function updateControls():void {
 			if (FlxG.keys.any()) {
-				FlxG.switchState(new PlayState);
+				//FlxG.switchState(new PlayState);
+				begin();
 			}
 		}
 		
@@ -96,5 +112,17 @@ package
 		private function resetTimerMaybeTwitch():void {
 			timerMaybeTwitch = 0;
 		}
+		
+		private function begin():void {
+			// call after the fade
+			var $switchState:Function = function():void {
+				FlxG.switchState(new PlayState());
+			};
+			// we want the music to fade out too
+			Registry.kSplashScreenMusic.fadeOut(kFadeTime);
+			FlxG.fade(0xff000000,kFadeTime,$switchState);
+			
+		}
+		
 	}
 }

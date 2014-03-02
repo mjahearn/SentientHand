@@ -1,5 +1,8 @@
 package {
 	
+	import flash.display.Shape;
+	
+	import flash.display.BitmapData;
 	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	
@@ -9,7 +12,7 @@ package {
 	import org.flixel.system.FlxTile;
 	
 	public class PlayState extends FlxState {
-		
+						
 		public static var current:PlayState;
 		
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
@@ -202,13 +205,8 @@ package {
 			// if there's no cosmetic level, we'll want to see the functional level (in debug)
 			if (Registry.DEBUG_ON && levelCosmeticFront.totalTiles <= 0) {add(levelFunctional);}
 			
-			// set the bounds for the camera
-			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
-			if (Registry.extendedCamera) {
-				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
-			} else {
-				FlxG.camera.bounds = FlxG.worldBounds;
-			}
+			// the camera needs some special setup because of rotation stuff
+			setUpCamera();
 			
 			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,SprBody,levelFunctional);
@@ -338,6 +336,17 @@ package {
 			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional);
 			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional);
 			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional);
+		}
+		
+		private function setUpCamera():void {
+			// first handle where the bounds are (for panning)
+			FlxG.worldBounds = new FlxRect(0, 0, levelFunctional.width,levelFunctional.height);
+			if (Registry.extendedCamera) {
+				FlxG.camera.bounds = new FlxRect(-FlxG.width/2, -FlxG.height/2, levelFunctional.width+FlxG.width, levelFunctional.height+FlxG.height);
+			} else {
+				FlxG.camera.bounds = FlxG.worldBounds;
+			}
+			FlxG.camera.zoom = 1;
 		}
 		
 		private function setUpAudio():void {
@@ -731,7 +740,7 @@ package {
 			// only continue if there's an overlap
 			if (!$exitChute) {return;}
 			// then exit on the action key press
-			if (FlxG.keys.justPressed(RegistryControls.ACTION_KEY)) {
+			if (FlxG.keys.justPressed(RegistryControls.BODY_KEY)) {
 				// just place it in the center for now
 				hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
 				hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
@@ -748,9 +757,8 @@ package {
 			}
 			return null;
 		}
-		
+				
 		override public function update():void {
-			
 			
 			checkIfHandExitedViaChute();
 			
