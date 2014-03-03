@@ -346,7 +346,8 @@ package {
 			} else {
 				FlxG.camera.bounds = FlxG.worldBounds;
 			}
-			FlxG.camera.zoom = 1;
+			//FlxG.camera.zoom = 1;
+			FlxG.camera.zoom = 1.5;
 		}
 		
 		private function setUpAudio():void {

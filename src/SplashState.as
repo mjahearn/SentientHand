@@ -40,9 +40,11 @@ package
 		}
 		
 		private function fixCamera():void {
+			/*
 			FlxG.camera.x = FlxG.width/8;//(FlxG.width * FlxG.camera.zoom)/2;
 			FlxG.camera.y = FlxG.height/8;//(FlxG.height * FlxG.camera.zoom)/2;
-			FlxG.camera.zoom = 1;
+			FlxG.camera.zoom = 1;*/
+			FlxG.camera.zoom = 1.5;
 		}
 		
 		private function addMusic():void {
