@@ -1,8 +1,7 @@
 package {
 	
-	import flash.display.Shape;
-	
 	import flash.display.BitmapData;
+	import flash.display.Shape;
 	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	
@@ -13,6 +12,7 @@ package {
 	
 	public class PlayState extends FlxState {
 						
+		
 		public static var current:PlayState;
 		
 		public const FLOOR_JUMP_VEL:Number = 200; //initial velocity (in pixels per second) of a hand jumping from the floor
@@ -198,7 +198,7 @@ package {
 			addLevelCosmeticBack();
 			addLevelCosmeticSemiBack();
 			addLevelCosmeticMid();
-			addLevelCosmeticFront();
+			//addLevelCosmeticFront();
 			// add chutes after front layer, so they can go over vent backings
 			addExitChutes();
 			
@@ -416,7 +416,10 @@ package {
 			if ($lvlCosmMid.totalTiles <= 0) {return;}
 			
 			add($lvlCosmMid);
+			addLevelCosmeticFront(); // for now doing this, should change hints later...
 			addHints($lvlCosmMid);
+			
+			
 			/*
 			// GEARS
 			for (var i:int = GEAR_MIN; i <= GEAR_MAX; i++) {
@@ -586,7 +589,7 @@ package {
 			var $hint2Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint2,SprHint,$lvl);
 			for (i = 0; i < $hint2Group.length; i++) {
 				$hint = $hint2Group.members[i];
-				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.text = "SCRAP definitely cannot press DOWN to enter an open duct";
 				$hint.angle = 0;
 				$hintGroup.add($hint);
 			}
@@ -595,7 +598,7 @@ package {
 			var $hint3Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint3,SprHint,$lvl);
 			for (i = 0; i < $hint3Group.length; i++) {
 				$hint = $hint3Group.members[i];
-				$hint.text = "HINT " + $debugCounter + " NOT YET IMPLEMENTED";
+				$hint.text = "SCRAP certainly is unable to press UP to detach from surfaces";
 				$hint.angle = 0;
 				$hintGroup.add($hint);
 			}
@@ -1681,6 +1684,20 @@ package {
 		}
 		
 		public function goToNextLevel():void {
+			
+			// for demo:
+			if (RegistryLevels.num == 3) {
+				RegistryLevels.currentMusic.fadeOut(1);
+				RegistryLevels.currentMusicOverlay.fadeOut(1);
+				var $exittFunction:Function = function():void {
+					stopAllSounds();
+					RegistryLevels.num = 0;
+					FlxG.switchState(new SplashState);
+				};
+				// the fade just makes things look cooler
+				FlxG.fade(0xff000000,1,$exittFunction);
+				return;
+			}
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
 			// this'll fire at the end of the fade

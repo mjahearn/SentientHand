@@ -192,7 +192,9 @@ package
 			return _num;
 		}
 		public static function set num(setNum:uint):void {
-			_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
+			//_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
+			//instead, for the demo:
+			_num = (setNum < 3) ? setNum : 3;
 		}
 		public static function reset():void {
 			_num = 0;
