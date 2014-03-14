@@ -123,8 +123,6 @@ package {
 		
 		[Embed("assets/spr_bodygear.png")] public var bodyGearSheet:Class;
 				
-		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
 		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
 		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
@@ -136,11 +134,8 @@ package {
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
 
-		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
 		
-		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
-		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
 		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
@@ -152,7 +147,6 @@ package {
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
 		
-		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
 		
@@ -1029,42 +1023,7 @@ package {
 			*/
 			/* Begin Audio */
 			// Something's not quite right here...
-				
-			// The hand is crawling on wood or metal
-			if (!hand.isAttachedToBody() && /*hand.touching*/hand.isOnGround() && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-			//if ((!bodyMode &&!hand.isAttachedToCannon()) && /*hand.touching*/hand.isOnGround() && (hand.velocity.x != 0 || hand.velocity.y != 0)) {
-				/*if (lastTouchedWood && !lastTouchedDirt) {
-					metalCrawlSound.stop();
-					dirtFootstepsSound.stop();
-					woodCrawlSound.play();
-				} else if (lastTouchedDirt) {
-					metalCrawlSound.stop();
-					woodCrawlSound.stop();
-					dirtFootstepsSound.play();
-				} else {
-					woodCrawlSound.stop();
-					dirtFootstepsSound.stop();
-					metalCrawlSound.play();
-					
-				}*/
-				if (touchingMetal) {
-					woodCrawlSound.stop();
-					dirtFootstepsSound.stop();
-					metalCrawlSound.play();
-				} else if (lastTouchedDirt) {
-					metalCrawlSound.stop();
-					woodCrawlSound.stop();
-					dirtFootstepsSound.play();
-				} else {
-					metalCrawlSound.stop();
-					dirtFootstepsSound.stop();
-					woodCrawlSound.play();
-				}
-			} else {
-				woodCrawlSound.stop();
-				metalCrawlSound.stop();
-				dirtFootstepsSound.stop();
-			}
+			
 			// The hand is in the body, aiming
 			if (hand.isAttachedToBody() && hand.isIdle()) {
 			//if ((bodyMode || hand.isAttachedToCannon()) && !hand.isExtending() && !handIn) {
