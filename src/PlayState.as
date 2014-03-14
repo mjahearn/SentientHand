@@ -413,7 +413,7 @@ package {
 		
 		private function addLevelCosmeticMid():void {
 			var $lvlCosmMid:FlxTilemap = RegistryLevels.lvlCosmMid();
-			if ($lvlCosmMid.totalTiles <= 0) {return;}
+			if ($lvlCosmMid.totalTiles <= 0) {addLevelCosmeticFront();return;}
 			
 			add($lvlCosmMid);
 			addLevelCosmeticFront(); // for now doing this, should change hints later...
@@ -746,8 +746,8 @@ package {
 			// then exit on the action key press
 			if (FlxG.keys.justPressed(RegistryControls.BODY_KEY)) {
 				// just place it in the center for now
-				hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
-				hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
+				//hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
+				//hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
 				goToNextLevel();
 			}
 		}
@@ -1491,13 +1491,13 @@ package {
 			}*/
 			
 			correctMetal();
-						
+			/*			
 			// Pause
 			if (FlxG.keys.justPressed("ENTER")) {
 				FlxG.paused = !FlxG.paused;
 				pause.setAll("exists", FlxG.paused);
 				//IDLE_TIME = 22;
-			}
+			}*/
 			
 			if (FlxG.paused) {
 				if (hand.isAttachedToBody()) {
@@ -1684,20 +1684,6 @@ package {
 		}
 		
 		public function goToNextLevel():void {
-			
-			// for demo:
-			if (RegistryLevels.num == 3) {
-				RegistryLevels.currentMusic.fadeOut(1);
-				RegistryLevels.currentMusicOverlay.fadeOut(1);
-				var $exittFunction:Function = function():void {
-					stopAllSounds();
-					RegistryLevels.num = 0;
-					FlxG.switchState(new SplashState);
-				};
-				// the fade just makes things look cooler
-				FlxG.fade(0xff000000,1,$exittFunction);
-				return;
-			}
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
 			// this'll fire at the end of the fade

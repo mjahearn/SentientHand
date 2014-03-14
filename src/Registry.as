@@ -60,7 +60,7 @@ package {
 		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
 		[Embed("assets/spr_exit_chute.png")] public static const kExitChuteSheet:Class;
 		[Embed("assets/spr_exit_chute_door.png")] public static const kExitChuteDoorSheet:Class;
-		
+		[Embed(source="assets/spr_splash_bkg_detailed-01.png")] public static const kSplashDetailed:Class;
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
 		public static const kAttachHappySound:FlxSound = new FlxSound().loadEmbedded(kAttachHappySFX);
@@ -99,6 +99,6 @@ package {
 		public static var kDroplet3Sound:FlxSound = new FlxSound().loadEmbedded(kDroplet3SFX);
 		
 		[Embed("assets/SplashScreen v1.mp3")] public static const kSplashScreenMus:Class;
-		public static var kSplashScreenMusic:FlxSound = new FlxSound().loadEmbedded(kSplashScreenMus);
+		public static var kSplashScreenMusic:FlxSound = new FlxSound().loadEmbedded(kSplashScreenMus,true);
 	}
 }

@@ -7,6 +7,86 @@ package
 	
 	public class SplashState extends FlxState
 	{
+		private var prompt:FlxText;
+		private var promptTimer:Number;
+		private var promptDir:int;
+		private const kPromptPeriod:Number = 5;
+		private const kFadeTime:Number = 1.22; // how long it will take to transition into the game
+		
+		override public function create():void {
+			addBkg();
+			addTitle();
+			addPrompt();
+			addMusic();
+		}
+		
+		private function addBkg():void {
+			var $bkg:FlxSprite = new FlxSprite(0,0,Registry.kSplashDetailed);
+			//$bkg.scale.x = 0.5;
+			//$bkg.scale.y = 0.5;
+			$bkg.alpha = 0.44;
+			$bkg.x = FlxG.width/2 - $bkg.width/2;
+			$bkg.y = FlxG.height/2 - $bkg.height/2;
+			add($bkg);
+		}
+		
+		private function addTitle():void {
+			var $title:FlxText = new FlxText(0,2*FlxG.height/5,FlxG.width,"it came from the\nSCRAPHEAP");
+			$title.alignment = "center";
+			$title.size = 44;
+			$title.color = 0x884c4c;
+			add($title);
+		}
+		
+		private function addPrompt():void {
+			prompt = new FlxText(0,3*FlxG.height/5,FlxG.width,"press any key");
+			prompt.alignment = "center";
+			prompt.size = 22;
+			add(prompt);
+			promptTimer = 0;
+			promptDir = 1;
+		}
+		
+		private function addMusic():void {
+			add(Registry.kSplashScreenMusic);
+			Registry.kSplashScreenMusic.fadeIn(0.22);
+		}
+		
+		override public function update():void {
+			super.update();
+			updateControls();
+			updateScene();
+		}
+		
+		private function updateScene():void {
+			pulsePrompt();
+		}
+		
+		private function pulsePrompt():void {
+			promptTimer += FlxG.elapsed*promptDir;
+			prompt.alpha = Math.abs(promptTimer/kPromptPeriod);
+			if (promptTimer < kPromptPeriod && promptTimer > -kPromptPeriod) {return;}
+			promptDir *= -1;
+		}
+		
+		private function updateControls():void {
+			if (FlxG.keys.any()) {
+				begin();
+			}
+		}
+		
+		private function begin():void {
+			// call after the fade
+			var $switchState:Function = function():void {
+				FlxG.switchState(new PlayState());
+			};
+			// we want the music to fade out too
+			Registry.kSplashScreenMusic.fadeOut(kFadeTime);
+			FlxG.fade(0xff000000,kFadeTime,$switchState);
+			
+		}
+		
+		/*
 		private var title:FlxSprite;
 		private var prompt:FlxSprite;
 		
@@ -29,10 +109,6 @@ package
 		
 		override public function create():void {
 			fixCamera();
-			/*var tmpText:FlxText = new FlxText(0,FlxG.height/2.0,FlxG.width,"SPLASH SCREEN");
-			tmpText.alignment = "center";
-			add(tmpText);*/
-			addTitle();
 			addPrompt();
 			resetTimerFade();
 			resetTimerMaybeTwitch();
@@ -40,10 +116,6 @@ package
 		}
 		
 		private function fixCamera():void {
-			/*
-			FlxG.camera.x = FlxG.width/8;//(FlxG.width * FlxG.camera.zoom)/2;
-			FlxG.camera.y = FlxG.height/8;//(FlxG.height * FlxG.camera.zoom)/2;
-			FlxG.camera.zoom = 1;*/
 			FlxG.camera.zoom = 1.5;
 		}
 		
@@ -125,6 +197,6 @@ package
 			FlxG.fade(0xff000000,kFadeTime,$switchState);
 			
 		}
-		
+		*/
 	}
 }

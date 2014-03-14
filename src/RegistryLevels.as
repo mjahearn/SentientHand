@@ -192,9 +192,7 @@ package
 			return _num;
 		}
 		public static function set num(setNum:uint):void {
-			//_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
-			//instead, for the demo:
-			_num = (setNum < 3) ? setNum : 3;
+			_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
 		}
 		public static function reset():void {
 			_num = 0;
@@ -203,8 +201,8 @@ package
 		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
 		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
 		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm002BackSheet,kCosm003BackSheet,kCosm004BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm002BackBackSheet,kCosm003BackBackSheet,kCosm004BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
 		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
 		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
 		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
