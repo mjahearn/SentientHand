@@ -73,6 +73,13 @@ package
 		
 		//protected var _heart:FlxSprite;
 		
+		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
+		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
+		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
+		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
+		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
+		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
 			_bodyMarkerGroup = new FlxGroup();
@@ -161,6 +168,9 @@ package
 			}
 			
 			super.update(); //collision happens here?
+			if (velocity.x == 0 && velocity.y == 0) { //instead of this check, include as part of the callback provided in this class when those finally work
+				stopCrawlEffects();
+			}
 			
 			if (!isAttachedToBody() && isOnGround()) {
 				changeHandGravity(); //for convex corners and walking onto/off non-polar surfaces
@@ -178,24 +188,26 @@ package
 				hitGround();
 				_camTag.angle = trueAngle(_camTag.angle);
 			}
-			if (dir == FlxObject.DOWN) {
-				_camAngle = 0;
-			} else if (dir == FlxObject.UP) {
-				if (_camAngle < 0) {
-					_camAngle = -180;
-				} else {
-					_camAngle = 180;
+			if (Registry.cameraRotates) {
+				if (dir == FlxObject.DOWN) {
+					_camAngle = 0;
+				} else if (dir == FlxObject.UP) {
+					if (_camAngle < 0) {
+						_camAngle = -180;
+					} else {
+						_camAngle = 180;
+					}
+				} else if (dir == FlxObject.LEFT) {
+					if (_camAngle == -180) {
+						_camTag.angle = 180;
+					}
+					_camAngle = 90;
+				} else if (dir == FlxObject.RIGHT) {
+					if (_camAngle == 180) {
+						_camTag.angle = -180;
+					}
+					_camAngle = -90;
 				}
-			} else if (dir == FlxObject.LEFT) {
-				if (_camAngle == -180) {
-					_camTag.angle = 180;
-				}
-				_camAngle = 90;
-			} else if (dir == FlxObject.RIGHT) {
-				if (_camAngle == 180) {
-					_camTag.angle = -180;
-				}
-				_camAngle = -90;
 			}
 		}
 		
@@ -393,9 +405,13 @@ package
 				}
 				if (RegistryControls.isPressed(FlxObject.LEFT)) {
 					moveLeft();
-				} if (RegistryControls.isPressed(FlxObject.RIGHT)) {
+				} else if (RegistryControls.isPressed(FlxObject.RIGHT)) {
 					moveRight();
-				} if (RegistryControls.isPressed(FlxObject.UP)) {
+				} else {
+					stopCrawlEffects();
+				}
+				
+				if (RegistryControls.isPressed(FlxObject.UP)) {
 					RegistryControls.remove(FlxObject.UP);
 					if (facing != FlxObject.DOWN) {
 						jump();
@@ -446,6 +462,7 @@ package
 			
 			facing = _targetBody.facing;
 			
+			stopCrawlEffects();
 			showArrow();
 			
 			if (Registry.neverEnteredBodyOrCannon) {
@@ -500,6 +517,8 @@ package
 			} else if (facing == FlxObject.RIGHT) {
 				acceleration.y = MOVE_ACCEL;
 			}
+			
+			crawlEffects();
 		}
 		
 		public function moveRight():void {
@@ -515,6 +534,30 @@ package
 			} else if (facing == FlxObject.LEFT) {
 				acceleration.y = MOVE_ACCEL;
 			}
+			
+			crawlEffects();
+		}
+		
+		public function crawlEffects():void {
+			if (isMetalInDir(facing)) {
+				woodCrawlSound.stop();
+				dirtFootstepsSound.stop();
+				metalCrawlSound.play();
+			} else if (isNeutralInDir(facing)) {
+				metalCrawlSound.stop();
+				dirtFootstepsSound.stop();
+				woodCrawlSound.play();
+			} else { //there's currently no kSpawnDirt in RegistryLevels
+				metalCrawlSound.stop();
+				woodCrawlSound.stop();
+				dirtFootstepsSound.play();
+			}
+		}
+		
+		public function stopCrawlEffects():void {
+			woodCrawlSound.stop();
+			metalCrawlSound.stop();
+			dirtFootstepsSound.stop();
 		}
 		
 		public function changeHandGravity():void {

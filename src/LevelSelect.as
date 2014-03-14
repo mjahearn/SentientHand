@@ -39,9 +39,12 @@ package
 			add(text);
 			
 			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
-			camera = new FlxButton(100, 130, "Follow Gravity", changeCamera);
-			if (Registry.cameraFollowsHand) {
+			camera = new FlxButton(100, 130, /*"Follow Gravity"*/"Off", changeCamera);
+			/*if (Registry.cameraFollowsHand) {
 				camera.label.text = "Follow Hand";
+			}*/
+			if (Registry.cameraRotates) {
+				camera.label.text = "On";
 			}
 			add(camText);
 			add(camera);
@@ -77,11 +80,17 @@ package
 		}
 		
 		public function changeCamera():void {
-			Registry.cameraFollowsHand = !Registry.cameraFollowsHand;
+			/*Registry.cameraFollowsHand = !Registry.cameraFollowsHand;
 			if (Registry.cameraFollowsHand) {
 				camera.label.text = "Follow Hand";
 			} else {
 				camera.label.text = "Follow Gravity";
+			}*/
+			Registry.cameraRotates = !Registry.cameraRotates;
+			if (Registry.cameraRotates) {
+				camera.label.text = "On";
+			} else {
+				camera.label.text = "Off";
 			}
 		}
 		

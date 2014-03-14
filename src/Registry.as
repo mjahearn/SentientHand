@@ -14,7 +14,8 @@ package {
 		public static var musicSwitch:Boolean = true;
 		public static var stupid:Boolean = true;
 		public static var dumb:Boolean = false;
-		public static var cameraFollowsHand:Boolean = false;
+		public static var cameraRotates:Boolean = true;
+		public static var cameraFollowsHand:Boolean = false; //this means rotationally, FYI- camera follows positionally no matter what
 		public static var extendedCamera:Boolean = true;
 		public static var jumpSpace:Boolean = false;
 		

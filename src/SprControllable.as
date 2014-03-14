@@ -119,6 +119,23 @@ package
 			return RegistryLevels.kSpawnMetal.indexOf(tile) != -1;
 		}
 		
+		public function isNeutralInDir(dir:uint):Boolean {
+			var tiles:Array = getTilesInDir(dir);
+			for (var i:uint = 0; i < tiles.length; i++) {
+				if (isNeutral(tiles[i])) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		private function isNeutral(tile:uint):Boolean {
+			if (PlayState.current.reversePolarity) {
+				return (RegistryLevels.kSpawnMetal.indexOf(tile) != -1 || RegistryLevels.kSpawnNeutral.indexOf(tile) != -1);
+			}
+			return (RegistryLevels.kSpawnWood.indexOf(tile) != -1 || RegistryLevels.kSpawnNeutral.indexOf(tile) != -1);
+		}
+		
 		// update: collide with levelFunctional, correct metal
 		// other functions: is___InDir, collider callbacks, fixGravity
 	}
