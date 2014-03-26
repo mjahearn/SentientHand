@@ -12,6 +12,8 @@ package {
 	
 	public class PlayState extends FlxState {
 						
+		private var isTransitioningToNextLevel:Boolean;
+		
 		
 		public static var current:PlayState;
 		
@@ -737,12 +739,24 @@ package {
 			var $exitChute:SprExitChute = overlappedChute();
 			// only continue if there's an overlap
 			if (!$exitChute) {return;}
+			/*
 			// then exit on the action key press
 			if (FlxG.keys.justPressed(RegistryControls.BODY_KEY)) {
 				// just place it in the center for now
 				//hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
 				//hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
 				goToNextLevel();
+			}*/
+			// we want the hand to be fully enclosed by the chute
+			if (hand.x >= $exitChute.x &&
+				hand.x + hand.width <= $exitChute.x + $exitChute.width &&
+				hand.y >= $exitChute.y &&
+				hand.y + hand.height <= $exitChute.y + $exitChute.height) {
+				goToNextLevel();
+				
+				// then stick the hand in the center for now
+				hand.x = $exitChute.x + $exitChute.width/2 - hand.width/2;
+				hand.y = $exitChute.y + $exitChute.height/2 - hand.height/2;
 			}
 		}
 		
@@ -1643,6 +1657,22 @@ package {
 		}
 		
 		public function goToNextLevel():void {
+			if (isTransitioningToNextLevel) {return;}
+			isTransitioningToNextLevel = true;
+			/*
+			// for testing
+			// the level num must be incremented so that the switch state will choose the next level
+			RegistryLevels.num++;
+			// this'll fire at the end of the fade
+			var $exitFunction:Function = function():void {
+				stopAllSounds();
+				var $state:FlxState = (RegistryLevels.num > 3) ? new SplashState : new PlayState;
+				if (RegistryLevels.num > 3) {RegistryLevels.num = 0;}
+				FlxG.switchState($state);
+			};*/
+			
+			
+			
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
 			// this'll fire at the end of the fade
