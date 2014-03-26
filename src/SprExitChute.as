@@ -1,7 +1,7 @@
 package
 {
-	import org.flixel.FlxSprite;
 	import org.flixel.FlxG;
+	import org.flixel.FlxSprite;
 	
 	public class SprExitChute extends FlxSprite
 	{
@@ -13,7 +13,7 @@ package
 		
 		public function SprExitChute($hasDoor:Boolean,$x:Number=0,$y:Number=0)
 		{
-			super($x,$y,Registry.kExitChuteSheet);
+			super($x,$y,($hasDoor ? Registry.kExitChuteSheet : Registry.kExitChuteInSheet));
 						
 			// generate a door only if there is one
 			if (!$hasDoor) {return;}

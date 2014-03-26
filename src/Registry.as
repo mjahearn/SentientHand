@@ -60,6 +60,7 @@ package {
 		[Embed("assets/spr_window_rain.png")] public static const kWindowRainSheet:Class;
 		[Embed("assets/spr_grate.png")] public static const kGrateSheet:Class;
 		[Embed("assets/spr_exit_chute.png")] public static const kExitChuteSheet:Class;
+		[Embed("assets/spr_exit_chute_in.png")] public static const kExitChuteInSheet:Class;
 		[Embed("assets/spr_exit_chute_door.png")] public static const kExitChuteDoorSheet:Class;
 		[Embed(source="assets/spr_splash_bkg_detailed-01.png")] public static const kSplashDetailed:Class;
 		
