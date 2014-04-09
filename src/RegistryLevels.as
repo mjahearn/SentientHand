@@ -145,8 +145,9 @@ package
 		[Embed("assets/mapCSV_cosmetic_front_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002FrontSheet:Class;
 		[Embed("assets/mapCSV_cosmetic_front_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003FrontSheet:Class;
 		[Embed("assets/mapCSV_cosmetic_front_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_005_front.csv",mimeType="application/octet-stream")] private static const kCosm005FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_006_front.csv",mimeType="application/octet-stream")] private static const kCosm006FrontSheet:Class;
+		[Embed("assets/mapCSV_cosmetic_front_cannon1.csv",mimeType="application/octet-stream")] private static const kCosm005FrontSheet:Class;
+		[Embed("assets/mapCSV_cosmetic_front_plain1.csv",mimeType="application/octet-stream")] private static const kCosm006FrontSheet:Class;
+		[Embed("assets/mapCSV_cosmetic_front_grapple1.csv",mimeType="application/octet-stream")] private static const kCosm007FrontSheet:Class;
 		[Embed("assets/mapCSV_cosmetic_m01_front.csv",mimeType="application/octet-stream")] private static const kCosmm01FrontSheet:Class;
 		//// MID
 		[Embed("assets/mapCSV_cosmetic_mid_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001MidSheet:Class;
@@ -199,7 +200,7 @@ package
 		}
 		
 		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,null,null,null,null,null,null,null,null,null,null];
 		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
 		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
 		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];

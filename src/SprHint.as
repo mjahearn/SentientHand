@@ -21,7 +21,7 @@ package
 		private function initFlxText():void {
 			
 			var $xBuffer:uint = 14;
-			var $yBuffer:int = -14;
+			var $yBuffer:int = -7;//-14;
 			
 			_flxText = new FlxText(0,0,width-$xBuffer*2);
 			_flxText.size = 11;
@@ -31,7 +31,8 @@ package
 			_flxText.y += height/2.0 - _flxText.height/2.0 + $yBuffer;
 			_flxTextXLocal = _flxText.x;
 			_flxTextYLocal = _flxText.y;
-			_flxText.shadow = 0x000000;
+			//_flxText.shadow = 0x000000;
+			_flxText.font = "Capture it";
 		}
 		
 		private function parseMsg(msg:String):String {

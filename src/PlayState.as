@@ -587,7 +587,7 @@ package {
 			var $hint2Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint2,SprHint,$lvl);
 			for (i = 0; i < $hint2Group.length; i++) {
 				$hint = $hint2Group.members[i];
-				$hint.text = "SCRAP definitely cannot press DOWN to enter an open duct";
+				$hint.text = "SCRAP definitely enter ducts.";
 				$hint.angle = 0;
 				$hintGroup.add($hint);
 			}
@@ -1671,8 +1671,8 @@ package {
 				var $state:FlxState = (RegistryLevels.num > 3) ? new SplashState : new PlayState;
 				if (RegistryLevels.num > 3) {RegistryLevels.num = 0;}
 				FlxG.switchState($state);
-			};*/
-			
+			};
+			*/
 			
 			
 			// the level num must be incremented so that the switch state will choose the next level
