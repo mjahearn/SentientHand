@@ -51,6 +51,8 @@ package {
 		public var electricityNum:int = 1;
 		
 		public var levelCosmeticFront:FlxTilemap;
+		
+		public var sprControllableGroup:FlxGroup;
 
 		public var hand:SprHand;
 
@@ -177,6 +179,7 @@ package {
 			lastTouchedDirt = false; //ditto
 			//doorsDead = false;
 			reversePolarity = false;
+			sprControllableGroup = new FlxGroup();
 			
 			FlxG.bgColor = 0xff000000;
 			if (RegistryLevels.isLastLevel()) {
@@ -185,7 +188,6 @@ package {
 				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
 				sky.scrollFactor = new FlxPoint(0,0);
 				add(sky);
-				
 			}
 			
 			setUpLevelFunctional();

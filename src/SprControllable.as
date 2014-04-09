@@ -15,6 +15,7 @@ package
 		public function SprControllable(X:Number=0, Y:Number=0, SimpleGraphic:Class=null, CollideCallback:Function=null) {
 			super(X, Y, SimpleGraphic);
 			collideCallback = CollideCallback;
+			PlayState.current.sprControllableGroup.add(this);
 		}
 		
 		/*override public function update():void {
@@ -137,6 +138,6 @@ package
 		}
 		
 		// update: collide with levelFunctional, correct metal
-		// other functions: is___InDir, collider callbacks, fixGravity
+		// other functions: collider callbacks, fixGravity
 	}
 }
