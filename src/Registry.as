@@ -102,5 +102,7 @@ package {
 		
 		[Embed("assets/SplashScreen v1.mp3")] public static const kSplashScreenMus:Class;
 		public static var kSplashScreenMusic:FlxSound = new FlxSound().loadEmbedded(kSplashScreenMus,true);
+		
+		[Embed(source="assets/font.ttf",fontName="Capture it",embedAsCFF="false",mimeType="application/x-font")] private const kFont:Class;
 	}
 }
