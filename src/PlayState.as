@@ -580,7 +580,7 @@ package {
 			var $hint2Group:FlxGroup = groupFromSpawn(RegistryLevels.kSpawnMidHint2,SprHint,$lvl);
 			for (i = 0; i < $hint2Group.length; i++) {
 				$hint = $hint2Group.members[i];
-				$hint.text = "SCRAP definitely enter ducts.";
+				$hint.text = "SCRAP definitely cannot enter ducts.";
 				$hint.angle = 0;
 				$hintGroup.add($hint);
 			}
