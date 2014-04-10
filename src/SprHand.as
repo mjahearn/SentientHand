@@ -65,7 +65,7 @@ package
 		protected var _startAimAngle:Number; //change to radians?
 		protected var _bodyMarkerGroup:FlxGroup;
 		protected var _bodyMarkerTimer:Number;
-		protected var _markerEnd:SprControllable;
+		protected var _markerEnd:SprHandMarker;
 		protected var _markerEndGroup:FlxGroup;
 		
 		[Embed("assets/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
@@ -130,7 +130,7 @@ package
 			_cannonMarkerLine.visible = false;
 			PlayState.current.add(_cannonMarkerLine);
 			
-			_markerEnd = new SprControllable(0,0,null,raytraceCallback);
+			_markerEnd = new SprHandMarker(0,0,null/*,raytraceCallback*/);
 			_markerEnd.loadGraphic(Registry.kHandSheet,true,false,32,32);
 			_markerEnd.frame = 21;
 			_markerEnd.alpha = 0.75;
@@ -623,26 +623,19 @@ package
 			Registry.kJumpSound.stop();
 		}
 		
-		public function raytraceCallback(spr1:FlxObject, spr2:FlxSprite):void {
-			if (_markerEnd.isTouching(FlxObject.DOWN)) {
-				_markerEnd.setDir(FlxObject.DOWN);
-			} else if (_markerEnd.isTouching(FlxObject.UP)) {
-				_markerEnd.setDir(FlxObject.UP);
-			} else if (_markerEnd.isTouching(FlxObject.LEFT)) {
-				_markerEnd.setDir(FlxObject.LEFT);
-			} else if (_markerEnd.isTouching(FlxObject.RIGHT)) {
-				_markerEnd.setDir(FlxObject.RIGHT);
+		override public function collideCallback():void {
+			if (!isAttachedToBody() || !isIdle()) {
+				super.collideCallback();
 			}
-			_markerEnd.velocity.x = 0;
-			_markerEnd.velocity.y = 0;
-			if (_markerEnd.isMetalInDir(_markerEnd.facing)) {
-				setGrappleOkay();
+		}
+		
+		override public function collideWithWood(grav:Boolean):void {
+			if (!isExtending() && !isRetracting()) {
+				super.collideWithWood(grav);
 			}
 		}
 		
 		public function setGrappleOkay():void {
-			_markerEnd.visible = true;
-			_markerEnd.color = PlayState.current.poleCol;
 			_bodyMarkerGroup.setAll("color", 0xffffff);
 		}
 		
@@ -732,7 +725,7 @@ package
 			_bodyMarkerGroup.setAll("color", 0xff0000);
 			while (Math.sqrt(Math.pow(_markerEnd.x-x, 2) + Math.pow(_markerEnd.y-y, 2)) < GRAPPLE_LENGTH) {
 				_markerEndGroup.update();
-				if (FlxG.collide(PlayState.current.levelFunctional, _markerEnd, raytraceCallback)) {
+				if (FlxG.collide(PlayState.current.levelFunctional, _markerEnd, _markerEnd.raytraceCallback)) {
 					break;
 				}
 			}

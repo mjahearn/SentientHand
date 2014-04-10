@@ -10,19 +10,10 @@ package
 		public const MAX_MOVE_VEL:Number = 200; //maximum velocity (in pixels per second) of the hand's movement
 		public const MAX_GRAV_VEL:Number = 400; //terminal velocity (in pixels per second) of gravity
 		
-		public var collideCallback:Function;
-		
-		public function SprControllable(X:Number=0, Y:Number=0, SimpleGraphic:Class=null, CollideCallback:Function=null) {
+		public function SprControllable(X:Number=0, Y:Number=0, SimpleGraphic:Class=null) {
 			super(X, Y, SimpleGraphic);
-			collideCallback = CollideCallback;
 			PlayState.current.sprControllableGroup.add(this);
 		}
-		
-		/*override public function update():void {
-			//doesn't work yet; when it does, take corresponding collides out of PlayState
-			super.update();
-			//FlxG.collide(PlayState.current.levelFunctional,this,collideCallback);
-		}*/
 		
 		public function setDir(dir:uint, grav:Boolean=false, setAngle:Boolean=true):void {
 			facing = dir;
@@ -137,7 +128,30 @@ package
 			return (RegistryLevels.kSpawnWood.indexOf(tile) != -1 || RegistryLevels.kSpawnNeutral.indexOf(tile) != -1);
 		}
 		
-		// update: collide with levelFunctional, correct metal
-		// other functions: collider callbacks, fixGravity
+		public function collideCallback():void {
+			if (isTouching(FlxObject.DOWN)) {
+				if (isMetalInDir(FlxObject.DOWN)) {
+					collideWithMetal(FlxObject.DOWN);
+				} else {
+					collideWithWood(false);
+				}
+			} else if (isTouching(FlxObject.UP) && isMetalInDir(FlxObject.UP)) { //shorten this to isMetalInDir(touching)?
+				collideWithMetal(FlxObject.UP);
+			} else if (isTouching(FlxObject.LEFT) && isMetalInDir(FlxObject.LEFT)) {
+				collideWithMetal(FlxObject.LEFT);
+			} else if (isTouching(FlxObject.RIGHT) && isMetalInDir(FlxObject.RIGHT)) {
+				collideWithMetal(FlxObject.RIGHT);
+			} else if (/*!hand.isOnGround() && */facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by cannon
+				collideWithWood(true);
+			}
+		}
+		
+		public function collideWithMetal(dir:uint):void {
+			setDir(dir);
+		}
+		
+		public function collideWithWood(grav:Boolean):void {
+			setDir(FlxObject.DOWN, grav);
+		}
 	}
 }

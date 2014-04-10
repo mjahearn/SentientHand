@@ -12,4 +12,6 @@ package
 			PlayState.current.hand.showArrow(); //there's GOTTA be a better place to put this
 		}
 	}
+	
+	//make cannon and grappler subclasses; make components like gears a part of the body
 }

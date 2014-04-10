@@ -71,8 +71,6 @@ package {
 		public const numArms:int = 22;
 		public var handDir:uint;
 		
-		public var handMetalFlag:uint;
-		public var handWoodFlag:uint;
 		public var lastVel:FlxPoint; //last nonzero hand velocity - used for convex corners
 		
 		public var gearInGroup:FlxGroup = new FlxGroup();
@@ -285,8 +283,6 @@ package {
 			electricity.play("electricute");
 			
 			curBody = uint.MAX_VALUE;
-			handMetalFlag = uint.MAX_VALUE;
-			handWoodFlag = uint.MAX_VALUE;
 			lastVel = new FlxPoint();
 			
 			pause = new PauseState();
@@ -329,11 +325,8 @@ package {
 		
 		private function setUpLevelFunctional():void {
 			levelFunctional = RegistryLevels.lvlFunc();
-			// deal with all the collision shit
+			// this section used to deal with all the collision shit- but then tile-based callbacks were removed
 			// remember when we had wood? heh...
-			setCallbackFromSpawn(RegistryLevels.kSpawnMetal,metalCallback,levelFunctional);
-			setCallbackFromSpawn(RegistryLevels.kSpawnWood,woodCallback,levelFunctional);
-			setCallbackFromSpawn(RegistryLevels.kSpawnNeutral,neutralCallback,levelFunctional);
 		}
 		
 		private function setUpCamera():void {
@@ -1452,20 +1445,10 @@ package {
 				var tmpRoach:SprRoach = roachGroup.members[mmmmm];
 				tmpRoach.goAwayFromSprite(hand);
 			}
-			
-			handMetalFlag = uint.MAX_VALUE;
-			handWoodFlag = uint.MAX_VALUE;
 	
 			FlxG.collide(dripGroup,levelFunctional);
+			FlxG.collide(levelFunctional, sprControllableGroup, sprControllableCallback);
 			
-			FlxG.collide(levelFunctional,hand);
-			FlxG.collide(levelFunctional,bodyGroup);
-			/*if (FlxG.collide(levelFunctional, hand._markerEnd, hand.raytraceCallback)) {
-				hand._markerEnd.velocity.x = 0;
-				hand._markerEnd.velocity.y = 0;
-			}*/
-			
-			correctMetal();
 			/*			
 			// Pause
 			if (FlxG.keys.justPressed("ENTER")) {
@@ -1490,54 +1473,8 @@ package {
 			}
 		}
 		
-		/*public function levelHandCallback(a:FlxObject, b:FlxObject):void {
-			FlxG.log("okay");
-		}*/
-		
-		public function metalCallback(tile:FlxTile, spr:SprControllable):void {
-			if (reversePolarity) {
-				woodStuff(tile.mapIndex, spr);
-			} else {
-				metalStuff(tile.mapIndex, spr);
-			}
-		}
-		
-		public function metalStuff(ind:uint, spr:SprControllable):void {
-			if (spr == hand && !hand.isAttachedToCannon()) {
-				handMetalFlag = ind;
-				fixGravity(spr);
-			} else if (isBody(spr)) {
-				fixGravity(spr);
-			}
-		}
-		
-		public function woodCallback(tile:FlxTile, spr:SprControllable):void {
-			if (reversePolarity) {
-				metalStuff(tile.mapIndex, spr);
-			} else {
-				woodStuff(tile.mapIndex, spr);
-			}
-		}
-		
-		public function woodStuff(ind:uint, spr:SprControllable):void {
-			if (spr == hand) {
-				handWoodFlag = ind;
-				if (!hand.isAttachedToGrappler() || hand.isFalling()) {
-				//if (!bodyMode) {
-					fixGravity(spr);
-				}
-			} else if (isBody(spr)) {
-				fixGravity(spr);
-			}
-		}
-		
-		public function neutralCallback(tile:FlxTile, spr:SprControllable):void {
-			woodStuff(tile.mapIndex, spr);
-		}
-		
-		public function dirtCallback(tile:FlxTile, spr:SprControllable):void {
-			lastTouchedDirt = true;
-			woodCallback(tile,spr);
+		public function sprControllableCallback(level:FlxTilemap, spr:SprControllable):void {
+			spr.collideCallback();
 		}
 		
 		/*
@@ -1555,26 +1492,6 @@ package {
 			spr.velocity.x = -MAX_MOVE_VEL;
 		}
 		*/
-				
-		public function fixGravity(spr:SprControllable):void {
-			var hitOnlyWood:Boolean = true;
-			if (spr.isTouching(FlxObject.DOWN)) {
-				hitOnlyWood = false;
-				spr.setDir(FlxObject.DOWN);
-			} else if (spr.isTouching(FlxObject.UP) && spr.isMetalInDir(FlxObject.UP)) {
-				hitOnlyWood = false;
-				spr.setDir(FlxObject.UP);
-			} else if (spr.isTouching(FlxObject.LEFT) && spr.isMetalInDir(FlxObject.LEFT)) {
-				hitOnlyWood = false;
-				spr.setDir(FlxObject.LEFT);
-			} else if (spr.isTouching(FlxObject.RIGHT) && spr.isMetalInDir(FlxObject.RIGHT)) {
-				hitOnlyWood = false;
-				spr.setDir(FlxObject.RIGHT);
-			}
-			if (hitOnlyWood && !hand.isOnGround() && spr.facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by steam
-				spr.setDir(FlxObject.DOWN, true);
-			}
-		}
 		
 		public function handOverlapsBody():uint {
 			var hasOverlapped:Boolean = false;
@@ -1691,19 +1608,6 @@ package {
 			ambientElectricalHumSound.stop();
 		}
 		
-		public function correctMetal():void {
-			if (handWoodFlag < uint.MAX_VALUE && handMetalFlag == uint.MAX_VALUE) {
-				/* since Flixel only ever calls one tile callback function, the one corresponding to the topmost or leftmost corner 
-				of the hand against the surface, we must do this check for the other corner to compensate */
-				if ((hand.isTouching(FlxObject.UP) && hand.isMetalInDir(FlxObject.UP)) //should probably be spr, not hand
-				 || (hand.isTouching(FlxObject.DOWN) && hand.isMetalInDir(FlxObject.DOWN))
-				 || (hand.isTouching(FlxObject.LEFT) && hand.isMetalInDir(FlxObject.LEFT))
-				 || (hand.isTouching(FlxObject.RIGHT) && hand.isMetalInDir(FlxObject.RIGHT))) {
-					metalStuff(1, hand);
-				}
-			}
-		}
-		
 		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap):FlxGroup {
 			var _group:FlxGroup = new FlxGroup();
 			for (var i:uint = 0; i <_spawn.length; i++) {
@@ -1716,13 +1620,6 @@ package {
 				}
 			}
 			return _group;
-		}
-		
-		private function setCallbackFromSpawn($spawn:Array,$callback:Function,$map:FlxTilemap):void {
-			for (var i:uint = 0; i <$spawn.length; i++) {
-				$map.setTileProperties($spawn[i],FlxObject.ANY,$callback);
-				var _array:Array = $map.getTileInstances($spawn[i]);
-			}
 		}
 		
 		private function pointForTile(_tile:uint,_map:FlxTilemap):FlxPoint {
