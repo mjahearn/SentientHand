@@ -9,11 +9,11 @@ package {
 		//[Embed("assets/SentientHandTrackB.mp3")] public static const musicBackgroundB:Class;
 		
 		//public static const soundOrder:Array = new Array(musicBackgroundA,musicBackgroundA,musicBackgroundB,musicBackgroundB,musicBackgroundB,musicBackgroundA);
-		public static var music1:FlxSound = new FlxSound();
-		public static var music2:FlxSound = new FlxSound();
-		public static var musicSwitch:Boolean = true;
-		public static var stupid:Boolean = true;
-		public static var dumb:Boolean = false;
+		//public static var music1:FlxSound = new FlxSound();
+		//public static var music2:FlxSound = new FlxSound();
+		//public static var musicSwitch:Boolean = true;
+		//public static var stupid:Boolean = true;
+		//public static var dumb:Boolean = false;
 		public static var cameraRotates:Boolean = true;
 		public static var cameraFollowsHand:Boolean = false; //this means rotationally, FYI- camera follows positionally no matter what
 		public static var extendedCamera:Boolean = true;
@@ -29,12 +29,13 @@ package {
 		public static var neverCrawled:Boolean = true;
 		public static var neverJumped:Boolean = true;
 		
+		/*
 		public static function music():FlxSound {
 			if (musicSwitch) {
 				return music1;
 			}
 			return music2;
-		}
+		}*/
 		
 		[Embed("assets/spr_hand.png")] public static const kHandSheet:Class;
 		[Embed("assets/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;

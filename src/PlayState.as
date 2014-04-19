@@ -1578,6 +1578,7 @@ package {
 		public function goToNextLevel():void {
 			if (isTransitioningToNextLevel) {return;}
 			isTransitioningToNextLevel = true;
+			
 			/*
 			// for testing
 			// the level num must be incremented so that the switch state will choose the next level
@@ -1585,11 +1586,11 @@ package {
 			// this'll fire at the end of the fade
 			var $exitFunction:Function = function():void {
 				stopAllSounds();
-				var $state:FlxState = (RegistryLevels.num > 3) ? new SplashState : new PlayState;
-				if (RegistryLevels.num > 3) {RegistryLevels.num = 0;}
+				var $state:FlxState = (RegistryLevels.num > 6) ? new SplashState : new PlayState;
+				if (RegistryLevels.num > 6) {RegistryLevels.num = 0;}
 				FlxG.switchState($state);
-			};
-			*/
+			};*/
+			
 			
 			
 			// the level num must be incremented so that the switch state will choose the next level
