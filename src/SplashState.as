@@ -14,6 +14,8 @@ package
 		private const kFadeTime:Number = 1.22; // how long it will take to transition into the game
 		
 		override public function create():void {
+			FlxG.camera.x = -95;
+			FlxG.camera.y = -95;
 			addBkg();
 			addTitle();
 			addPrompt();

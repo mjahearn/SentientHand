@@ -13,7 +13,7 @@ package
 			//Registry.background = Registry.backgroundMap;
 		
 			//var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0,"Press one of the following: \n A -> tsh_1evel01.csv \n B -> tsh_level02.csv \n C -> tsh_level03.csv \n D -> testMap.csv \n E -> factory-demo.csv \n F -> tallMap.csv \n G -> tsh_level04.csv \n H -> tsh_level05.csv \n I -> tsh_level06.csv");
-			var text:FlxText = new FlxText(FlxG.width/2.0,FlxG.height/4.0,FlxG.width/2.0);
+			var text:FlxText = new FlxText(200,50,440);
 			text.text = "Press one of the following:";
 			text.text += "\n\nTutorial levels:\n";
 			text.text += "\nA -> tutorial1";
@@ -38,7 +38,7 @@ package
 			text.text += "\nQ -> 006";
 			add(text);
 			
-			var camText:FlxText = new FlxText(100, 100, 400, "Camera Rotation:");
+			var camText:FlxText = new FlxText(50, 100, 400, "Camera Rotation:");
 			camera = new FlxButton(100, 130, /*"Follow Gravity"*/"Off", changeCamera);
 			/*if (Registry.cameraFollowsHand) {
 				camera.label.text = "Follow Hand";
@@ -49,7 +49,7 @@ package
 			add(camText);
 			add(camera);
 			
-			var rangeText:FlxText = new FlxText(100, 200, 400, "Camera Range:");
+			var rangeText:FlxText = new FlxText(50, 200, 400, "Camera Range:");
 			range = new FlxButton(100, 230, "Level Bounds", changeRange);
 			if (Registry.extendedCamera) {
 				range.label.text = "Extended";
@@ -57,7 +57,7 @@ package
 			add(rangeText);
 			add(range);
 			
-			var jumpText:FlxText = new FlxText(100, 300, 400, "Jump Button:");
+			var jumpText:FlxText = new FlxText(50, 300, 400, "Jump Button:");
 			jump = new FlxButton(100, 330, "Up Arrow", changeJump);
 			if (Registry.jumpSpace) {
 				jump.label.text = "Spacebar";
