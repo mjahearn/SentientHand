@@ -204,6 +204,15 @@ package {
 			// the camera needs some special setup because of rotation stuff
 			setUpCamera();
 			
+			// Hand, part 1
+			// part 2 is below all the body stuff- we're initializing up here for the benefit of the exit chute, which is layered beneath the bodies and needs the hand's coordinates (should we spawn the hand from the exit chute's coordinates for the sake of code cleanliness?)
+			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
+			
+			// TEST EXIT CHUTE
+			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-32,hand.y+hand.height/2-48);
+			add($exitChute);
+			$exitChute.spit();
+			
 			// CANNONS
 			cannonGroup = groupFromSpawn(RegistryLevels.kSpawnLauncher,SprBody,levelFunctional);
 			for (var i:uint = 0; i < cannonGroup.length; i++) {
@@ -262,15 +271,9 @@ package {
 			add(arms);
 			
 			addDripperEvent();
-
-			// Hand
-			hand = groupFromSpawn(RegistryLevels.kSpawnHand,SprHand,levelFunctional).members[0];
 			
-			// TEST EXIT CHUTE
-			var $exitChute:SprExitChute = new SprExitChute(true,hand.x+hand.width/2-32,hand.y+hand.height/2-48);
-			add($exitChute);
-			$exitChute.spit();
-
+			// Hand, part 2
+			hand.addMarker();
 			add(hand);
 			handDir = FlxObject.RIGHT;
 			
@@ -1446,7 +1449,7 @@ package {
 				var tmpRoach:SprRoach = roachGroup.members[mmmmm];
 				tmpRoach.goAwayFromSprite(hand);
 			}
-	
+			
 			FlxG.collide(dripGroup,levelFunctional);
 			FlxG.collide(levelFunctional, sprControllableGroup, sprControllableCallback);
 			
