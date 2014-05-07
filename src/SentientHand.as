@@ -1,5 +1,7 @@
 package
 {
+
+	import flash.events.Event;
 	import org.flixel.*;
 	
 	[SWF(width="450", height="450", backgroundColor="#000000")]
@@ -17,5 +19,16 @@ package
 			
 			forceDebugger = Registry.DEBUG_ON;
 		}
+
+ override protected function create(FlashEvent:Event):void {
+
+super.create(FlashEvent);
+stage.removeEventListener(Event.DEACTIVATE,onFocusLost);
+
+
+stage.removeEventListener(Event.ACTIVATE,onFocus);
+
+stage.align = "TOP";
+}
 	}
 }
