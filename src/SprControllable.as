@@ -141,9 +141,10 @@ package
 				collideWithMetal(FlxObject.LEFT);
 			} else if (isTouching(FlxObject.RIGHT) && isMetalInDir(FlxObject.RIGHT)) {
 				collideWithMetal(FlxObject.RIGHT);
-			} else if (/*!hand.isOnGround() && */facing != FlxObject.DOWN) { //if the hand only hit wood after being shot by cannon
+			} //The corner-reversed-gravity bug was caused by this else if statement. I fixed it (by adding the second condition), but come to think of it, I'm not sure it's necessary to handle this case at all... 
+			/*else if (facing != FlxObject.DOWN && !isMetalInDir(facing)) { //if the hand only hit wood after being shot by cannon
 				collideWithWood(true);
-			}
+			}*/
 		}
 		
 		public function collideWithMetal(dir:uint):void {

@@ -82,10 +82,7 @@ package
 		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
-			_bodyMarkerGroup = new FlxGroup();
-			_bodyMarkerTimer = 0;
-			PlayState.current.add(_bodyMarkerGroup);
-			
+			//make sure PlayState also calls addMarker
 			super(X, Y);
 			loadGraphic(Registry.kHandSheet,true,false,32,32,true);
 			
@@ -126,6 +123,18 @@ package
 			
 			_camTag = new FlxSprite(x,y);
 			
+			setDir(FlxObject.DOWN, true);
+			FlxG.camera.follow(_camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
+			
+			scale.x = 0;
+			scale.y = 0;
+		}
+		
+		public function addMarker():void {
+			_bodyMarkerGroup = new FlxGroup();
+			_bodyMarkerTimer = 0;
+			PlayState.current.add(_bodyMarkerGroup);
+			
 			_cannonMarkerLine = new FlxSprite(0,0,_cannonMarkerLineSheet);
 			_cannonMarkerLine.visible = false;
 			PlayState.current.add(_cannonMarkerLine);
@@ -138,12 +147,6 @@ package
 			_markerEndGroup = new FlxGroup();
 			_markerEndGroup.add(_markerEnd);
 			PlayState.current.add(_markerEndGroup);
-			
-			setDir(FlxObject.DOWN, true);
-			FlxG.camera.follow(_camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
-			
-			scale.x = 0;
-			scale.y = 0;
 		}
 		
 		override public function update():void {
@@ -167,7 +170,8 @@ package
 				handleSoloMovement();
 			}
 			
-			super.update(); //collision happens here?
+			super.update();
+			
 			if (velocity.x == 0 && velocity.y == 0) { //instead of this check, include as part of the callback provided in this class when those finally work
 				stopCrawlEffects();
 			}
