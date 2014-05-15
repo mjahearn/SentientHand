@@ -131,7 +131,6 @@ package {
 		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
 		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
 		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var ambientElectricalHumSFX:Class;
-		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
@@ -144,7 +143,6 @@ package {
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
 		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX,true);
-		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
@@ -1073,12 +1071,6 @@ package {
 				ambientElectricalHumSound.play();
 			} else {
 				ambientElectricalHumSound.stop();
-			}
-			
-			// cannon fire
-			if (hand.isAttachedToCannon() && FlxG.keys.justPressed(RegistryControls.ACTION_KEY)) {
-				cannonShotSound.stop();
-				cannonShotSound.play();
 			}
 			
 			// hand landed

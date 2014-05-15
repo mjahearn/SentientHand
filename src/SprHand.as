@@ -76,9 +76,11 @@ package
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
+		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
+		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
 		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
@@ -391,6 +393,9 @@ package
 			angle = _aimAngle - 90;
 			velocity.x = CANNON_VEL * Math.cos(rad);
 			velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
+			
+			cannonShotSound.stop();
+			cannonShotSound.play();
 		}
 		
 		public function handleSoloMovement():void {
