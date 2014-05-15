@@ -24,7 +24,7 @@ package
 		
 		// COSMETIC SPAWNS
 		public static const kSpawnHintArrowKeys:Array = [293]; // update this
-		public static const kSpawnDrip:Array = [45,77];
+		public static const kSpawnDrip:Array = [304,305];//[45,77];
 		public static const kSpawnRoaches:Array = [295]; // update this
 		
 		public static const kSpawnMidHint0:Array = [48];

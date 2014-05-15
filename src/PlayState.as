@@ -69,7 +69,6 @@ package {
 		
 		public var arms:FlxGroup = new FlxGroup();
 		public const numArms:int = 22;
-		public var handDir:uint;
 		
 		public var lastVel:FlxPoint; //last nonzero hand velocity - used for convex corners
 		
@@ -85,8 +84,6 @@ package {
 		//public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
 		public var electricity:FlxSprite;
-		
-		public var timeFallen:Number;
 		
 		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
@@ -171,7 +168,6 @@ package {
 			setUpAudio();
 			
 			dbg = 0;
-			timeFallen = 0; //this was initialized above, so I moved it here for saftey's sake- mjahearn
 			lastTouchedDirt = false; //ditto
 			//doorsDead = false;
 			reversePolarity = false;
@@ -273,7 +269,6 @@ package {
 			// Hand, part 2
 			hand.addMarker();
 			add(hand);
-			handDir = FlxObject.RIGHT;
 			
 			electricity = new FlxSprite(hand.x,hand.y);
 			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
@@ -1136,10 +1131,6 @@ package {
 			}*/
 			/* End Audio */
 			
-			// to time the fall for the different falling rot, really belongs with anim stuff
-			if (hand.isOnGround()) {timeFallen = 0;}
-			timeFallen += FlxG.elapsed;
-			
 			// less janky way of getting gears/heads to move with body...
 			if (hand.isAttachedToGrappler()) {
 			//if (bodyMode) {
@@ -1207,93 +1198,8 @@ package {
 			}
 			
 			/* Begin Animations */
-			// The hand is not attached to a body
-			if (!hand.isAttachedToBody()) {
-			//if (!bodyMode && !hand.isAttachedToCannon()) {
-				// The hand is crawling along a flat surface
-				if (/*hand.touching*/hand.isOnGround()) {
-					// The hand is changing direction
-					// (because the sprite's not ambidexterous)
-					if (RegistryControls.isPressed(FlxObject.LEFT)) {handDir = FlxObject.LEFT;}
-					if (RegistryControls.isPressed(FlxObject.RIGHT)) {handDir = FlxObject.RIGHT;}
-					// Make the hand crawl or idle
-					// (this relies on the facing and direction because the sprite's not ambidexterous)
-					if (handDir == FlxObject.LEFT) {
-						if ((hand.facing == FlxObject.UP && hand.velocity.x > 0) ||
-							(hand.facing == FlxObject.DOWN && hand.velocity.x < 0) ||
-							(hand.facing == FlxObject.LEFT && hand.velocity.y < 0) ||
-							(hand.facing == FlxObject.RIGHT && hand.velocity.y > 0)) {
-							hand.play(SprHand.kAnimCrawlLeft);
-						} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-							hand.play(SprHand.kAnimIdleLeft);
-						}
-					} else if (handDir == FlxObject.RIGHT) {
-						if ((hand.facing == FlxObject.UP && hand.velocity.x < 0) ||
-							(hand.facing == FlxObject.DOWN && hand.velocity.x > 0) ||
-							(hand.facing == FlxObject.LEFT && hand.velocity.y > 0) ||
-							(hand.facing == FlxObject.RIGHT && hand.velocity.y < 0)) {
-							hand.play(SprHand.kAnimCrawlRight);
-						} else if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-							hand.play(SprHand.kAnimIdleRight);
-						}
-					}
-				}
-				// The hand is rounding a convex corner
-				else if (hand.isRoundingCorner()) { // (!lastTouchedWood)
-					
-					if (handDir == FlxObject.LEFT) {
-						hand.angle -= 2.2;
-						hand.play(SprHand.kAnimFallLeft); //<- placeholder {hand.play("jump left");
-					} else if (handDir == FlxObject.RIGHT) {
-						hand.angle += 2.2;
-						hand.play(SprHand.kAnimFallRight); //<- placeholder {hand.play("jump right");
-					}
-				}
-				
-				/*
-				else if (!hand.isOnGround() && lastTouchedWood) {
-					if (handDir == FlxObject.LEFT) {
-						hand.play("fall left"); //<- placeholder {hand.play("jump left");
-						//}
-					} else if (handDir == FlxObject.RIGHT) {
-						hand.play("fall right"); //<- placeholder {hand.play("jump right");
-						//}
-					}
-				}
-				*/
-				
-				/*
-				// The hand ran off a wooden platform
-				else if (lastTouchedWood) {
-					if (handDir == FlxObject.LEFT) {
-						hand.play("fall left");
-					} else if (handDir == FlxObject.RIGHT) {
-						hand.play("fall right");
-					}
-				} */
-				// The hand is falling (with style!)
-				else {
-					if (hand.angle > 0 && hand.angle < 360) {
-						if (handDir == FlxObject.LEFT) {
-							hand.play(SprHand.kAnimFallLeft);
-							hand.angle += 10;
-						} else if (handDir == FlxObject.RIGHT) {
-							hand.play(SprHand.kAnimFallRight);
-							hand.angle -= 10;
-						}
-					}
-					else if (timeFallen > 0.44) {
-						var vSquared:Number = Math.pow(hand.velocity.x,2) + Math.pow(hand.velocity.y,2);
-						
-						if (handDir == FlxObject.LEFT) {hand.angle += vSquared/8000;}
-						else if (handDir == FlxObject.RIGHT) {hand.angle -= vSquared/8000;}
-					}
-				}
-			}
-			
 			// The hand is attached to a body
-			else if (hand.isAttachedToBody()) {
-			//else if (bodyMode || hand.isAttachedToCannon()) {
+			if (hand.isAttachedToBody()) {
 				// The hand is idling in the body
 				if (hand.isIdle()) {
 					/*body.angle = bodyTargetAngle;
@@ -1313,12 +1219,6 @@ package {
 						body.angle = 270;
 					}
 					
-					if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimIdleBodyLeft);}
-					else {hand.play(SprHand.kAnimIdleBodyRight);}
-					// The hand is about to dismount 
-					//if (FlxG.keys.justPressed(RegistryControls.BODY_KEY)) {
-						// play falling animations?
-					//}
 					// Keep arms hidden
 					for (var i:String in arms.members) {
 						arms.members[i].visible = false;
@@ -1326,19 +1226,6 @@ package {
 				}
 				// The hand is extended
 				else if (hand.isExtending() || hand.isRetracting()) {
-					
-					if (/*FlxG.keys.SPACE*/hand.isExtending() && /*!hand.touching*/ !touchingMetal) {
-						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimExtendLeft);}
-						else {hand.play(SprHand.kAnimExtendRight);} // maybe there should be an animation for extending?
-					} else {
-						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimIdleBodyLeft);}
-						else {hand.play(SprHand.kAnimIdleBodyRight);}
-					}
-					
-					if (hand.velocity.x == 0 && hand.velocity.y == 0) {
-						if (handDir == FlxObject.LEFT) {hand.play(SprHand.kAnimGrabLeft);}
-						else {hand.play(SprHand.kAnimGrabRight);}
-					}
 					
 					// Properly space and rotate the arm segments
 					var deltaX:Number = -body.x + hand.x;
