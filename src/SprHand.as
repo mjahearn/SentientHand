@@ -166,7 +166,7 @@ package
 		override public function update():void {
 			
 			gravityArrow.x = x;
-			gravityArrow.y = y + 20;
+			gravityArrow.y = y + gravityArrow.height*2;
 			gravityArrow.update();
 			
 			if (scale.x < 1 && scale.y < 1) {
@@ -237,12 +237,12 @@ package
 		public function moveCamTag():void {
 			if (Registry.cameraFollowsHand) {
 				if (isOnGround()) {
-					_camTag.angle += angleDifference(_camAngle, _camTag.angle)/12.0;
+					_camTag.angle += angleDifference(_camAngle, _camTag.angle)/32.0;
 				} else {
-					_camTag.angle += angleDifference(angle, _camTag.angle)/12.0;
+					_camTag.angle += angleDifference(angle, _camTag.angle)/32.0;
 				}
 			} else if (_camTag.angle != _camAngle) {
-				_camTag.angle += (-_camTag.angle + _camAngle)/12.0;
+				_camTag.angle += (-_camTag.angle + _camAngle)/32.0;
 			}
 			FlxG.camera.angle = -_camTag.angle;
 			
