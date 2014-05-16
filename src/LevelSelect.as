@@ -7,6 +7,8 @@ package
 		public var camera:FlxButton;
 		public var range:FlxButton;
 		public var jump:FlxButton;
+		public var camRate:FlxText;
+		
 		override public function create():void {
 			
 			//Registry.midground = Registry.midgroundMap;
@@ -38,8 +40,8 @@ package
 			text.text += "\nQ -> 006";
 			add(text);
 			
-			var camText:FlxText = new FlxText(50, 100, 400, "Camera Rotation:");
-			camera = new FlxButton(100, 130, /*"Follow Gravity"*/"Off", changeCamera);
+			var camText:FlxText = new FlxText(50, 50, 400, "Camera Rotation:");
+			camera = new FlxButton(100, 80, /*"Follow Gravity"*/"Off", changeCamera);
 			/*if (Registry.cameraFollowsHand) {
 				camera.label.text = "Follow Hand";
 			}*/
@@ -49,21 +51,26 @@ package
 			add(camText);
 			add(camera);
 			
-			var rangeText:FlxText = new FlxText(50, 200, 400, "Camera Range:");
-			range = new FlxButton(100, 230, "Level Bounds", changeRange);
+			var rangeText:FlxText = new FlxText(50, 130, 400, "Camera Range:");
+			range = new FlxButton(100, 160, "Level Bounds", changeRange);
 			if (Registry.extendedCamera) {
 				range.label.text = "Extended";
 			}
 			add(rangeText);
 			add(range);
 			
-			var jumpText:FlxText = new FlxText(50, 300, 400, "Jump Button:");
-			jump = new FlxButton(100, 330, "Up Arrow", changeJump);
+			var jumpText:FlxText = new FlxText(50, 210, 400, "Jump Button:");
+			jump = new FlxButton(100, 240, "Up Arrow", changeJump);
 			if (Registry.jumpSpace) {
 				jump.label.text = "Spacebar";
 			}
 			add(jumpText);
 			add(jump);
+			
+			var camRateText:FlxText = new FlxText(50, 290, 400, "Speed of camera rotation:\n(bigger numbers are slower;\npress up and down arrow\nkeys to change)");
+			camRate = new FlxText(50, 350, 400, Registry.cameraTurnRate.toString());
+			add(camRateText);
+			add(camRate);
 		}
 		
 		override public function update():void {
@@ -74,6 +81,16 @@ package
 					FlxG.switchState(new SplashState);
 					break;
 				}
+			}
+			
+			if (FlxG.keys.justPressed("UP")) {
+				var increment:Number = Math.pow(2, Math.floor(Math.log(Registry.cameraTurnRate)/Math.LN2) - 2);
+				Registry.cameraTurnRate += increment;
+				camRate.text = Registry.cameraTurnRate.toString();
+			} else if (FlxG.keys.justPressed("DOWN")) {
+				var increment:Number = Math.pow(2, Math.ceil(Math.log(Registry.cameraTurnRate)/Math.LN2) - 3);
+				Registry.cameraTurnRate -= increment;
+				camRate.text = Registry.cameraTurnRate.toString();
 			}
 			
 			super.update();

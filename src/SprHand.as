@@ -221,13 +221,13 @@ package
 						_camAngle = 180;
 					}
 				} else if (dir == FlxObject.LEFT) {
-					if (_camAngle == -180) {
-						_camTag.angle = 180;
+					if (_camTag.angle < -90) {
+						_camTag.angle += 360;
 					}
 					_camAngle = 90;
 				} else if (dir == FlxObject.RIGHT) {
-					if (_camAngle == 180) {
-						_camTag.angle = -180;
+					if (_camTag.angle > 90) {
+						_camTag.angle -= 360;
 					}
 					_camAngle = -90;
 				}
@@ -237,12 +237,12 @@ package
 		public function moveCamTag():void {
 			if (Registry.cameraFollowsHand) {
 				if (isOnGround()) {
-					_camTag.angle += angleDifference(_camAngle, _camTag.angle)/12.0;
+					_camTag.angle += angleDifference(_camAngle, _camTag.angle)/Registry.cameraTurnRate;
 				} else {
-					_camTag.angle += angleDifference(angle, _camTag.angle)/12.0;
+					_camTag.angle += angleDifference(angle, _camTag.angle)/Registry.cameraTurnRate;
 				}
 			} else if (_camTag.angle != _camAngle) {
-				_camTag.angle += (-_camTag.angle + _camAngle)/12.0;
+				_camTag.angle += angleDifference(_camAngle, _camTag.angle)/Registry.cameraTurnRate;
 			}
 			FlxG.camera.angle = -_camTag.angle;
 			

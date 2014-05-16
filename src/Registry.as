@@ -18,8 +18,9 @@ package {
 		public static var cameraFollowsHand:Boolean = false; //this means rotationally, FYI- camera follows positionally no matter what
 		public static var extendedCamera:Boolean = true;
 		public static var jumpSpace:Boolean = false;
+		public static var cameraTurnRate:Number = 12.0;
 		
-		public static const SOUND_ON:Boolean = true;
+		public static const SOUND_ON:Boolean = false;
 		public static const DEBUG_ON:Boolean = true;
 		
 		// hint system stuff
