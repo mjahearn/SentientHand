@@ -80,11 +80,16 @@ package
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		
+		private var gravityArrow:FlxSprite;
+		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
 			//make sure PlayState also calls addMarker
 			super(X, Y);
 			loadGraphic(Registry.kHandSheet,true,false,32,32,true);
+			
+			gravityArrow = new FlxSprite();
+			gravityArrow.loadGraphic(Registry.kGravityArrow);
 			
 			addAnimation(kAnimCrawlRight,[0,1,2,3,4,5,6],22,true);
 			addAnimation(kAnimIdleRight,[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
@@ -149,7 +154,16 @@ package
 			PlayState.current.add(_markerEndGroup);
 		}
 		
+		override public function draw():void {
+			super.draw();
+			gravityArrow.draw();
+		}
+		
 		override public function update():void {
+			
+			gravityArrow.x = x;
+			gravityArrow.y = y + 20;
+			gravityArrow.update();
 			
 			if (scale.x < 1 && scale.y < 1) {
 				scale.x += 0.03;
