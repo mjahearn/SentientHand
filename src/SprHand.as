@@ -55,6 +55,7 @@ package
 		protected var _bodyState:int;
 		protected var _isInGrappler:Boolean;
 		protected var _isInCannon:Boolean;
+		protected var _timeFallen:Number;
 		
 		protected var _targetBody:SprBody;
 		protected var _targetBodyType:int;
@@ -76,9 +77,11 @@ package
 		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
+		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
+		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
 		
 		private var gravityArrow:FlxSprite;
 		
@@ -125,13 +128,14 @@ package
 			_wasTouchingMetal = false;
 			_aimAngle = 0;
 			_rad = 0;
+			_timeFallen = 0;
 			
 			_camTag = new FlxSprite(x,y);
 			
 			setDir(FlxObject.DOWN, true);
 			FlxG.camera.follow(_camTag, Registry.extendedCamera?FlxCamera.STYLE_LOCKON:FlxCamera.STYLE_TOPDOWN);
 			
-			scale.x = 0;
+			scale.x = 0; //what are these for again?
 			scale.y = 0;
 		}
 		
@@ -146,7 +150,7 @@ package
 			
 			_markerEnd = new SprHandMarker(0,0,null/*,raytraceCallback*/);
 			_markerEnd.loadGraphic(Registry.kHandSheet,true,false,32,32);
-			_markerEnd.frame = 21;
+			_markerEnd.frame = 30;
 			_markerEnd.alpha = 0.75;
 			_markerEnd.visible = false;
 			_markerEndGroup = new FlxGroup();
@@ -186,12 +190,13 @@ package
 			
 			super.update();
 			
-			if (velocity.x == 0 && velocity.y == 0) { //instead of this check, include as part of the callback provided in this class when those finally work
-				stopCrawlEffects();
-			}
-			
-			if (!isAttachedToBody() && isOnGround()) {
-				changeHandGravity(); //for convex corners and walking onto/off non-polar surfaces
+			if (!isAttachedToBody()) {
+				if (velocity.x == 0 && velocity.y == 0) { //instead of this check, include as part of the callback provided in this class when those finally work
+					stopCrawlEffects();
+				}
+				if (isOnGround()) {
+					changeHandGravity(); //for convex corners and walking onto/off non-polar surfaces
+				}
 			}
 			
 			_wasTouchingMetal = (isOnGround() && isMetalInDir(facing));
@@ -272,6 +277,11 @@ package
 				_bodyState = RETRACTING;
 				velocity = new FlxPoint();
 			}
+			if (_isLeft) {
+				play(kAnimExtendLeft);
+			} else if (_isRight) {
+				play(kAnimExtendRight);
+			}
 		}
 		
 		public function handleBodyRetractingMovement():void {
@@ -288,10 +298,21 @@ package
 				} else if (angle < _targetBody.angle) {
 					_targetBody.angle -= 4;
 				}
+				if (_isLeft) {
+					play(kAnimGrabLeft);
+				} else if (_isRight) {
+					play(kAnimGrabRight);
+				}
 			} else {
 				velocity.x = -GRAPPLE_SPEED * Math.cos(_rad);
 				velocity.y = -GRAPPLE_SPEED * Math.sin(_rad);
+				if (_isLeft) {
+					play(kAnimIdleBodyLeft);
+				} else if (_isRight) {
+					play(kAnimIdleBodyRight);
+				}
 			}
+
 			if (Math.abs(diffX) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.cos(_rad)) + EPSILON &&
 				Math.abs(diffY) <= Math.abs(GRAPPLE_SPEED * FlxG.elapsed * Math.sin(_rad)) + EPSILON) {
 				_bodyState = IDLE;
@@ -319,6 +340,7 @@ package
 					_targetBody.setDir(FlxObject.DOWN,true);
 					setDir(FlxObject.DOWN,true);
 				}
+				idleBodyEffects();
 			}
 		}
 		
@@ -346,6 +368,7 @@ package
 					updateRaytrace();
 				}
 			}
+			idleBodyEffects();
 			angle = _aimAngle - 90;
 			updateBodyMarker();
 			if (RegistryControls.isPressed(FlxObject.DOWN)) {
@@ -405,6 +428,9 @@ package
 			angle = _aimAngle - 90;
 			velocity.x = CANNON_VEL * Math.cos(rad);
 			velocity.y = 1.5 * CANNON_VEL * Math.sin(rad);
+			
+			cannonShotSound.stop();
+			cannonShotSound.play();
 		}
 		
 		public function handleSoloMovement():void {
@@ -416,6 +442,7 @@ package
 					attachToCannon();
 				}
 			} else if (isOnGround()) {
+				_timeFallen = 0; // move this to the moment it lands
 				if (facing == FlxObject.DOWN || facing == FlxObject.UP) {
 					acceleration.x = 0;
 				} else if (facing == FlxObject.LEFT || facing == FlxObject.RIGHT) {
@@ -426,7 +453,7 @@ package
 				} else if (RegistryControls.isPressed(FlxObject.RIGHT)) {
 					moveRight();
 				} else {
-					stopCrawlEffects();
+					stopCrawlEffects(); //test if this is called when hand hits wall
 				}
 				
 				if (RegistryControls.isPressed(FlxObject.UP)) {
@@ -434,6 +461,31 @@ package
 					if (facing != FlxObject.DOWN) {
 						jump();
 					}
+				}
+			} else if (isRoundingCorner()) {
+				if (_isLeft) {
+					angle -= 2.2;
+					play(kAnimFallLeft); //<- placeholder {hand.play("jump left");
+				} else if (_isRight) {
+					angle += 2.2;
+					play(kAnimFallRight); //<- placeholder {hand.play("jump right");
+				}
+			} else if (isFalling()) {
+				_timeFallen += FlxG.elapsed;
+				if (angle > 0 && angle < 360) {
+					if (_isLeft) {
+						play(kAnimFallLeft);
+						angle += 10;
+					} else if (_isRight) {
+						play(kAnimFallRight);
+						angle -= 10;
+					}
+				}
+				else if (_timeFallen > 0.44) {
+					var vSquared:Number = Math.pow(velocity.x,2) + Math.pow(velocity.y,2);
+					
+					if (_isLeft) {angle += vSquared/8000;}
+					else if (_isRight) {angle -= vSquared/8000;}
 				}
 			}
 		}
@@ -482,9 +534,18 @@ package
 			
 			stopCrawlEffects();
 			showArrow();
+			idleBodyEffects();
 			
 			if (Registry.neverEnteredBodyOrCannon) {
 				Registry.neverEnteredBodyOrCannon = false;
+			}
+		}
+		
+		private function idleBodyEffects():void {
+			if (_isLeft) {
+				play(kAnimIdleBodyLeft);
+			} else if (_isRight) {
+				play(kAnimIdleBodyRight);
 			}
 		}
 		
@@ -513,6 +574,7 @@ package
 				velocity.x = -WALL_JUMP_VEL;
 			}
 			
+			stopCrawlEffects();
 			Registry.kJumpSound = FlxG.play(Registry.kJumpSFX);
 			
 			if (_isLeft) {
@@ -570,12 +632,24 @@ package
 				woodCrawlSound.stop();
 				dirtFootstepsSound.play();
 			}
+			
+			if (_isLeft) {
+				play(kAnimCrawlLeft);
+			} else if (_isRight) {
+				play(kAnimCrawlRight);
+			}
 		}
 		
 		public function stopCrawlEffects():void {
 			woodCrawlSound.stop();
 			metalCrawlSound.stop();
 			dirtFootstepsSound.stop();
+			
+			if (_isLeft) {
+				play(kAnimIdleLeft);
+			} else if (_isRight) {
+				play(kAnimIdleRight);
+			}
 		}
 		
 		public function changeHandGravity():void {
@@ -667,9 +741,9 @@ package
 			if (isAttachedToGrappler()) {
 				_markerEnd.visible = true;
 				if (_isRight) {
-					_markerEnd.frame = 21;
+					_markerEnd.frame = 30;
 				} else if (_isLeft) {
-					_markerEnd.frame = 27;
+					_markerEnd.frame = 32;
 				}
 				_bodyMarkerGroup.visible = true;
 				updateRaytrace();
