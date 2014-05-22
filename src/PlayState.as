@@ -83,8 +83,6 @@ package {
 		//public var buttonMode:uint;
 		//public var buttonBangGroup:FlxGroup = new FlxGroup();
 		
-		public var electricity:FlxSprite;
-		
 		public var markerLine:FlxSprite;
 		//public var hintArrow:FlxSprite = new FlxSprite();
 		//public var exitArrow:FlxSprite = new FlxSprite();
@@ -112,8 +110,6 @@ package {
 		[Embed("assets/spr_arm.png")] public var armSheet:Class;
 		[Embed("assets/spr_body.png")] public var bodySheet:Class;
 		
-		[Embed("assets/electricity.png")] public var electricitySheet:Class;
-		
 		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
 		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
 		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
@@ -127,7 +123,6 @@ package {
 		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
 		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
 		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
-		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var ambientElectricalHumSFX:Class;
 		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
 		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
 		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
@@ -139,7 +134,6 @@ package {
 		public var pipeWalkSound:FlxSound = new FlxSound().loadEmbedded(pipeWalkSFX);
 		public var robodyLandOnPipeSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnPipeSFX);
 		public var robodyLandOnWallSound:FlxSound = new FlxSound().loadEmbedded(robodyLandOnWallSFX);
-		public var ambientElectricalHumSound:FlxSound = new FlxSound().loadEmbedded(ambientElectricalHumSFX,true);
 		public var handLandingOnMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnMetalSFX);
 		public var handLandingOnNonstickMetalSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnNonstickMetalSFX);
 		public var ambientGearsSound:FlxSound = new FlxSound().loadEmbedded(ambientGearsSFX,true);
@@ -269,14 +263,7 @@ package {
 			// Hand, part 2
 			hand.addMarker();
 			add(hand);
-			
-			electricity = new FlxSprite(hand.x,hand.y);
-			electricity.loadGraphic(electricitySheet,true,false,32,32,true);
-			electricity.addAnimation("electricute",[1,2,3,4,5,6,7],22,true);
-			electricity.addAnimation("stop",[0]);
-			add(electricity);
-			
-			electricity.play("electricute");
+			hand.addElectricity();
 			
 			curBody = uint.MAX_VALUE;
 			lastVel = new FlxPoint();
@@ -853,7 +840,7 @@ package {
 				}
 			}
 			
-			var touchingMetal:Boolean = (hand.isOnGround() && hand.isMetalInDir(hand.facing)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
+			//var touchingMetal:Boolean = (hand.isOnGround() && hand.isMetalInDir(hand.facing)); //USE ONLY FOR GRAPHICS + AUDIO; THIS MAY CHANGE DURING CONTROLS SECTION
 			
 			if (enteringBody || hand.isAttachedToGrappler()) {
 			//if (enteringBody || bodyMode) {
@@ -933,8 +920,7 @@ package {
 			*/
 			
 			// marker glow (for hand overlapping)
-			hand.color = poleCol; //retrieved through get function below
-			electricity.color = poleCol;
+			hand.setColor(poleCol); //retrieved through get function below
 			for (var mmm:String in bodyGroup.members) {
 				bodyGroup.members[mmm].color = 0xaaaaaa;
 				bodyArmBaseGroup.members[mmm].color = 0xffffff;
@@ -1062,11 +1048,11 @@ package {
 			}
 			
 			// hand electricity
-			if (/*hand.touching && !lastTouchedWood*/touchingMetal) {
+			/*if (touchingMetal) {
 				ambientElectricalHumSound.play();
 			} else {
 				ambientElectricalHumSound.stop();
-			}
+			}*/
 			
 			// hand landed
 			//if ((lastVel.x != 0 && lastVel.y != 0) || handFalling) {
@@ -1251,14 +1237,10 @@ package {
 							
 						}
 					}*/
-					// The hand is retracting without having touched anything
-					if (/*!FlxG.keys.SPACE*/hand.isRetracting() && /*!hand.touching*/!touchingMetal) {
-						
-					}
 				}
 			}
 			
-			if (/*hand.touching && !lastTouchedWood*/touchingMetal) {
+			/*if (touchingMetal) {
 				electricity.play("electricute");
 				electricity.angle = hand.angle;
 				electricity.x = hand.x;
@@ -1271,7 +1253,7 @@ package {
 			} else {
 				electricity.play("stop");
 				electricity.alpha = 1;
-			}
+			}*/
 			
 			/*
 			for (var mn:uint = 0; mn < steams.length; mn++) {
@@ -1349,9 +1331,7 @@ package {
 			}
 			if (FlxG.paused && FlxG.keys.justPressed("R")) {
 				// sound stuff
-				ambientGearsSound.stop();
-				//ambientSteamSound.stop();
-				ambientElectricalHumSound.stop();
+				stopAllSounds(); //should this be stopAllSounds()?
 				FlxG.resetState();
 			}
 		}
@@ -1489,7 +1469,7 @@ package {
 		
 		private function stopAllSounds():void {
 			ambientGearsSound.stop();
-			ambientElectricalHumSound.stop();
+			hand.stopElectricityEffects(); //not just sound, though
 		}
 		
 		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap):FlxGroup {

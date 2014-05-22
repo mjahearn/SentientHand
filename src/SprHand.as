@@ -69,7 +69,10 @@ package
 		protected var _markerEnd:SprHandMarker;
 		protected var _markerEndGroup:FlxGroup;
 		
+		protected var _electricity:FlxSprite;
+		
 		[Embed("assets/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
+		[Embed("assets/electricity.png")] protected var _electricitySheet:Class;
 		protected var _cannonMarkerLine:FlxSprite = new FlxSprite();
 		
 		//protected var _heart:FlxSprite;
@@ -78,10 +81,12 @@ package
 		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
 		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
 		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
+		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var _electricalHumSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
 		public var cannonShotSound:FlxSound = new FlxSound().loadEmbedded(cannonShotSFX);
+		public var electricalHumSound:FlxSound = new FlxSound().loadEmbedded(_electricalHumSFX,true);
 		
 		private var gravityArrow:FlxSprite;
 		
@@ -158,6 +163,14 @@ package
 			PlayState.current.add(_markerEndGroup);
 		}
 		
+		public function addElectricity():void {
+			_electricity = new FlxSprite(x, y);
+			_electricity.loadGraphic(_electricitySheet,true,false,32,32,true);
+			_electricity.addAnimation("electrocute",[1,2,3,4,5,6,7],22,true);
+			_electricity.addAnimation("stop",[0]);
+			PlayState.current.add(_electricity);
+		}
+		
 		override public function draw():void {
 			super.draw();
 			gravityArrow.draw();
@@ -200,6 +213,12 @@ package
 			}
 			
 			_wasTouchingMetal = (isOnGround() && isMetalInDir(facing));
+			
+			if (_wasTouchingMetal) {
+				playElectricityEffects();
+			} else {
+				stopElectricityEffects();
+			}
 		}
 		
 		override public function setDir(dir:uint, grav:Boolean=false, setAngle:Boolean=true):void {
@@ -627,11 +646,11 @@ package
 				metalCrawlSound.stop();
 				dirtFootstepsSound.stop();
 				woodCrawlSound.play();
-			} else { //there's currently no kSpawnDirt in RegistryLevels
+			} /*else { //there's currently no kSpawnDirt in RegistryLevels
 				metalCrawlSound.stop();
 				woodCrawlSound.stop();
 				dirtFootstepsSound.play();
-			}
+			}*/
 			
 			if (_isLeft) {
 				play(kAnimCrawlLeft);
@@ -828,9 +847,33 @@ package
 			_markerEnd.velocity.y = 0;
 		}
 		
+		private function playElectricityEffects():void {
+			electricalHumSound.play();
+			_electricity.play("electrocute");
+			_electricity.angle = angle;
+			_electricity.x = x;
+			_electricity.y = y;
+			_electricity.alpha = (6.0 - _electricity.frame)/6.0 + 0.22;
+			//_electricity.alpha += electricityNum*0.022;
+			//if (_electricity.alpha <= 0.5 || _electricity.alpha >= 1) {
+			//electricityNum *= -1;
+			//}
+		}
+		
+		public function stopElectricityEffects():void {
+			electricalHumSound.stop();
+			_electricity.play("stop");
+			_electricity.alpha = 1;
+		}
+		
 		public function setTarget(body:SprBody, type:int):void {
 			_targetBody = body;
 			_targetBodyType = type;
+		}
+		
+		public function setColor(col:uint):void {
+			color = col;
+			_electricity.color = col;
 		}
 		
 		public function isAttachedToGrappler():Boolean {
