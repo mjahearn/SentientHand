@@ -88,8 +88,8 @@ package
 				Registry.cameraTurnRate += increment;
 				camRate.text = Registry.cameraTurnRate.toString();
 			} else if (FlxG.keys.justPressed("DOWN")) {
-				var increment:Number = Math.pow(2, Math.ceil(Math.log(Registry.cameraTurnRate)/Math.LN2) - 3);
-				Registry.cameraTurnRate -= increment;
+				var increment2:Number = Math.pow(2, Math.ceil(Math.log(Registry.cameraTurnRate)/Math.LN2) - 3);
+				Registry.cameraTurnRate -= increment2;
 				camRate.text = Registry.cameraTurnRate.toString();
 			}
 			
