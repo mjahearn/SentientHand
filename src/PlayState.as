@@ -1660,7 +1660,7 @@ package {
 					if (!hand.isAttachedToBody()) {
 						hand.bubble.string = "Press DOWN to\nenter a mechanism";
 					} else {
-						hand.bubble.string = "Press LEFT or\nRIGHT to aim,\nandUP to fire.\n\nDetach with DOWN";
+						hand.bubble.string = "Press LEFT or\nRIGHT to aim, and\nUP to fire.\n\nDetach with DOWN";
 					}
 				}
 			}
