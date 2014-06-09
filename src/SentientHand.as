@@ -14,8 +14,8 @@ package
 			
 			var startClass:Class = (Registry.DEBUG_ON) ? LevelSelect : SplashState;
 			
-			super(450,450,startClass,1,60,60,true); // log isn't visible otherwise
-			//super(640,640,startClass,1,60,60,true);
+			//super(450,450,startClass,1,60,60,true); // log isn't visible otherwise
+			super(640,640,startClass,1,60,60,true);
 			
 			forceDebugger = Registry.DEBUG_ON;
 		}

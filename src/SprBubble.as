@@ -27,6 +27,7 @@ package
 			label = new FlxText(x,y,200);
 			label.alignment = "center";
 			visible = false;
+			alpha = 0.75;
 		}
 		
 		override public function draw():void {
@@ -62,7 +63,7 @@ package
 			visible = false; return;
 			//if (!visible) {return;}
 			isHiding = true;
-			frame = kAnimHideFrameStart;
+			//frame = kAnimHideFrameStart;
 		}
 		private function updateHide():void {
 			if (!isHiding) {return;}
