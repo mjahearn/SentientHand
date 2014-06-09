@@ -28,6 +28,8 @@ package
 			label.alignment = "center";
 			visible = false;
 			alpha = 0.75;
+			label.font = "Capture it";
+			label.size = 14;
 		}
 		
 		override public function draw():void {

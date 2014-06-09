@@ -1655,12 +1655,18 @@ package {
 			for (i = 0; i < hintPointsAttachDetach.length; i++) {
 				var $pointAttachDetach:FlxSprite = hintPointsAttachDetach.members[i];
 				if (hand.overlaps($pointAttachDetach)) {
-					$overlapsSomethingHintworthy = true;
-					hand.hintShow();
-					if (!hand.isAttachedToBody()) {
-						hand.bubble.string = "Press DOWN to\nenter a mechanism";
-					} else {
-						hand.bubble.string = "Press LEFT or\nRIGHT to aim, and\nUP to fire.\n\nDetach with DOWN";
+					if (!hand.isAttachedToBody() && RegistryLevels.num <= 4) {
+						$overlapsSomethingHintworthy = true;
+						hand.hintShow();
+						hand.bubble.string = "Press DOWN\nto enter\na mechanism";
+					} else if (hand.isAttachedToCannon()) {
+						$overlapsSomethingHintworthy = true;
+						hand.hintShow();
+						hand.bubble.string = "Press LEFT or\nRIGHT to\naim, and\nUP to fire.";
+					} else if (hand.isAttachedToGrappler()) {
+						$overlapsSomethingHintworthy = true;
+						hand.hintShow();
+						hand.bubble.string = "Press DOWN\n to detach";
 					}
 				}
 			}
