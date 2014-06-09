@@ -5,11 +5,11 @@ package
 	public class SprBubble extends FlxSprite
 	{
 		private const kAnimIdle:String = "kAnimIdle";
-		private const kAnimHideFrameStart:uint = 2;
-		private const kAnimHideFrameEnd:uint = 0;
-		private const kAnimShowFrameStart:uint = 0;
-		private const kAnimShowFrameEnd:uint = 2;
-		private const kFrameRate:Number = 1.0/22.0;
+		private const kAnimHideFrameStart:uint = 7;
+		private const kAnimHideFrameEnd:uint = 4;
+		private const kAnimShowFrameStart:uint = 4;
+		private const kAnimShowFrameEnd:uint = 7;
+		private const kFrameRate:Number = 1.0/10.0;
 		
 		private var timer:Number;
 		private var isHiding:Boolean;
@@ -45,7 +45,7 @@ package
 		}
 		
 		public function show():void {
-			if (visible) {return;}
+			if (isShowing || visible) {return;}
 			isShowing = true;
 			visible = true;
 			frame = kAnimShowFrameStart;
@@ -60,10 +60,11 @@ package
 		}
 		
 		public function hide():void {
-			visible = false; return;
+			//visible = false; return;
 			//if (!visible) {return;}
+			if (isHiding || !visible) {return;}
 			isHiding = true;
-			//frame = kAnimHideFrameStart;
+			frame = kAnimHideFrameStart;
 		}
 		private function updateHide():void {
 			if (!isHiding) {return;}
@@ -81,8 +82,9 @@ package
 			label.update();
 			timer += FlxG.elapsed;
 			if (timer > kFrameRate) {
-				updateHide();
 				updateShow();
+				updateHide();
+				timer = 0;
 			}
 		}
 	}
