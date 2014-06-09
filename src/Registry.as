@@ -66,6 +66,7 @@ package {
 		[Embed("assets/spr_exit_chute_door.png")] public static const kExitChuteDoorSheet:Class;
 		[Embed("assets/spr_arrow.png")] public static const kGravityArrow:Class;
 		[Embed(source="assets/spr_splash_bkg_detailed-01.png")] public static const kSplashDetailed:Class;
+		[Embed("assets/spr_thought.png")] public static const kBubble:Class;
 		
 		[Embed("assets/Attach_Happy1.mp3")] public static const kAttachHappySFX:Class;
 		public static const kAttachHappySound:FlxSound = new FlxSound().loadEmbedded(kAttachHappySFX);

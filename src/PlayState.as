@@ -12,6 +12,10 @@ package {
 	
 	public class PlayState extends FlxState {
 						
+		private var hintPointsLeftRight:FlxGroup;
+		private var hintPointsJump:FlxGroup;
+		private var hintPointsAttachDetach:FlxGroup;
+		
 		private var isTransitioningToNextLevel:Boolean;
 		
 		
@@ -310,6 +314,35 @@ package {
 			levelFunctional = RegistryLevels.lvlFunc();
 			// this section used to deal with all the collision shit- but then tile-based callbacks were removed
 			// remember when we had wood? heh...
+			
+			var $point:FlxPoint;
+			// HINT POINTS L/R
+			hintPointsLeftRight = new FlxGroup();
+			var $callbackLeftRight:Function = function($map:FlxTilemap,$tile:uint):void {
+				$point = pointForTile($tile,$map)
+				var $spr2:FlxSprite = new FlxSprite($point.x,$point.y);
+				hintPointsLeftRight.add($spr2);
+				$map.setTileByIndex($tile,0);
+			};
+			applyFunctionToTile(RegistryLevels.kSpawnHintLeftRight,$callbackLeftRight,levelFunctional);
+			// HINT POINTS JUMP
+			hintPointsJump = new FlxGroup();
+			var $callbackJump:Function = function($map:FlxTilemap,$tile:uint):void {
+				$point = pointForTile($tile,$map)
+				var $spr1:FlxSprite = new FlxSprite($point.x,$point.y);
+				hintPointsJump.add($spr1);
+				$map.setTileByIndex($tile,0);
+			};
+			applyFunctionToTile(RegistryLevels.kSpawnHintJump,$callbackJump,levelFunctional);
+			// HINT POINTS ATTACH/DETACH
+			hintPointsAttachDetach = new FlxGroup();
+			var $callbackAttachDetach:Function = function($map:FlxTilemap,$tile:uint):void {
+				$point = pointForTile($tile,$map)
+				var $spr0:FlxSprite = new FlxSprite($point.x,$point.y);
+				hintPointsAttachDetach.add($spr0);
+				$map.setTileByIndex($tile,0);
+			};
+			applyFunctionToTile(RegistryLevels.kSpawnHintAttachDetach,$callbackAttachDetach,levelFunctional);
 		}
 		
 		private function setUpCamera():void {
@@ -750,6 +783,8 @@ package {
 		}
 				
 		override public function update():void {
+			
+			checkHintBubbles();
 			
 			checkIfHandExitedViaChute();
 			
@@ -1486,6 +1521,17 @@ package {
 			return _group;
 		}
 		
+		private function applyFunctionToTile($spawn:Array,$function:Function,$map:FlxTilemap):void {
+			for (var i:uint = 0; i <$spawn.length; i++) {
+				var $array:Array = $map.getTileInstances($spawn[i]);
+				if ($array) {
+					for (var j:uint = 0; j < $array.length; j++) {
+						$function($map,$array[j]);
+					}
+				}
+			}
+		}
+		
 		private function pointForTile(_tile:uint,_map:FlxTilemap):FlxPoint {
 			var _x:Number = (_map.width/_map.widthInTiles)*(int)(_tile%_map.widthInTiles);
 			var _y:Number = (_map.width/_map.widthInTiles)*(int)(_tile/_map.widthInTiles);
@@ -1582,6 +1628,45 @@ package {
 		
 		private function isBody(spr:FlxSprite):Boolean {
 			return bodyGroup.members.indexOf(spr) > -1;
+		}
+		
+		
+		
+		
+		private function checkHintBubbles():void {
+			var $overlapsSomethingHintworthy:Boolean = false;
+			var i:uint;
+			for (i = 0; i < hintPointsLeftRight.length; i++) {
+				var $pointLR:FlxSprite = hintPointsLeftRight.members[i];
+				if (hand.overlaps($pointLR)) {
+					$overlapsSomethingHintworthy = true;
+					hand.hintShow();
+					hand.bubble.string = "Press LEFT\nor RIGHT\nto move";
+				}
+			}
+			for (i = 0; i < hintPointsJump.length; i++) {
+				var $pointJump:FlxSprite = hintPointsJump.members[i];
+				if (hand.overlaps($pointJump)) {
+					$overlapsSomethingHintworthy = true;
+					hand.hintShow();
+					hand.bubble.string = "Press UP\n to fall";
+				}
+			}
+			for (i = 0; i < hintPointsAttachDetach.length; i++) {
+				var $pointAttachDetach:FlxSprite = hintPointsAttachDetach.members[i];
+				if (hand.overlaps($pointAttachDetach)) {
+					$overlapsSomethingHintworthy = true;
+					hand.hintShow();
+					if (!hand.isAttachedToBody()) {
+						hand.bubble.string = "Press DOWN to\nenter a mechanism";
+					} else {
+						hand.bubble.string = "Press LEFT or\nRIGHT to aim,\nandUP to fire.\n\nDetach with DOWN";
+					}
+				}
+			}
+			if (!$overlapsSomethingHintworthy) {
+				hand.hintHide();
+			}
 		}
 	}
 }

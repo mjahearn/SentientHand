@@ -14,21 +14,17 @@ package
 			
 			var startClass:Class = (Registry.DEBUG_ON) ? LevelSelect : SplashState;
 			
-			//super(1000,1000,startClass,0.64,60,60,true);
+			//super(450,450,startClass,1,60,60,true); // log isn't visible otherwise
 			super(640,640,startClass,1,60,60,true);
 			
 			forceDebugger = Registry.DEBUG_ON;
 		}
 
- override protected function create(FlashEvent:Event):void {
-
-super.create(FlashEvent);
-stage.removeEventListener(Event.DEACTIVATE,onFocusLost);
-
-
-stage.removeEventListener(Event.ACTIVATE,onFocus);
-
-stage.align = "TOP";
-}
+		override protected function create(FlashEvent:Event):void {
+			super.create(FlashEvent);
+			stage.removeEventListener(Event.DEACTIVATE,onFocusLost);
+			stage.removeEventListener(Event.ACTIVATE,onFocus);
+			stage.align = "TOP";
+		}
 	}
 }

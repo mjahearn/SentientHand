@@ -90,6 +90,8 @@ package
 		
 		private var gravityArrow:FlxSprite;
 		
+		public var bubble:SprBubble;
+		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
 			//make sure PlayState also calls addMarker
@@ -142,6 +144,20 @@ package
 			
 			scale.x = 0; //what are these for again?
 			scale.y = 0;
+			
+			
+			
+			
+			
+			
+			bubble = new SprBubble(x,y);
+		}
+		
+		public function hintShow():void {
+			bubble.show();
+		}
+		public function hintHide():void {
+			bubble.hide();
 		}
 		
 		public function addMarker():void {
@@ -174,6 +190,17 @@ package
 		override public function draw():void {
 			super.draw();
 			gravityArrow.draw();
+			bubble.draw();
+		}
+		
+		override public function preUpdate():void {
+			super.preUpdate();
+			bubble.preUpdate();
+		}
+		
+		override public function postUpdate():void {
+			super.postUpdate();
+			bubble.postUpdate();
 		}
 		
 		override public function update():void {
@@ -181,6 +208,9 @@ package
 			gravityArrow.x = x;
 			gravityArrow.y = y + gravityArrow.height*2;
 			gravityArrow.update();
+			bubble.x = x - bubble.width/2 + width/2;
+			bubble.y = y - bubble.height;
+			bubble.update();
 			
 			if (scale.x < 1 && scale.y < 1) {
 				scale.x += 0.03;

@@ -21,6 +21,9 @@ package
 		public static const kSpawnDoor:Array = [10,11];
 		public static const kSpawnExitArrow:Array = [12];
 		public static const kSpawnExit:Array = [14];
+		public static const kSpawnHintLeftRight:Array = [15];
+		public static const kSpawnHintJump:Array = [16];
+		public static const kSpawnHintAttachDetach:Array = [17];
 		
 		// COSMETIC SPAWNS
 		public static const kSpawnHintArrowKeys:Array = [293]; // update this
