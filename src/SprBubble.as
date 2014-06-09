@@ -9,7 +9,7 @@ package
 		private const kAnimHideFrameEnd:uint = 4;
 		private const kAnimShowFrameStart:uint = 4;
 		private const kAnimShowFrameEnd:uint = 7;
-		private const kFrameRate:Number = 1.0/10.0;
+		private const kFrameRate:Number = 1.0/15.0;
 		
 		private var timer:Number;
 		private var isHiding:Boolean;
