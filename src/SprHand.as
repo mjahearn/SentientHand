@@ -71,17 +71,17 @@ package
 		
 		protected var _electricity:FlxSprite;
 		
-		[Embed("assets/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
-		[Embed("assets/electricity.png")] protected var _electricitySheet:Class;
+		[Embed("assets/sprites/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
+		[Embed("assets/sprites/electricity.png")] protected var _electricitySheet:Class;
 		protected var _cannonMarkerLine:FlxSprite = new FlxSprite();
 		
 		//protected var _heart:FlxSprite;
 		
-		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
-		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
-		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
-		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var _electricalHumSFX:Class;
+		[Embed("assets/audio/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
+		[Embed("assets/audio/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/audio/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
+		[Embed("assets/audio/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
+		[Embed("assets/audio/Ambient_Electrical_Hum.mp3")] public var _electricalHumSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);

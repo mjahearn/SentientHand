@@ -104,34 +104,34 @@ package {
 		
 		public var reversePolarity:Boolean;
 		
-		[Embed("assets/spr_cannon.png")] public var cannonSheet:Class;
+		[Embed("assets/sprites/spr_cannon.png")] public var cannonSheet:Class;
 		
-		[Embed("assets/trash.png")] public var trashSheet:Class;
+		//[Embed("assets/trash.png")] public var trashSheet:Class;
 		
-		[Embed("assets/spr_arm_base.png")] public var armBaseSheet:Class;
+		[Embed("assets/sprites/spr_arm_base.png")] public var armBaseSheet:Class;
 		
-		[Embed("assets/arrow.png")] public var arrowSheet:Class;
-		[Embed("assets/spr_arm.png")] public var armSheet:Class;
-		[Embed("assets/spr_body.png")] public var bodySheet:Class;
+		//[Embed("assets/sprites/arrow.png")] public var arrowSheet:Class;
+		[Embed("assets/sprites/spr_arm.png")] public var armSheet:Class;
+		[Embed("assets/sprites/spr_body.png")] public var bodySheet:Class;
 		
-		[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
-		[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
-		[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
+		//[Embed("assets/gear_64x64.png")] public var gear64x64Sheet:Class;
+		//[Embed("assets/gear_32x32.png")] public var gear32x32Sheet:Class;
+		//[Embed("assets/gear_16x16.png")] public var gear16x16Sheet:Class;
 		
-		[Embed("assets/sign.png")] public var signSheet:Class;
+		//[Embed("assets/sprites/sign.png")] public var signSheet:Class;
 		
-		[Embed("assets/spr_bodygear.png")] public var bodyGearSheet:Class;
+		[Embed("assets/sprites/spr_bodygear.png")] public var bodyGearSheet:Class;
 				
-		[Embed("assets/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
-		[Embed("assets/Robody_Aim.mp3")] public var robodyAimSFX:Class;
-		[Embed("assets/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
-		[Embed("assets/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
-		[Embed("assets/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
-		[Embed("assets/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
-		[Embed("assets/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
-		[Embed("assets/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
+		[Embed("assets/audio/Grapple_Extend.mp3")] public var grappleExtendSFX:Class;
+		[Embed("assets/audio/Robody_Aim.mp3")] public var robodyAimSFX:Class;
+		[Embed("assets/audio/Pipe_Walk.mp3")] public var pipeWalkSFX:Class;
+		[Embed("assets/audio/Robody_LandOnPipe.mp3")] public var robodyLandOnPipeSFX:Class;
+		[Embed("assets/audio/Robody_LandOnWall.mp3")] public var robodyLandOnWallSFX:Class;
+		[Embed("assets/audio/Hand_Landing_On_Metal.mp3")] public var handLandingOnMetalSFX:Class;
+		[Embed("assets/audio/Hand_Landing_On_Nonstick_Metal.mp3")] public var handLandingOnNonstickMetalSFX:Class;
+		[Embed("assets/audio/Ambient_Gears.mp3")] public var ambientGearsSFX:Class;
 
-		[Embed("assets/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
+		[Embed("assets/audio/Land_On_Dirt.mp3")] public var handLandingOnDirtSFX:Class;
 		
 		public var grappleExtendSound:FlxSound = new FlxSound().loadEmbedded(grappleExtendSFX);
 		public var robodyAimSound:FlxSound = new FlxSound().loadEmbedded(robodyAimSFX);
@@ -145,8 +145,8 @@ package {
 		public var handLandingOnDirtSound:FlxSound = new FlxSound().loadEmbedded(handLandingOnDirtSFX);
 		
 		
-		[Embed("assets/spr_head.png")] public var headSheet:Class;
-		[Embed("assets/sky.png")] public var skySheet:Class;
+		[Embed("assets/sprites/spr_head.png")] public var headSheet:Class;
+		//[Embed("assets/sky.png")] public var skySheet:Class;
 		//[Embed("assets/factory.png")] public var factorySheet:Class;
 		
 		//[Embed("assets/body_marker_line.png")] public var bodyMarkerLineSheet:Class;
@@ -172,13 +172,13 @@ package {
 			sprControllableGroup = new FlxGroup();
 			
 			FlxG.bgColor = 0xff000000;
-			if (RegistryLevels.isLastLevel()) {
+			//if (RegistryLevels.isLastLevel()) {
 				//FlxG.bgColor = 0xff442288;
 				//0xffaaaaaa; //and... if we want motion blur... 0x22000000
-				var sky:FlxSprite = new FlxSprite(0,0,skySheet);
-				sky.scrollFactor = new FlxPoint(0,0);
-				add(sky);
-			}
+				//var sky:FlxSprite = new FlxSprite(0,0,skySheet);
+				//sky.scrollFactor = new FlxPoint(0,0);
+				//add(sky);
+			//}
 			
 			setUpLevelFunctional();
 			// add cosmetic maps in order
