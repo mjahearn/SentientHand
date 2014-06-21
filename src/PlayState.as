@@ -1655,7 +1655,7 @@ package {
 			for (i = 0; i < hintPointsAttachDetach.length; i++) {
 				var $pointAttachDetach:FlxSprite = hintPointsAttachDetach.members[i];
 				if (hand.overlaps($pointAttachDetach)) {
-					if (!hand.isAttachedToBody() && RegistryLevels.num <= 5) {
+					if (!hand.isAttachedToBody() && RegistryLevels.num <= 6) {
 						$overlapsSomethingHintworthy = true;
 						hand.hintShow();
 						hand.bubble.string = "Press DOWN\nto enter\na mechanism";

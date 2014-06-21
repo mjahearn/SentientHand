@@ -124,6 +124,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_functional_tutorial2.5.csv",mimeType="application/octet-stream")] private static const kFunct02_5Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_tutorial3.csv",mimeType="application/octet-stream")] private static const kFunct03Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_tutorial4.csv",mimeType="application/octet-stream")] private static const kFunct04Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial5.csv",mimeType="application/octet-stream")] private static const kFunct05_Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_cannon1.csv",mimeType="application/octet-stream")] private static const kFuncb01Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_plain1.csv",mimeType="application/octet-stream")] private static const kFuncb02Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_grapple1.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
@@ -150,6 +151,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial2.5.csv",mimeType="application/octet-stream")] private static const kCosm002_5FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial5.csv",mimeType="application/octet-stream")] private static const kCosm005_FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_cannon1.csv",mimeType="application/octet-stream")] private static const kCosm005FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_plain1.csv",mimeType="application/octet-stream")] private static const kCosm006FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_grapple1.csv",mimeType="application/octet-stream")] private static const kCosm007FrontSheet:Class;
@@ -210,14 +212,14 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,null,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosm010FrontSheet,kCosm012FrontSheet,kCosm013FrontSheet,null,null,null,null,null];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,null,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
