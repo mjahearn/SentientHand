@@ -13,7 +13,7 @@ package {
 		public static var cameraTurnRate:Number = 32.0;
 		
 		public static const SOUND_ON:Boolean = true;
-		public static const DEBUG_ON:Boolean = true;
+		public static const DEBUG_ON:Boolean = false;
 		
 		// hint system stuff
 		public static var neverEnteredBodyOrCannon:Boolean = true;

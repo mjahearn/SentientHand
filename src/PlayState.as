@@ -1566,15 +1566,17 @@ package {
 		}
 		
 		public function addHeartHappy():void {
-			var $heart:SprHeart = new SprHeart(hand);
-			add($heart);
-			$heart.makeHappy();
+			return;
+			//var $heart:SprHeart = new SprHeart(hand);
+			//add($heart);
+			//$heart.makeHappy();
 		}
 		
 		public function addHeartSad():void {
-			var $Heart:SprHeart = new SprHeart(hand);
-			add($Heart);
-			$Heart.makeSad();
+			return;
+			//var $Heart:SprHeart = new SprHeart(hand);
+			//add($Heart);
+			//$Heart.makeSad();
 		}
 		
 		private function hideMusicOverlayInstantly():void {

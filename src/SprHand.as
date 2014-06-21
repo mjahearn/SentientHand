@@ -99,7 +99,9 @@ package
 			loadGraphic(Registry.kHandSheet,true,false,32,32,true);
 			
 			gravityArrow = new FlxSprite();
-			gravityArrow.loadGraphic(Registry.kGravityArrow);
+			gravityArrow.loadGraphic(Registry.kGravityArrow,true,false,32,40);
+			gravityArrow.addAnimation("animPulse",[0,1,2,3,2,1],5,true);
+			gravityArrow.play("animPulse");
 			
 			addAnimation(kAnimCrawlRight,[0,1,2,3,4,5,6],22,true);
 			addAnimation(kAnimIdleRight,[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
@@ -196,11 +198,13 @@ package
 		override public function preUpdate():void {
 			super.preUpdate();
 			bubble.preUpdate();
+			gravityArrow.preUpdate();
 		}
 		
 		override public function postUpdate():void {
 			super.postUpdate();
 			bubble.postUpdate();
+			gravityArrow.postUpdate();
 		}
 		
 		override public function update():void {
