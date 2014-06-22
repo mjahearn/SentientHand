@@ -1484,8 +1484,8 @@ package {
 			// this'll fire at the end of the fade
 			var $exitFunction:Function = function():void {
 				stopAllSounds();
-				var $state:FlxState = (RegistryLevels.num > 12) ? new EndState : new PlayState;
-				if (RegistryLevels.num > 12) {RegistryLevels.num = 0;}
+				var $state:FlxState = (RegistryLevels.num > 11) ? new EndState : new PlayState;
+				if (RegistryLevels.num > 11) {RegistryLevels.num = 0;}
 				FlxG.switchState($state);
 			};
 			

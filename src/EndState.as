@@ -21,7 +21,7 @@ package
 			text.alignment = "center";
 			add(text);
 			
-			var $demoText:FlxText = new FlxText(0,FlxG.height*0.55,FlxG.width,"[The Demo has ended; the game will restart soon]");
+			var $demoText:FlxText = new FlxText(0,FlxG.height*0.55,FlxG.width,"[The Demo has ended; the game will restart]");
 			
 			$demoText.alignment = "center";
 			$demoText.size = 10;

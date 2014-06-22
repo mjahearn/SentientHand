@@ -80,7 +80,7 @@ package
 		override public function update():void {
 			super.update();
 			label.x = x + width/2 - label.width/2;
-			label.y = y + height*0.5 - label.height*0.95;
+			label.y = y + height*0.5 - label.height*0.85;
 			label.update();
 			timer += FlxG.elapsed;
 			if (timer > kFrameRate) {
