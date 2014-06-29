@@ -99,7 +99,9 @@ package
 			loadGraphic(Registry.kHandSheet,true,false,32,32,true);
 			
 			gravityArrow = new FlxSprite();
-			gravityArrow.loadGraphic(Registry.kGravityArrow);
+			gravityArrow.loadGraphic(Registry.kGravityArrow,true,false,32,40);
+			gravityArrow.addAnimation("animPulse",[0,1,2,3,2,1],5,true);
+			gravityArrow.play("animPulse");
 			
 			addAnimation(kAnimCrawlRight,[0,1,2,3,4,5,6],22,true);
 			addAnimation(kAnimIdleRight,[7,7,7,7,7,7,7,8,9,9,9,9,9,9,8],10,true);
@@ -196,11 +198,13 @@ package
 		override public function preUpdate():void {
 			super.preUpdate();
 			bubble.preUpdate();
+			gravityArrow.preUpdate();
 		}
 		
 		override public function postUpdate():void {
 			super.postUpdate();
 			bubble.postUpdate();
+			gravityArrow.postUpdate();
 		}
 		
 		override public function update():void {
@@ -322,6 +326,7 @@ package
 			if (touching <= 0 && Math.pow(diffX, 2) + Math.pow(diffY, 2) < Math.pow(GRAPPLE_LENGTH,2)) {
 				velocity.x = GRAPPLE_SPEED * Math.cos(_rad);
 				velocity.y = GRAPPLE_SPEED * Math.sin(_rad);
+				FlxG.log("h " + velocity.x + " " + velocity.y);
 			} else {
 				_bodyState = RETRACTING;
 				velocity = new FlxPoint();
@@ -338,12 +343,10 @@ package
 			var diffY:Number = getMidpoint().y - _targetBody.getMidpoint().y;
 			//we should really have a separate variable for if the hand is extended and sticking to something instead of this indirect check
 			//in fact, I think that's what the unused variable "handGrab" from PlayState was supposed to be
-			if (facing != _targetBody.facing) {
-				var ang:Number = Math.atan2(diffY, diffX);
+			var ang:Number = Math.atan2(diffY, diffX);
+			if (facing != _targetBody.facing) { //grapple succeeded
 				_targetBody.velocity.x = GRAPPLE_SPEED * Math.cos(ang);
 				_targetBody.velocity.y = GRAPPLE_SPEED * Math.sin(ang);
-				FlxG.log("velocity: " + _targetBody.velocity.x + " " + _targetBody.velocity.y);
-				FlxG.log("intended velocity: " + GRAPPLE_SPEED * Math.cos(ang) + " " + GRAPPLE_SPEED * Math.sin(ang));
 				if (angle > _targetBody.angle) {
 					_targetBody.angle += 4; //Math.min with difference between angles?  Seems like it'd be necessary
 				} else if (angle < _targetBody.angle) {
@@ -354,9 +357,9 @@ package
 				} else if (_isRight) {
 					play(kAnimGrabRight);
 				}
-			} else {
-				velocity.x = -GRAPPLE_SPEED * Math.cos(_rad);
-				velocity.y = -GRAPPLE_SPEED * Math.sin(_rad);
+			} else { //grapple failed
+				velocity.x = -GRAPPLE_SPEED * Math.cos(ang);
+				velocity.y = -GRAPPLE_SPEED * Math.sin(ang);
 				if (_isLeft) {
 					play(kAnimIdleBodyLeft);
 				} else if (_isRight) {
@@ -454,6 +457,7 @@ package
 			drag.y = 0;
 			velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 			velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+			FlxG.log("f " + velocity.x + " " + velocity.y);
 			
 			allowCollisions = 0; //is this stuff even necessary without blocks?
 			if (velocity.x > 0) {
@@ -859,6 +863,7 @@ package
 			_markerEnd.y = y;
 			_markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(_rad);
 			_markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(_rad);
+			FlxG.log("r " + _markerEnd.velocity.x + " " + _markerEnd.velocity.y);
 			_markerEnd.maxVelocity.x = Number.MAX_VALUE;
 			_markerEnd.maxVelocity.y = Number.MAX_VALUE;
 			_markerEnd.drag.x = 0;

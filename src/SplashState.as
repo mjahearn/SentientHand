@@ -37,6 +37,7 @@ package
 			$title.alignment = "center";
 			$title.size = 44;
 			$title.color = 0x884c4c;
+			$title.font = "Capture it";
 			add($title);
 		}
 		
@@ -44,6 +45,7 @@ package
 			prompt = new FlxText(0,3*FlxG.height/5,FlxG.width,"press any key");
 			prompt.alignment = "center";
 			prompt.size = 22;
+			prompt.font = "Capture it";
 			add(prompt);
 			promptTimer = 0;
 			promptDir = 1;
