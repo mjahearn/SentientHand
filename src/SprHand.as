@@ -71,17 +71,17 @@ package
 		
 		protected var _electricity:FlxSprite;
 		
-		[Embed("assets/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
-		[Embed("assets/electricity.png")] protected var _electricitySheet:Class;
+		[Embed("assets/sprites/cannon_marker_line.png")] protected var _cannonMarkerLineSheet:Class;
+		[Embed("assets/sprites/electricity.png")] protected var _electricitySheet:Class;
 		protected var _cannonMarkerLine:FlxSprite = new FlxSprite();
 		
 		//protected var _heart:FlxSprite;
 		
-		[Embed("assets/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
-		[Embed("assets/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
-		[Embed("assets/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
-		[Embed("assets/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
-		[Embed("assets/Ambient_Electrical_Hum.mp3")] public var _electricalHumSFX:Class;
+		[Embed("assets/audio/Metal_Footsteps.mp3")] public var metalFootstepsSFX:Class;
+		[Embed("assets/audio/Wood_Footsteps.mp3")] public var woodFootstepsSFX:Class;
+		[Embed("assets/audio/Dirt_Footsteps.mp3")] public var dirtFootstepsSFX:Class;
+		[Embed("assets/audio/Cannon_Shot.mp3")] public var cannonShotSFX:Class;
+		[Embed("assets/audio/Ambient_Electrical_Hum.mp3")] public var _electricalHumSFX:Class;
 		public var metalCrawlSound:FlxSound = new FlxSound().loadEmbedded(metalFootstepsSFX);
 		public var woodCrawlSound:FlxSound = new FlxSound().loadEmbedded(woodFootstepsSFX);
 		public var dirtFootstepsSound:FlxSound = new FlxSound().loadEmbedded(dirtFootstepsSFX);
@@ -89,6 +89,8 @@ package
 		public var electricalHumSound:FlxSound = new FlxSound().loadEmbedded(_electricalHumSFX,true);
 		
 		private var gravityArrow:FlxSprite;
+		
+		public var bubble:SprBubble;
 		
 		public function SprHand(X:Number=0, Y:Number=0)
 		{
@@ -142,6 +144,20 @@ package
 			
 			scale.x = 0; //what are these for again?
 			scale.y = 0;
+			
+			
+			
+			
+			
+			
+			bubble = new SprBubble(x,y);
+		}
+		
+		public function hintShow():void {
+			bubble.show();
+		}
+		public function hintHide():void {
+			bubble.hide();
 		}
 		
 		public function addMarker():void {
@@ -174,6 +190,17 @@ package
 		override public function draw():void {
 			super.draw();
 			gravityArrow.draw();
+			bubble.draw();
+		}
+		
+		override public function preUpdate():void {
+			super.preUpdate();
+			bubble.preUpdate();
+		}
+		
+		override public function postUpdate():void {
+			super.postUpdate();
+			bubble.postUpdate();
 		}
 		
 		override public function update():void {
@@ -181,6 +208,9 @@ package
 			gravityArrow.x = x;
 			gravityArrow.y = y + gravityArrow.height*2;
 			gravityArrow.update();
+			bubble.x = x - bubble.width/2 + width/2;
+			bubble.y = y - bubble.height;
+			bubble.update();
 			
 			if (scale.x < 1 && scale.y < 1) {
 				scale.x += 0.03;
@@ -312,6 +342,8 @@ package
 				var ang:Number = Math.atan2(diffY, diffX);
 				_targetBody.velocity.x = GRAPPLE_SPEED * Math.cos(ang);
 				_targetBody.velocity.y = GRAPPLE_SPEED * Math.sin(ang);
+				FlxG.log("velocity: " + _targetBody.velocity.x + " " + _targetBody.velocity.y);
+				FlxG.log("intended velocity: " + GRAPPLE_SPEED * Math.cos(ang) + " " + GRAPPLE_SPEED * Math.sin(ang));
 				if (angle > _targetBody.angle) {
 					_targetBody.angle += 4; //Math.min with difference between angles?  Seems like it'd be necessary
 				} else if (angle < _targetBody.angle) {

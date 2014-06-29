@@ -21,6 +21,9 @@ package
 		public static const kSpawnDoor:Array = [10,11];
 		public static const kSpawnExitArrow:Array = [12];
 		public static const kSpawnExit:Array = [14];
+		public static const kSpawnHintLeftRight:Array = [15];
+		public static const kSpawnHintJump:Array = [16];
+		public static const kSpawnHintAttachDetach:Array = [17];
 		
 		// COSMETIC SPAWNS
 		public static const kSpawnHintArrowKeys:Array = [293]; // update this
@@ -114,82 +117,84 @@ package
 		private static const tileHeight:uint = tileLength;
 		
 		// FUNCTIONAL TILES
-		[Embed("assets/tiles_functional.png")] public static const kTilesFunc:Class;
+		[Embed("assets/level_creation/tiles_functional.png")] public static const kTilesFunc:Class;
 		// FUNCTIONAL LEVELS
-		[Embed("assets/mapCSV_functional_tutorial1.csv",mimeType="application/octet-stream")] private static const kFunct01Sheet:Class;
-		[Embed("assets/mapCSV_functional_tutorial2.csv",mimeType="application/octet-stream")] private static const kFunct02Sheet:Class;
-		[Embed("assets/mapCSV_functional_tutorial3.csv",mimeType="application/octet-stream")] private static const kFunct03Sheet:Class;
-		[Embed("assets/mapCSV_functional_tutorial4.csv",mimeType="application/octet-stream")] private static const kFunct04Sheet:Class;
-		[Embed("assets/mapCSV_functional_cannon1.csv",mimeType="application/octet-stream")] private static const kFuncb01Sheet:Class;
-		[Embed("assets/mapCSV_functional_plain1.csv",mimeType="application/octet-stream")] private static const kFuncb02Sheet:Class;
-		[Embed("assets/mapCSV_functional_grapple1.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
-		[Embed("assets/mapCSV_functional_cannon2.csv",mimeType="application/octet-stream")] private static const kFuncb04Sheet:Class;
-		[Embed("assets/mapCSV_functional_grapple2.csv",mimeType="application/octet-stream")] private static const kFuncb05Sheet:Class;
-		[Embed("assets/mapCSV_functional_Map11.csv",mimeType="application/octet-stream")] private static const kFuncb06Sheet:Class;
-		[Embed("assets/mapCSV_functional_Map12.csv",mimeType="application/octet-stream")] private static const kFuncb07Sheet:Class;
-		[Embed("assets/mapCSV_functional_Map13.csv",mimeType="application/octet-stream")] private static const kFuncb08Sheet:Class;
-		[Embed("assets/mapCSV_functional_Map14.csv",mimeType="application/octet-stream")] private static const kFuncb09Sheet:Class;
-		[Embed("assets/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
-		[Embed("assets/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
-		[Embed("assets/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
-		[Embed("assets/mapCSV_functional_m02.csv",mimeType="application/octet-stream")] private static const kFuncm02Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial1.csv",mimeType="application/octet-stream")] private static const kFunct01Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial2.csv",mimeType="application/octet-stream")] private static const kFunct02Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial2.5.csv",mimeType="application/octet-stream")] private static const kFunct02_5Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial3.csv",mimeType="application/octet-stream")] private static const kFunct03Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_tutorial4.csv",mimeType="application/octet-stream")] private static const kFunct04Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_cannon1.csv",mimeType="application/octet-stream")] private static const kFuncb01Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_plain1.csv",mimeType="application/octet-stream")] private static const kFuncb02Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_grapple1.csv",mimeType="application/octet-stream")] private static const kFuncb03Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_cannon2.csv",mimeType="application/octet-stream")] private static const kFuncb04Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_grapple2.csv",mimeType="application/octet-stream")] private static const kFuncb05Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_Map11.csv",mimeType="application/octet-stream")] private static const kFuncb06Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_Map12.csv",mimeType="application/octet-stream")] private static const kFuncb07Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_Map13.csv",mimeType="application/octet-stream")] private static const kFuncb08Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_Map14.csv",mimeType="application/octet-stream")] private static const kFuncb09Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_001.csv",mimeType="application/octet-stream")] private static const kFunc001Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_m02.csv",mimeType="application/octet-stream")] private static const kFuncm02Sheet:Class;
 		// COSMETIC TILES
-		[Embed("assets/tiles_cosmetic_front.png")] public static const kTilesCosmFront:Class;
-		[Embed("assets/tiles_cosmetic_mid.png")] public static const kTilesCosmMid:Class;
-		[Embed("assets/tiles_cosmetic_back.png")] public static const kTilesCosmBack:Class;
-		[Embed("assets/tiles_cosmetic_back_back.png")] public static const kTilesCosmBackBack:Class;
-		[Embed("assets/tiles_cosmetic_semi_back.png")] public static const kTilesCosmSemiBack:Class;
+		[Embed("assets/level_creation/tiles_cosmetic_front.png")] public static const kTilesCosmFront:Class;
+		[Embed("assets/level_creation/tiles_cosmetic_mid.png")] public static const kTilesCosmMid:Class;
+		[Embed("assets/level_creation/tiles_cosmetic_back.png")] public static const kTilesCosmBack:Class;
+		[Embed("assets/level_creation/tiles_cosmetic_back_back.png")] public static const kTilesCosmBackBack:Class;
+		[Embed("assets/level_creation/tiles_cosmetic_semi_back.png")] public static const kTilesCosmSemiBack:Class;
 		// COSMETIC LEVELS
 		//// FRONT
-		[Embed("assets/mapCSV_cosmetic_front_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_cannon1.csv",mimeType="application/octet-stream")] private static const kCosm005FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_plain1.csv",mimeType="application/octet-stream")] private static const kCosm006FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_grapple1.csv",mimeType="application/octet-stream")] private static const kCosm007FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_cannon2.csv",mimeType="application/octet-stream")] private static const kCosm008FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_grapple2.csv",mimeType="application/octet-stream")] private static const kCosm009FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_Map10.csv",mimeType="application/octet-stream")] private static const kCosmNOT010FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_Map11.csv",mimeType="application/octet-stream")] private static const kCosm010FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_Map12.csv",mimeType="application/octet-stream")] private static const kCosm012FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_front_Map13.csv",mimeType="application/octet-stream")] private static const kCosm013FrontSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_m01_front.csv",mimeType="application/octet-stream")] private static const kCosmm01FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial2.5.csv",mimeType="application/octet-stream")] private static const kCosm002_5FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_cannon1.csv",mimeType="application/octet-stream")] private static const kCosm005FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_plain1.csv",mimeType="application/octet-stream")] private static const kCosm006FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_grapple1.csv",mimeType="application/octet-stream")] private static const kCosm007FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_cannon2.csv",mimeType="application/octet-stream")] private static const kCosm008FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_grapple2.csv",mimeType="application/octet-stream")] private static const kCosm009FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map10.csv",mimeType="application/octet-stream")] private static const kCosmNOT010FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map11.csv",mimeType="application/octet-stream")] private static const kCosm010FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map12.csv",mimeType="application/octet-stream")] private static const kCosm012FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map13.csv",mimeType="application/octet-stream")] private static const kCosm013FrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_m01_front.csv",mimeType="application/octet-stream")] private static const kCosmm01FrontSheet:Class;
 		//// MID
-		[Embed("assets/mapCSV_cosmetic_mid_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_mid_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_mid_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_mid_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_005_mid.csv",mimeType="application/octet-stream")] private static const kCosm005MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_006_mid.csv",mimeType="application/octet-stream")] private static const kCosm006MidSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_m01_mid.csv",mimeType="application/octet-stream")] private static const kCosmm01MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_005_mid.csv",mimeType="application/octet-stream")] private static const kCosm005MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_006_mid.csv",mimeType="application/octet-stream")] private static const kCosm006MidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_m01_mid.csv",mimeType="application/octet-stream")] private static const kCosmm01MidSheet:Class;
 		//// Semi Back
-		[Embed("assets/mapCSV_cosmetic_semi_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001SemiBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_semi_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002SemiBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_semi_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003SemiBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_semi_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004SemiBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001SemiBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002SemiBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003SemiBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004SemiBackSheet:Class;
 		//// BACK
-		[Embed("assets/mapCSV_cosmetic_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_005_back.csv",mimeType="application/octet-stream")] private static const kCosm005BackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_006_back.csv",mimeType="application/octet-stream")] private static const kCosm006BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_005_back.csv",mimeType="application/octet-stream")] private static const kCosm005BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_006_back.csv",mimeType="application/octet-stream")] private static const kCosm006BackSheet:Class;
 		//// BACK BACK
-		[Embed("assets/mapCSV_cosmetic_back_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackBackSheet:Class;
-		[Embed("assets/mapCSV_cosmetic_back_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackBackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackBackSheet:Class;
 
 		
 		// MUSIC
 		// MUSIC
-		[Embed("assets/SentientHandTrackA.mp3")] private static const kMusicAFile:Class;
+		[Embed("assets/audio/SentientHandTrackA.mp3")] private static const kMusicAFile:Class;
 		private static const kMusicA:FlxSound = new FlxSound().loadEmbedded(kMusicAFile,true);
-		[Embed("assets/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
+		[Embed("assets/audio/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
 		private static const kMusicB:FlxSound = new FlxSound().loadEmbedded(kMusicBFile,true);
 		
-		[Embed("assets/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
+		[Embed("assets/audio/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
 		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile,true);
 		//[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
 		//private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile,true);
@@ -205,14 +210,14 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosm010FrontSheet,kCosm012FrontSheet,kCosm013FrontSheet,null,null,null,null,null];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncb06Sheet,kFuncb07Sheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFunc001Sheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,null,kCosm003MidSheet,kCosm004MidSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {

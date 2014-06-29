@@ -25,7 +25,10 @@ package
 			velocity.y = 0;
 			if (isMetalInDir(facing)) {
 				setGrappleOkay();
-			}
+			} /*else { //for debug
+				visible = true;
+				color = 0x0000ff;
+			}*/
 		}
 		
 		public function setGrappleOkay():void {

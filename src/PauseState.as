@@ -13,7 +13,7 @@ package
 		public var jumpText:FlxText;
 		public var con:FlxSprite;
 		
-		[Embed("assets/controls.png")] public var controlsSheet:Class;
+		//[Embed("assets/sprites/controls.png")] public var controlsSheet:Class;
 
 		
 		public function PauseState(MaxSize:uint=0)
@@ -54,7 +54,7 @@ package
 			*/
 			
 			con = new  FlxSprite(0,0);//(FlxG.width/2,FlxG.height/2);
-			con.loadGraphic(controlsSheet,true,false,640,480);
+			//con.loadGraphic(controlsSheet,true,false,640,480);
 			//con.x -= con.width/2;
 			//con.y -= con.height/2;
 			con.scrollFactor = new FlxPoint(0,0);

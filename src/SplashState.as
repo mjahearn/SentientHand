@@ -23,13 +23,13 @@ package
 		}
 		
 		private function addBkg():void {
-			var $bkg:FlxSprite = new FlxSprite(0,0,Registry.kSplashDetailed);
+			//var $bkg:FlxSprite = new FlxSprite(0,0,Registry.kSplashDetailed);
 			//$bkg.scale.x = 0.5;
 			//$bkg.scale.y = 0.5;
-			$bkg.alpha = 0.44;
-			$bkg.x = FlxG.width/2 - $bkg.width/2;
-			$bkg.y = FlxG.height/2 - $bkg.height/2;
-			add($bkg);
+			//$bkg.alpha = 0.44;
+			//$bkg.x = FlxG.width/2 - $bkg.width/2;
+			//$bkg.y = FlxG.height/2 - $bkg.height/2;
+			//add($bkg);
 		}
 		
 		private function addTitle():void {
