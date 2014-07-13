@@ -829,10 +829,10 @@ package {
 				hand.y > FlxG.worldBounds.bottom || hand.y < FlxG.worldBounds.top) {
 				//if (doorsDead || RegistryLevels.isLastLevel()) {
 				//maybe replace the old doorsDead check with a check to see if the hand is in the right place?
-					goToNextLevel();
-				/*} else {
+					//goToNextLevel();
+				//} else {
 					FlxG.resetState();
-				}*/
+				//}
 			}
 			
 			RegistryControls.update();

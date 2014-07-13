@@ -10,7 +10,7 @@ package
 		public var camRate:FlxText;
 		
 		override public function create():void {
-			
+			FlxG.setDebuggerLayout(FlxG.DEBUGGER_TOP);
 			//Registry.midground = Registry.midgroundMap;
 			//Registry.background = Registry.backgroundMap;
 		
@@ -20,24 +20,26 @@ package
 			text.text += "\n\nTutorial levels:\n";
 			text.text += "\nA -> tutorial1";
 			text.text += "\nB -> tutorial2";
-			text.text += "\nC -> tutorial3";
-			text.text += "\nD -> tutorial4";
+			text.text += "\nC -> tutorial2.5";
+			text.text += "\nD -> tutorial3";
+			text.text += "\nE -> tutorial4";
+			text.text += "\nF -> tutorial5";
 			text.text += "\n\nBen's unsorted levels:\n";
-			text.text += "\nE -> cannon1";
-			text.text += "\nF -> plain1";
-			text.text += "\nG -> grapple1";
-			text.text += "\nH -> cannon2";
-			text.text += "\nI -> grapple2";
-			text.text += "\nJ -> Map11";
-			text.text += "\nK -> Map12";
-			text.text += "\nL -> Map13";
-			text.text += "\nM -> Map14";
+			text.text += "\nG -> cannon1";
+			text.text += "\nH -> plain1";
+			text.text += "\nI -> grapple1";
+			text.text += "\nJ -> cannon2";
+			text.text += "\nK -> grapple2";
+			text.text += "\nL -> Map11";
+			text.text += "\nM -> Map12";
+			text.text += "\nN -> Map13";
+			text.text += "\nO -> Map14";
 			text.text += "\n\nMike's unsorted levels:\n";
-			text.text += "\nN -> m01";
-			text.text += "\nO -> m02";
+			text.text += "\nP -> m01";
+			text.text += "\nQ -> m02";
 			text.text += "\n\nOld levels:\n";
-			text.text += "\nP -> 001";
-			text.text += "\nQ -> 006";
+			text.text += "\nR -> 001";
+			text.text += "\nS -> 006";
 			add(text);
 			
 			var camText:FlxText = new FlxText(50, 50, 400, "Camera Rotation:");

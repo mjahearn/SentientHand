@@ -326,6 +326,7 @@ package
 			if (touching <= 0 && Math.pow(diffX, 2) + Math.pow(diffY, 2) < Math.pow(GRAPPLE_LENGTH,2)) {
 				velocity.x = GRAPPLE_SPEED * Math.cos(_rad);
 				velocity.y = GRAPPLE_SPEED * Math.sin(_rad);
+				FlxG.log("h " + velocity.x + " " + velocity.y);
 			} else {
 				_bodyState = RETRACTING;
 				velocity = new FlxPoint();
@@ -342,8 +343,8 @@ package
 			var diffY:Number = getMidpoint().y - _targetBody.getMidpoint().y;
 			//we should really have a separate variable for if the hand is extended and sticking to something instead of this indirect check
 			//in fact, I think that's what the unused variable "handGrab" from PlayState was supposed to be
-			if (facing != _targetBody.facing) {
-				var ang:Number = Math.atan2(diffY, diffX);
+			var ang:Number = Math.atan2(diffY, diffX);
+			if (facing != _targetBody.facing) { //grapple succeeded
 				_targetBody.velocity.x = GRAPPLE_SPEED * Math.cos(ang);
 				_targetBody.velocity.y = GRAPPLE_SPEED * Math.sin(ang);
 				if (angle > _targetBody.angle) {
@@ -356,9 +357,9 @@ package
 				} else if (_isRight) {
 					play(kAnimGrabRight);
 				}
-			} else {
-				velocity.x = -GRAPPLE_SPEED * Math.cos(_rad);
-				velocity.y = -GRAPPLE_SPEED * Math.sin(_rad);
+			} else { //grapple failed
+				velocity.x = -GRAPPLE_SPEED * Math.cos(ang);
+				velocity.y = -GRAPPLE_SPEED * Math.sin(ang);
 				if (_isLeft) {
 					play(kAnimIdleBodyLeft);
 				} else if (_isRight) {
@@ -456,6 +457,7 @@ package
 			drag.y = 0;
 			velocity.x = GRAPPLE_SPEED * Math.cos(rad);
 			velocity.y = GRAPPLE_SPEED * Math.sin(rad);
+			FlxG.log("f " + velocity.x + " " + velocity.y);
 			
 			allowCollisions = 0; //is this stuff even necessary without blocks?
 			if (velocity.x > 0) {
@@ -861,6 +863,7 @@ package
 			_markerEnd.y = y;
 			_markerEnd.velocity.x = GRAPPLE_SPEED*Math.cos(_rad);
 			_markerEnd.velocity.y = GRAPPLE_SPEED*Math.sin(_rad);
+			FlxG.log("r " + _markerEnd.velocity.x + " " + _markerEnd.velocity.y);
 			_markerEnd.maxVelocity.x = Number.MAX_VALUE;
 			_markerEnd.maxVelocity.y = Number.MAX_VALUE;
 			_markerEnd.drag.x = 0;
