@@ -138,6 +138,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_m02.csv",mimeType="application/octet-stream")] private static const kFuncm02Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_m03.csv",mimeType="application/octet-stream")] private static const kFuncm03Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_combo1.csv",mimeType="application/octet-stream")] private static const kFuncbComboSheet:Class;
 		// COSMETIC TILES
 		[Embed("assets/level_creation/tiles_cosmetic_front.png")] public static const kTilesCosmFront:Class;
@@ -222,14 +223,14 @@ package
 			_num = 0;
 		}
 		
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncbComboSheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFuncbComboSheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosmComboFrontSheet,kCosm013FrontSheet,null,null,null,null,null];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm002_5MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005_MidSheet,kCosm005MidSheet,kCosm006MidSheet,kCosm007MidSheet,kCosm008MidSheet,kCosm009MidSheet,kCosmComboMidSheet,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet];
-		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncbComboSheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFuncm03Sheet,kFuncbComboSheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosmComboFrontSheet,kCosm013FrontSheet,null,null,null,null,null,null];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm002_5MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005_MidSheet,kCosm005MidSheet,kCosm006MidSheet,kCosm007MidSheet,kCosm008MidSheet,kCosm009MidSheet,kCosmComboMidSheet,null,null,null,null,null,null,null];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet];
+		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackSheet];
+		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {

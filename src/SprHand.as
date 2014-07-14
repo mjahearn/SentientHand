@@ -987,6 +987,10 @@ package
 			return _aimAngle;
 		}
 		
+		public function getTargetBody():SprBody {
+			return _targetBody;
+		}
+		
 		/*
 		private function hideHeart():void {
 		_heart.visible = false;
