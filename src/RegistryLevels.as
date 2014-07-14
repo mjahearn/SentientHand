@@ -217,67 +217,289 @@ package
 			return _num;
 		}
 		public static function set num(setNum:uint):void {
-			_num = (setNum < kFuncCsvs.length) ? setNum : kFuncCsvs.length;
+			_num = (setNum < kLevels.length) ? setNum : kLevels.length;
 		}
 		public static function reset():void {
 			_num = 0;
 		}
+
+		private static const kCSVKeyFunc:String = "kCSVKeyFunc";
+		private static const kCSVKeyFront:String = "kCSVKeyFront";
+		private static const kCSVKeyMid:String = "kCSVKeyMid";
+		private static const kCSVKeyBack:String = "kCSVKeyBack";
+		private static const kCSVKeyBackBack:String = "kCSVKeyBackBack";
+		private static const kCSVKeySemiBack:String = "kCSVKeySemiBack";
+		private static const kCSVKeyMusic:String = "kCSVKeyMusic";
+		private static const kCSVKeyMusicOverlay:String = "kCSVKeyMusicOverlay";
+		private static const kLevels:Array = [
+			{
+				// TUTORIAL1
+				kCSVKeyFunc : kFunct01Sheet,
+				kCSVKeyFront : kCosm001FrontSheet,
+				kCSVKeyMid : kCosm001MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm001SemiBackSheet,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// TUTORIAL2
+				kCSVKeyFunc : kFunct02Sheet,
+				kCSVKeyFront : kCosm002FrontSheet,
+				kCSVKeyMid : kCosm002MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm002SemiBackSheet,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// TUTORIAL2.5
+				kCSVKeyFunc : kFunct02_5Sheet,
+				kCSVKeyFront : kCosm002_5FrontSheet,
+				kCSVKeyMid : kCosm002_5MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// TUTORIAL3
+				kCSVKeyFunc : kFunct03Sheet,
+				kCSVKeyFront : kCosm003FrontSheet,
+				kCSVKeyMid : kCosm003MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm003SemiBackSheet,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// TUTORIAL4
+				kCSVKeyFunc : kFunct04Sheet,
+				kCSVKeyFront : kCosm004FrontSheet,
+				kCSVKeyMid : kCosm004MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm004SemiBackSheet,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// TUTORIAL5
+				kCSVKeyFunc : kFunct05_Sheet,
+				kCSVKeyFront : kCosm005_FrontSheet,
+				kCSVKeyMid : kCosm005_MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// CANNON1
+				kCSVKeyFunc : kFuncb01Sheet,
+				kCSVKeyFront : kCosm005FrontSheet,
+				kCSVKeyMid : kCosm005MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// PLAIN1
+				kCSVKeyFunc : kFuncb02Sheet,
+				kCSVKeyFront : kCosm006FrontSheet,
+				kCSVKeyMid : kCosm006MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// GRAPPLE1
+				kCSVKeyFunc : kFuncb03Sheet,
+				kCSVKeyFront : kCosm007FrontSheet,
+				kCSVKeyMid : kCosm007MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// CANNON2
+				kCSVKeyFunc : kFuncb04Sheet,
+				kCSVKeyFront : kCosm008FrontSheet,
+				kCSVKeyMid : kCosm008MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// GRAPPLE2
+				kCSVKeyFunc : kFuncb05Sheet,
+				kCSVKeyFront : kCosm009FrontSheet,
+				kCSVKeyMid : kCosm009MidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// COMBO1
+				kCSVKeyFunc : kFuncbComboSheet,
+				kCSVKeyFront : kCosmComboFrontSheet,
+				kCSVKeyMid : kCosmComboMidSheet,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// MAP13
+				kCSVKeyFunc : kFuncb08Sheet,
+				kCSVKeyFront : kCosm013FrontSheet,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// MAP14
+				kCSVKeyFunc : kFuncb09Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// M01
+				kCSVKeyFunc : kFuncm01Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// M02
+				kCSVKeyFunc : kFuncm02Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// M03
+				kCSVKeyFunc : kFuncm03Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// COMBO1
+				kCSVKeyFunc : kFuncbComboSheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
+				// 006
+				kCSVKeyFunc : kFunc006Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			];
 		
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncbComboSheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFuncm03Sheet,kFuncbComboSheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosmComboFrontSheet,kCosm013FrontSheet,null,null,null,null,null,null];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm002_5MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005_MidSheet,kCosm005MidSheet,kCosm006MidSheet,kCosm007MidSheet,kCosm008MidSheet,kCosm009MidSheet,kCosmComboMidSheet,null,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackSheet];
-		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		/*
+		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncbComboSheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFuncbComboSheet,kFunc006Sheet];
+		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosmComboFrontSheet,kCosm013FrontSheet,null,null,null,null,null];
+		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm002_5MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005_MidSheet,kCosm005MidSheet,kCosm006MidSheet,kCosm007MidSheet,kCosm008MidSheet,kCosm009MidSheet,kCosmComboMidSheet,null,null,null,null,null,null];
+		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet];
+		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet];
+		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
+		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
+		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
+		*/
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
-			return kFuncCsvs[num];
+			return kLevels[num][kCSVKeyFunc];
 		}
 		private static function get currentCosmCSVFront():Class {
-			return kCosmCsvsFront[num];
+			return kLevels[num][kCSVKeyFront];
 		}
 		private static function get currentCosmCSVMid():Class {
-			return kCosmCsvsMid[num];
+			return kLevels[num][kCSVKeyMid];
 		}
 		private static function get currentCosmCSVBack():Class {
-			return kCosmCsvsBack[num];
+			return kLevels[num][kCSVKeyBack];
 		}
 		private static function get currentCosmCSVBackBack():Class {
-			return kCosmCsvsBackBack[num];
+			return kLevels[num][kCSVKeyBackBack];
 		}
 		private static function get currentCosmCSVSemiBack():Class {
-			return kCosmCsvsSemiBack[num];
+			return kLevels[num][kCSVKeySemiBack];
 		}
 		
 		public static function get currentMusic():FlxSound {
-			return kMusic[num];
+			return kLevels[num][kCSVKeyMusic];
 		}
 		public static function get previousMusic():FlxSound {
 			if (num-1 >= 0) {
-				return kMusic[num-1];
+				return kLevels[num-1][kCSVKeyMusic];
 			}
 			return null;
 		}
 		
 		public static function get currentMusicOverlay():FlxSound {
-			return kMusicOverlay[num];
+			return kLevels[num][kCSVKeyMusicOverlay];
 		}
 		public static function get previousMusicOverlay():FlxSound {
 			if (num-1 >= 0) {
-				return kMusicOverlay[num-1];
+				return kLevels[num-1][kCSVKeyMusicOverlay];
 			}
 			return null;
 		}
 		
 		public static function isLastLevel():Boolean {
-			return (num >= kFuncCsvs.length-1);
+			return (num >= kLevels.length-1);
 		}
 		
 		public static function get numLevels():int {
-			return kFuncCsvs.length;
+			return kLevels.length;
 		}
 	}
 }

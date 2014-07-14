@@ -30,16 +30,16 @@ package
 			text.text += "\nI -> grapple1";
 			text.text += "\nJ -> cannon2";
 			text.text += "\nK -> grapple2";
-			text.text += "\nL -> bCombo";
-			text.text += "\nM -> b08 (broken)";
-			text.text += "\nN -> b09";
+			text.text += "\nL -> combo1";
+			text.text += "\nM -> Map13 (broken)";
+			text.text += "\nN -> Map14";
 			text.text += "\n\nMike's unsorted levels:\n";
 			text.text += "\nO -> m01";
 			text.text += "\nP -> m02";
-			text.text += "\nQ -> m03";
+			text.text += "\nQ -> m03 (work in progress)";
 			text.text += "\n\nOther stuff:\n";
-			text.text += "\nR -> bCombo without art";
-			text.text += "\nS -> ??? (broken)";
+			text.text += "\nR -> combo1 without art";
+			text.text += "\nS -> old 006 (broken)";
 			add(text);
 			
 			var camText:FlxText = new FlxText(50, 50, 400, "Camera Rotation:");
