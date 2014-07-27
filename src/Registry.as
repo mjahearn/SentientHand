@@ -13,7 +13,7 @@ package {
 		public static var cameraTurnRate:Number = 32.0;
 		
 		public static const SOUND_ON:Boolean = true;
-		public static const DEBUG_ON:Boolean = false;
+		public static const DEBUG_ON:Boolean = true;
 		
 		// hint system stuff
 		public static var neverEnteredBodyOrCannon:Boolean = true;
@@ -31,8 +31,6 @@ package {
 		[Embed("assets/sprites/button_l.png")] public static const kButtonLSheet:Class;
 		[Embed("assets/sprites/button_u.png")] public static const kButtonUSheet:Class;
 		[Embed("assets/sprites/button_r.png")] public static const kButtonRSheet:Class;
-		//[Embed("assets/splash.png")] public static const kSplashSheet:Class;
-		//[Embed("assets/prompt.png")] public static const kSplashPromptSheet:Class;
 		[Embed("assets/sprites/spr_heart.png")] public static const kHeartSheet:Class;
 		[Embed("assets/sprites/spr_bulb_base.png")] public static const kBulbBaseSheet:Class;
 		[Embed("assets/sprites/spr_bulb_anim.png")] public static const kBulbAnimSheet:Class;
