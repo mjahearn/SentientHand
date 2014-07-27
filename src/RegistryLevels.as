@@ -138,6 +138,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_functional_006.csv",mimeType="application/octet-stream")] private static const kFunc006Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_m01.csv",mimeType="application/octet-stream")] private static const kFuncm01Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_m02.csv",mimeType="application/octet-stream")] private static const kFuncm02Sheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_m03.csv",mimeType="application/octet-stream")] private static const kFuncm03Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_combo1.csv",mimeType="application/octet-stream")] private static const kFuncbComboSheet:Class;
 		// COSMETIC TILES
 		[Embed("assets/level_creation/tiles_cosmetic_front.png")] public static const kTilesCosmFront:Class;
@@ -221,7 +222,7 @@ package
 		public static function reset():void {
 			_num = 0;
 		}
-		
+
 		private static const kCSVKeyFunc:String = "kCSVKeyFunc";
 		private static const kCSVKeyFront:String = "kCSVKeyFront";
 		private static const kCSVKeyMid:String = "kCSVKeyMid";
@@ -408,6 +409,17 @@ package
 				kCSVKeyMusicOverlay : kMusicAOverlay
 			},
 			{
+				// M03
+				kCSVKeyFunc : kFuncm03Sheet,
+				kCSVKeyFront : null,
+				kCSVKeyMid : null,
+				kCSVKeyBack : kCosm001BackSheet,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : null,
+				kCSVKeyMusic : kMusicA,
+				kCSVKeyMusicOverlay : kMusicAOverlay
+			},
+			{
 				// COMBO1
 				kCSVKeyFunc : kFuncbComboSheet,
 				kCSVKeyFront : null,
@@ -441,7 +453,7 @@ package
 		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
 		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
 		*/
-			
+		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
 			return kLevels[num][kCSVKeyFunc];
