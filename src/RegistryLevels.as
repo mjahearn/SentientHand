@@ -202,7 +202,6 @@ package
 
 		
 		// MUSIC
-		// MUSIC
 		[Embed("assets/audio/SentientHandTrackA.mp3")] private static const kMusicAFile:Class;
 		private static const kMusicA:FlxSound = new FlxSound().loadEmbedded(kMusicAFile,true);
 		[Embed("assets/audio/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
@@ -210,8 +209,8 @@ package
 		
 		[Embed("assets/audio/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
 		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile,true);
-		//[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
-		//private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile,true);
+		[Embed("assets/audio/ScrapheapTrackB_OverlayOnly.mp3")] private static const kMusicBOverlayFile:Class;
+		private static const kMusicBOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicBOverlayFile,true);
 		
 		protected static var _num:uint = 0;
 		public static function get num():uint {
@@ -245,8 +244,8 @@ package
 				kCSVKeyBack : null,
 				kCSVKeyBackBack : kCosm001BackBackSheet,
 				kCSVKeySemiBack : kCosm001SemiBackSheet,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
+				kCSVKeyMusic : kMusicB,
+				kCSVKeyMusicOverlay : kMusicBOverlay
 			},
 			{
 				// TUTORIAL1
