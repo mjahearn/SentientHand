@@ -1549,7 +1549,7 @@ package {
 				if (tmpBtn.canBePressed() && hand.overlaps(tmpBtn)) {
 					tmpBtn.press();
 					tmpShouldToggleAll = true;
-				} else if (!tmpBtn.canBePressed() && !hand.overlaps(tmpBtn) && !tmpBtn.overlaps(bodyGroup)) {
+				} else if (!tmpBtn.canBePressed() && !hand.overlaps(tmpBtn) && (bodyGroup.length == 0 || !tmpBtn.overlaps(bodyGroup))) {
 					tmpBtn.unpress();
 				}
 			}
@@ -1558,7 +1558,7 @@ package {
 				for (i = 0; i < buttonGroup.length; i++) {
 					tmpBtn = buttonGroup.members[i];
 					tmpBtn.toggleColor();
-					if (!hand.overlaps(tmpBtn) && !tmpBtn.overlaps(bodyGroup)) {
+					if (!hand.overlaps(tmpBtn) && (bodyGroup.length == 0 || !tmpBtn.overlaps(bodyGroup))) {
 						tmpBtn.unpress();
 					}
 				}
