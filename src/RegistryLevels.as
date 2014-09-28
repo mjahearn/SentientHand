@@ -188,7 +188,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003SemiBackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004SemiBackSheet:Class;
 		//// BACK
-		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackSheet:Class;
