@@ -140,6 +140,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_functional_m02.csv",mimeType="application/octet-stream")] private static const kFuncm02Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_m03.csv",mimeType="application/octet-stream")] private static const kFuncm03Sheet:Class;
 		[Embed("assets/level_csvs/mapCSV_functional_combo1.csv",mimeType="application/octet-stream")] private static const kFuncbComboSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_functional_grapple3.csv",mimeType="application/octet-stream")] private static const kFuncGrapple3Sheet:Class;
 		// COSMETIC TILES
 		[Embed("assets/level_creation/tiles_cosmetic_front.png")] public static const kTilesCosmFront:Class;
 		[Embed("assets/level_creation/tiles_cosmetic_mid.png")] public static const kTilesCosmMid:Class;
@@ -165,6 +166,8 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map13.csv",mimeType="application/octet-stream")] private static const kCosm013FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_m01_front.csv",mimeType="application/octet-stream")] private static const kCosmm01FrontSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_front_Map13.csv",mimeType="application/octet-stream")] private static const kCosmComboFrontSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_front_grapple3.csv",mimeType="application/octet-stream")] private static const kCosmGrapple3FrontSheet:Class;
+
 		//// MID
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002MidSheet:Class;
@@ -177,8 +180,6 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_grapple1.csv",mimeType="application/octet-stream")] private static const kCosm007MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_cannon2.csv",mimeType="application/octet-stream")] private static const kCosm008MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_grapple2.csv",mimeType="application/octet-stream")] private static const kCosm009MidSheet:Class;
-		//[Embed("assets/level_csvs/mapCSV_cosmetic_005_mid.csv",mimeType="application/octet-stream")] private static const kCosm005MidSheet:Class;
-		//[Embed("assets/level_csvs/mapCSV_cosmetic_006_mid.csv",mimeType="application/octet-stream")] private static const kCosm006MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_m01_mid.csv",mimeType="application/octet-stream")] private static const kCosmm01MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_Map13.csv",mimeType="application/octet-stream")] private static const kCosmComboMidSheet:Class;
 		//// Semi Back
@@ -187,7 +188,7 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003SemiBackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004SemiBackSheet:Class;
 		//// BACK
-		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_back_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial3.csv",mimeType="application/octet-stream")] private static const kCosm003BackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_back_tutorial4.csv",mimeType="application/octet-stream")] private static const kCosm004BackSheet:Class;
@@ -201,7 +202,6 @@ package
 
 		
 		// MUSIC
-		// MUSIC
 		[Embed("assets/audio/SentientHandTrackA.mp3")] private static const kMusicAFile:Class;
 		private static const kMusicA:FlxSound = new FlxSound().loadEmbedded(kMusicAFile,true);
 		[Embed("assets/audio/SentientHandTrackB.mp3")] private static const kMusicBFile:Class;
@@ -209,8 +209,8 @@ package
 		
 		[Embed("assets/audio/SentientHandTrackA_Rev5_Overlay.mp3")] private static const kMusicAOverlayFile:Class;
 		private static const kMusicAOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicAOverlayFile,true);
-		//[Embed("assets/SentientHandTrackA_Rev5.mp3")] private static const kMusicAMainFile:Class;
-		//private static const kMusicAMain:FlxSound = new FlxSound().loadEmbedded(kMusicAMainFile,true);
+		[Embed("assets/audio/ScrapheapTrackB_OverlayOnly.mp3")] private static const kMusicBOverlayFile:Class;
+		private static const kMusicBOverlay:FlxSound = new FlxSound().loadEmbedded(kMusicBOverlayFile,true);
 		
 		protected static var _num:uint = 0;
 		public static function get num():uint {
@@ -231,7 +231,22 @@ package
 		private static const kCSVKeySemiBack:String = "kCSVKeySemiBack";
 		private static const kCSVKeyMusic:String = "kCSVKeyMusic";
 		private static const kCSVKeyMusicOverlay:String = "kCSVKeyMusicOverlay";
+		
+		/**
+		 * An array containing dictionaries of level data
+		**/
 		private static const kLevels:Array = [
+			{
+				// GRAPPLE3
+				kCSVKeyFunc : kFuncGrapple3Sheet,
+				kCSVKeyFront : kCosmGrapple3FrontSheet,
+				kCSVKeyMid : null,
+				kCSVKeyBack : null,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm001SemiBackSheet,
+				kCSVKeyMusic : kMusicB,
+				kCSVKeyMusicOverlay : kMusicBOverlay
+			},
 			{
 				// TUTORIAL1
 				kCSVKeyFunc : kFunct01Sheet,
@@ -442,17 +457,6 @@ package
 				kCSVKeyMusicOverlay : kMusicAOverlay
 			},
 			];
-		
-		/*
-		private static const kFuncCsvs:Array = [kFunct01Sheet,kFunct02Sheet,kFunct02_5Sheet,kFunct03Sheet,kFunct04Sheet,kFunct05_Sheet,kFuncb01Sheet,kFuncb02Sheet,kFuncb03Sheet,kFuncb04Sheet,kFuncb05Sheet,kFuncbComboSheet,kFuncb08Sheet,kFuncb09Sheet,kFuncm01Sheet,kFuncm02Sheet,kFuncbComboSheet,kFunc006Sheet];
-		private static const kCosmCsvsFront:Array = [kCosm001FrontSheet,kCosm002FrontSheet,kCosm002_5FrontSheet,kCosm003FrontSheet,kCosm004FrontSheet,kCosm005_FrontSheet,kCosm005FrontSheet,kCosm006FrontSheet,kCosm007FrontSheet,kCosm008FrontSheet,kCosm009FrontSheet,kCosmComboFrontSheet,kCosm013FrontSheet,null,null,null,null,null];
-		private static const kCosmCsvsMid:Array = [kCosm001MidSheet,kCosm002MidSheet,kCosm002_5MidSheet,kCosm003MidSheet,kCosm004MidSheet,kCosm005_MidSheet,kCosm005MidSheet,kCosm006MidSheet,kCosm007MidSheet,kCosm008MidSheet,kCosm009MidSheet,kCosmComboMidSheet,null,null,null,null,null,null];
-		private static const kCosmCsvsBack:Array = [kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet,kCosm001BackSheet];
-		private static const kCosmCsvsBackBack:Array = [kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet,kCosm001BackBackSheet];
-		private static const kCosmCsvsSemiBack:Array = [kCosm001SemiBackSheet,kCosm002SemiBackSheet,null,kCosm003SemiBackSheet,kCosm004SemiBackSheet,null,null,null,null,null,null,null,null,null,null,null,null,null];
-		private static const kMusic:Array = [kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA,kMusicA];
-		private static const kMusicOverlay:Array = [kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay,kMusicAOverlay];
-		*/
 		
 		// GET CSVS
 		private static function get currentFuncCSV():Class {
