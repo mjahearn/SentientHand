@@ -6,7 +6,7 @@ package
 	{	
 		public var camera:FlxButton;
 		public var range:FlxButton;
-		public var jump:FlxButton;
+		public var deleteButton:FlxButton;
 		public var camRate:FlxText;
 		
 		override public function create():void {
@@ -61,13 +61,10 @@ package
 			add(rangeText);
 			add(range);
 			
-			var jumpText:FlxText = new FlxText(50, 210, 400, "Jump Button:");
-			jump = new FlxButton(100, 240, "Up Arrow", changeJump);
-			if (Registry.jumpSpace) {
-				jump.label.text = "Spacebar";
-			}
-			add(jumpText);
-			add(jump);
+			var deleteText:FlxText = new FlxText(50, 210, 400, "Click this before testing a\nspecific level:");
+			deleteButton = new FlxButton(100, 240, "Delete Cookies", deleteCookies);
+			add(deleteText);
+			add(deleteButton);
 			
 			var camRateText:FlxText = new FlxText(50, 290, 400, "Speed of camera rotation:\n(bigger numbers are slower;\npress up and down arrow\nkeys to change)");
 			camRate = new FlxText(50, 350, 400, Registry.cameraTurnRate.toString());
@@ -122,13 +119,9 @@ package
 			}
 		}
 		
-		public function changeJump():void {
-			Registry.jumpSpace = !Registry.jumpSpace;
-			if (Registry.jumpSpace) {
-				jump.label.text = "Spacebar";
-			} else {
-				jump.label.text = "Up Arrow";
-			}
+		public function deleteCookies():void {
+			Registry.saveGame.bind("ICFTSH");
+			Registry.clearSave();
 		}
 	}
 }

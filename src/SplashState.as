@@ -10,10 +10,13 @@ package
 		private var prompt:FlxText;
 		private var promptTimer:Number;
 		private var promptDir:int;
+		private var firstTimePlaying:Boolean;
 		private const kPromptPeriod:Number = 5;
 		private const kFadeTime:Number = 1.22; // how long it will take to transition into the game
 		
 		override public function create():void {
+			bindSave();
+
 			FlxG.camera.x = -95;
 			FlxG.camera.y = -95;
 			addBkg();
@@ -22,6 +25,11 @@ package
 			addMusic();
 		}
 		
+		private function bindSave():void {
+			Registry.saveGame.bind("ICFTSH");
+			firstTimePlaying = (Registry.saveGame.data.level == null);
+		}
+
 		private function addBkg():void {
 			//var $bkg:FlxSprite = new FlxSprite(0,0,Registry.kSplashDetailed);
 			//$bkg.scale.x = 0.5;
@@ -42,7 +50,7 @@ package
 		}
 		
 		private function addPrompt():void {
-			prompt = new FlxText(0,3*FlxG.height/5,FlxG.width,"press any key");
+			prompt = new FlxText(0,3*FlxG.height/5,FlxG.width,firstTimePlaying?"press enter":"press enter to continue\npress esc to start new game");
 			prompt.alignment = "center";
 			prompt.size = 22;
 			prompt.font = "Capture it";
@@ -74,7 +82,14 @@ package
 		}
 		
 		private function updateControls():void {
-			if (FlxG.keys.any()) {
+			if (FlxG.keys.ENTER) {
+				if (!firstTimePlaying) {
+					Registry.loadSave();
+				}
+				begin();
+			}
+			if (FlxG.keys.ESCAPE && !firstTimePlaying) {
+				Registry.resetSave();
 				begin();
 			}
 		}

@@ -54,27 +54,35 @@ package
 		}
 		private function updateShow():void {
 			if (!isShowing) {return;}
+			FlxG.log("show1 " + frame);
 			frame ++;
 			if (frame >= kAnimShowFrameEnd) {
 				isShowing = false;
 				idle();
 			}
+			FlxG.log("show2 " + frame);
 		}
 		
 		public function hide():void {
 			//visible = false; return;
 			//if (!visible) {return;}
 			if (isHiding || !visible) {return;}
+			isShowing = false;
 			isHiding = true;
+			FlxG.log("hideB " + frame);
 			frame = kAnimHideFrameStart;
+			FlxG.log("hideA " + frame);
 		}
 		private function updateHide():void {
 			if (!isHiding) {return;}
+			FlxG.log("hide1 " + frame);
 			frame --;
 			if (frame <= kAnimHideFrameEnd) {
 				isHiding = false;
 				visible = false;
+				FlxG.log("got here");
 			}
+			FlxG.log("hide2 " + frame);
 		}
 		
 		override public function update():void {

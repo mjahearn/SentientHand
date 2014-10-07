@@ -21,6 +21,39 @@ package {
 		public static var neverAimedBodyOrCannon:Boolean = true;
 		public static var neverCrawled:Boolean = true;
 		public static var neverJumped:Boolean = true;
+
+		public static var saveGame:FlxSave = new FlxSave();
+		public static function clearSave():void {
+			saveGame.erase();
+			saveGame.bind("ICFTSH");
+		}
+		public static function resetSave():void {
+			clearSave();
+			saveGame.data.level = 0;
+			saveGame.data.neverEnteredBodyOrCannon = true;
+			saveGame.data.neverFiredBodyOrCannon = true;
+			saveGame.data.neverAimedBodyOrCannon = true;
+			saveGame.data.neverCrawled = true;
+			saveGame.data.neverJumped = true;
+			saveGame.flush();
+		}
+		public static function writeSave():void {
+			saveGame.data.level = RegistryLevels.num;
+			saveGame.data.neverEnteredBodyOrCannon = neverEnteredBodyOrCannon;
+			saveGame.data.neverFiredBodyOrCannon = neverFiredBodyOrCannon;
+			saveGame.data.neverAimedBodyOrCannon = neverAimedBodyOrCannon;
+			saveGame.data.neverCrawled = neverCrawled;
+			saveGame.data.neverJumped = neverJumped;
+			saveGame.flush();
+		}
+		public static function loadSave():void {
+			RegistryLevels.num = saveGame.data.level;
+			neverEnteredBodyOrCannon = saveGame.data.neverEnteredBodyOrCannon;
+			neverFiredBodyOrCannon = saveGame.data.neverFiredBodyOrCannon;
+			neverAimedBodyOrCannon = saveGame.data.neverAimedBodyOrCannon;
+			neverCrawled = saveGame.data.neverCrawled;
+			neverJumped = saveGame.data.neverJumped;
+		}
 		
 		[Embed("assets/sprites/spr_hand.png")] public static const kHandSheet:Class;
 		[Embed("assets/sprites/spr_keyboard_key.png")] public static const kKeyboardKeySheet:Class;

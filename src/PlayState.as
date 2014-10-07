@@ -161,7 +161,7 @@ package {
 		private var musOverlay:FlxSound;
 		
 		override public function create():void {
-			
+			Registry.writeSave();
 			current = this;
 			setUpAudio();
 			
@@ -296,7 +296,6 @@ package {
 			var $grate:SprGrate = new SprGrate(SprGrate.kBroken0,hand.x,hand.y+hand.height*2);
 			add($grate);*/
 			// TEST EXIT SIGN
-			
 		}
 		
 		private function stupidCollisionThing():void {
