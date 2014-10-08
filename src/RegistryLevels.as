@@ -435,17 +435,6 @@ package
 				kCSVKeyMusicOverlay : kMusicAOverlay
 			},
 			{
-				// COMBO1
-				kCSVKeyFunc : kFuncbComboSheet,
-				kCSVKeyFront : null,
-				kCSVKeyMid : null,
-				kCSVKeyBack : kCosm001BackSheet,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : null,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
-			{
 				// 006
 				kCSVKeyFunc : kFunc006Sheet,
 				kCSVKeyFront : null,
