@@ -182,6 +182,8 @@ package
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_grapple2.csv",mimeType="application/octet-stream")] private static const kCosm009MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_m01_mid.csv",mimeType="application/octet-stream")] private static const kCosmm01MidSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_Map13.csv",mimeType="application/octet-stream")] private static const kCosmComboMidSheet:Class;
+		[Embed("assets/level_csvs/mapCSV_cosmetic_mid_grapple3.csv",mimeType="application/octet-stream")] private static const kCosmGrapple3MidSheet:Class;
+
 		//// Semi Back
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial1.csv",mimeType="application/octet-stream")] private static const kCosm001SemiBackSheet:Class;
 		[Embed("assets/level_csvs/mapCSV_cosmetic_semi_back_tutorial2.csv",mimeType="application/octet-stream")] private static const kCosm002SemiBackSheet:Class;
@@ -236,17 +238,6 @@ package
 		 * An array containing dictionaries of level data
 		**/
 		private static const kLevels:Array = [
-			{
-				// GRAPPLE3
-				kCSVKeyFunc : kFuncGrapple3Sheet,
-				kCSVKeyFront : kCosmGrapple3FrontSheet,
-				kCSVKeyMid : null,
-				kCSVKeyBack : null,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : kCosm001SemiBackSheet,
-				kCSVKeyMusic : kMusicB,
-				kCSVKeyMusicOverlay : kMusicBOverlay
-			},
 			{
 				// TUTORIAL1
 				kCSVKeyFunc : kFunct01Sheet,
@@ -369,32 +360,21 @@ package
 				kCSVKeyMusicOverlay : kMusicAOverlay
 			},
 			{
+				// GRAPPLE3
+				kCSVKeyFunc : kFuncGrapple3Sheet,
+				kCSVKeyFront : kCosmGrapple3FrontSheet,
+				kCSVKeyMid : kCosmGrapple3MidSheet,
+				kCSVKeyBack : null,
+				kCSVKeyBackBack : kCosm001BackBackSheet,
+				kCSVKeySemiBack : kCosm001SemiBackSheet,
+				kCSVKeyMusic : kMusicB,
+				kCSVKeyMusicOverlay : kMusicBOverlay
+			},
+			{
 				// COMBO1
 				kCSVKeyFunc : kFuncbComboSheet,
 				kCSVKeyFront : kCosmComboFrontSheet,
 				kCSVKeyMid : kCosmComboMidSheet,
-				kCSVKeyBack : kCosm001BackSheet,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : null,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
-			{
-				// MAP13
-				kCSVKeyFunc : kFuncb08Sheet,
-				kCSVKeyFront : kCosm013FrontSheet,
-				kCSVKeyMid : null,
-				kCSVKeyBack : kCosm001BackSheet,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : null,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
-			{
-				// MAP14
-				kCSVKeyFunc : kFuncb09Sheet,
-				kCSVKeyFront : null,
-				kCSVKeyMid : null,
 				kCSVKeyBack : kCosm001BackSheet,
 				kCSVKeyBackBack : kCosm001BackBackSheet,
 				kCSVKeySemiBack : null,
@@ -426,28 +406,6 @@ package
 			{
 				// M03
 				kCSVKeyFunc : kFuncm03Sheet,
-				kCSVKeyFront : null,
-				kCSVKeyMid : null,
-				kCSVKeyBack : kCosm001BackSheet,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : null,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
-			{
-				// COMBO1
-				kCSVKeyFunc : kFuncbComboSheet,
-				kCSVKeyFront : null,
-				kCSVKeyMid : null,
-				kCSVKeyBack : kCosm001BackSheet,
-				kCSVKeyBackBack : kCosm001BackBackSheet,
-				kCSVKeySemiBack : null,
-				kCSVKeyMusic : kMusicA,
-				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
-			{
-				// 006
-				kCSVKeyFunc : kFunc006Sheet,
 				kCSVKeyFront : null,
 				kCSVKeyMid : null,
 				kCSVKeyBack : kCosm001BackSheet,

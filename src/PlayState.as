@@ -1476,7 +1476,7 @@ package {
 			if (isTransitioningToNextLevel) {return;}
 			isTransitioningToNextLevel = true;
 			
-			
+			/*
 			// for testing
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
@@ -1486,16 +1486,16 @@ package {
 				var $state:FlxState = (RegistryLevels.num > 11) ? new EndState : new PlayState;
 				if (RegistryLevels.num > 11) {RegistryLevels.num = 0;}
 				FlxG.switchState($state);
-			};
+			};*/
 			
-			/*
+			
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
 			// this'll fire at the end of the fade
 			var $exitFunction:Function = function():void {
 				stopAllSounds();
 				FlxG.switchState(new PlayState);
-			};*/
+			};
 			// the fade just makes things look cooler
 			FlxG.fade(0xff000000,1,$exitFunction);
 		}
