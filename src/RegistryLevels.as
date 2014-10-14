@@ -2,6 +2,7 @@ package
 {
 	import org.flixel.FlxSound;
 	import org.flixel.FlxTilemap;
+	import org.flixel.FlxG;
 	
 	public class RegistryLevels
 	{
@@ -367,7 +368,7 @@ package
 				kCSVKeyBack : null,
 				kCSVKeyBackBack : kCosm001BackBackSheet,
 				kCSVKeySemiBack : kCosm001SemiBackSheet,
-				kCSVKeyMusic : kMusicB,
+				kCSVKeyMusic : kMusicA,
 				kCSVKeyMusicOverlay : kMusicBOverlay
 			},
 			{
@@ -380,7 +381,7 @@ package
 				kCSVKeySemiBack : null,
 				kCSVKeyMusic : kMusicA,
 				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
+			}/*,
 			{
 				// M01
 				kCSVKeyFunc : kFuncm01Sheet,
@@ -413,7 +414,7 @@ package
 				kCSVKeySemiBack : null,
 				kCSVKeyMusic : kMusicA,
 				kCSVKeyMusicOverlay : kMusicAOverlay
-			},
+			},*/
 			];
 		
 		// GET CSVS

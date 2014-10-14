@@ -14,17 +14,21 @@ package
 		public var delta:Number = 0.022;
 		
 		override public function create():void {
-			text = new FlxText(0,FlxG.height/4.0,FlxG.width,"FREEDOM.");
+			FlxG.camera.x = -95;
+			//FlxG.camera.y = -95;
+
+			text = new FlxText(0,FlxG.height/4.0,FlxG.width,"THE END");
 			text.alpha = 0;
 			text.size = 22;
 			text.font = "Capture it";
 			text.alignment = "center";
 			add(text);
 			
-			var $demoText:FlxText = new FlxText(0,FlxG.height*0.55,FlxG.width,"[The Demo has ended; the game will restart]");
+			var $demoText:FlxText = new FlxText(0,FlxG.height*0.55,FlxG.width,"press enter to restart");
 			
 			$demoText.alignment = "center";
-			$demoText.size = 10;
+			$demoText.font = "Capture it";
+			$demoText.size = 22;
 			add($demoText);
 		}
 		
@@ -48,7 +52,7 @@ package
 				text.y = FlxG.height/2
 			}*/
 			
-			if (timer > 4.22 || FlxG.keys.justPressed("SPACE")) {
+			if (/*timer > 4.22 || */FlxG.keys.justPressed("ENTER")) {
 				var $exitFunction:Function = function():void {
 					FlxG.switchState(new SplashState);
 				};
@@ -56,11 +60,11 @@ package
 			}
 			
 			
-			if (FlxG.keys.RIGHT || FlxG.keys.LEFT) {
+			/*if (FlxG.keys.RIGHT || FlxG.keys.LEFT) {
 				dirtFootstepsSound.play();
 			} else {
 				dirtFootstepsSound.stop();
-			}
+			}*/
 			
 			
 		}

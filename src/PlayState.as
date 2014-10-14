@@ -313,7 +313,6 @@ package {
 			levelFunctional = RegistryLevels.lvlFunc();
 			// this section used to deal with all the collision shit- but then tile-based callbacks were removed
 			// remember when we had wood? heh...
-			
 			var $point:FlxPoint;
 			// HINT POINTS L/R
 			hintPointsLeftRight = new FlxGroup();
@@ -369,7 +368,6 @@ package {
 			var $preMusOverlay:FlxSound = RegistryLevels.previousMusicOverlay;
 			
 			musOverlay = $curMusOverlay;
-			
 			if ($preMus && $curMus != $preMus) {
 				add($preMus);
 				add($preMusOverlay);
@@ -1476,25 +1474,17 @@ package {
 			if (isTransitioningToNextLevel) {return;}
 			isTransitioningToNextLevel = true;
 			
-			/*
-			// for testing
 			// the level num must be incremented so that the switch state will choose the next level
 			RegistryLevels.num++;
 			// this'll fire at the end of the fade
 			var $exitFunction:Function = function():void {
 				stopAllSounds();
-				var $state:FlxState = (RegistryLevels.num > 11) ? new EndState : new PlayState;
-				if (RegistryLevels.num > 11) {RegistryLevels.num = 0;}
+				var $state:FlxState = (RegistryLevels.num >= RegistryLevels.numLevels) ? new EndState : new PlayState;
+				if (RegistryLevels.num >= RegistryLevels.numLevels) {
+					RegistryLevels.num = 0;
+					Registry.clearSave();
+				}
 				FlxG.switchState($state);
-			};*/
-			
-			
-			// the level num must be incremented so that the switch state will choose the next level
-			RegistryLevels.num++;
-			// this'll fire at the end of the fade
-			var $exitFunction:Function = function():void {
-				stopAllSounds();
-				FlxG.switchState(new PlayState);
 			};
 			// the fade just makes things look cooler
 			FlxG.fade(0xff000000,1,$exitFunction);
@@ -1503,6 +1493,7 @@ package {
 		private function stopAllSounds():void {
 			ambientGearsSound.stop();
 			hand.stopElectricityEffects(); //not just sound, though
+			
 		}
 		
 		private function groupFromSpawn(_spawn:Array,_class:Class,_map:FlxTilemap):FlxGroup {
